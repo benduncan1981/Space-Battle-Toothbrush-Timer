@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>PLAQUE INVADERS — OPERATION SAUCER FALL</title>
+<title>PLAQUE INVADERS — OPERATION SAUCER FALL (NEW BUILD)</title>
 <style>
 :root{
   --bg-top:#00020a; --bg-bottom:#001026;
@@ -20,7 +20,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .card{width:100%;max-width:920px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
 .title{font-weight:900;font-size:1.8rem;color:var(--accent-gold);text-shadow:0 0 12px rgba(255,210,74,0.14);letter-spacing:-0.5px}
 .lead{font-size:0.9rem;color:#BFEFFF;opacity:0.95;margin-top:6px}
-.row{display:flex;gap:10px}
 .input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#E8FBFF;font-weight:800;text-align:center}
 .statbar{display:flex;gap:8px;margin:12px 0}
 .stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
@@ -69,7 +68,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
       </div>
       <div style="text-align:right;min-width:140px">
         <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">PILOT: <span id="pilotNameDisplay">BEN</span></div>
-        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.0</div>
+        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.1</div>
       </div>
     </div>
 
@@ -134,7 +133,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
 
   <div class="mission-overlay">
-    <div class="center-count" id="countdown" style="display:none">5</div>
+    <div class="center-count" id="countdown" style="display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;z-index:80">5</div>
     <div class="controls">
       <button id="pauseBtn" class="control-btn" aria-label="Pause">PAUSE</button>
       <button id="resetBtn" class="control-btn" style="background:#ff6b6b" aria-label="Abort">ABORT</button>
@@ -205,11 +204,11 @@ const CONFIG = {
   SPAWN_RATES: { phase1: 0.9, phase2: 0.7, phase3: 0.55, phase4: 0.45 },
   BOSS_HP: 1.0,
   REWARD_BASE: 10,
-  STORAGE_KEY: "plaque_invaders_state_v1",
-  ADMIN_KEY: "plaque_invaders_admin_pin_v1"
+  STORAGE_KEY: "plaque_invaders_state_v2",
+  ADMIN_KEY: "plaque_invaders_admin_pin_v2"
 };
 
-/* Robust state load/save */
+/* State persistence */
 const defaultState = {
   name: "BEN",
   crystals: 0,
@@ -321,6 +320,7 @@ let rafId = null;
 let running = false;
 let paused = false;
 let countdown = 5;
+let countdownInterval = null; // global so abort can clear
 let missionTime = CONFIG.TOTAL_TIME;
 let spawnTimer = 0;
 let spawnInterval = CONFIG.SPAWN_RATES.phase1;
@@ -861,22 +861,49 @@ function markCompletedToday(){
   saveState();
 }
 
+/* START COUNTDOWN and BEGIN MISSION (NEW: show mission screen immediately, disable start, clear interval on abort) */
 function startCountdown(){
   if(!canPlayToday()){ alert("MISSION ALREADY COMPLETED TODAY. TRY AGAIN TOMORROW."); return; }
+
+  // switch UI immediately so menu disappears
+  showScreen("mission");
+
+  // disable start to prevent double-start
+  startBtn.disabled = true;
+
+  // ensure audio unlocked
   try{ ensureAudio(); }catch(e){}
+
+  // show countdown on mission screen
   countdown = 5;
-  countdownEl.textContent = countdown; countdownEl.style.display = "block";
+  countdownEl.textContent = countdown;
+  countdownEl.style.display = "block";
+
   playBeepSequence(5);
-  let cInt = setInterval(()=>{
+
+  // clear any existing interval just in case
+  if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
+  countdownInterval = setInterval(()=>{
     countdown--;
-    if(countdown<=0){ clearInterval(cInt); countdownEl.style.display="none"; beginMission(); }
-    else { countdownEl.textContent = countdown; beep(); }
-  },1000);
+    if(countdown <= 0){
+      clearInterval(countdownInterval); countdownInterval = null;
+      countdownEl.style.display = "none";
+      beginMission();
+    } else {
+      countdownEl.textContent = countdown;
+      beep();
+    }
+  }, 1000);
 }
 function playBeepSequence(n){ for(let i=0;i<n;i++) setTimeout(()=>beep(), i*900); }
 
 function beginMission(){
+  // ensure mission screen visible
+  showScreen("mission");
+
   running = true; paused = false; cinematicSlow = 1.0;
+
   missionTime = CONFIG.TOTAL_TIME; spawnTimer = 0; enemies.length = 0; lasers.length = 0; enemyBullets.length = 0; boss = null; bossActive = false; rewardForMission = 0; hyperspaceTick = -1;
   hudName.textContent = state.name || defaultState.name;
   hudCrystals.textContent = state.crystals;
@@ -886,6 +913,7 @@ function beginMission(){
   if(!rafId) rafId = requestAnimationFrame(loop);
 }
 
+/* Finish mission */
 function finishMission(){
   running = false; paused = false;
   markCompletedToday();
@@ -900,6 +928,8 @@ function finishMission(){
   saveState();
   rewardText.textContent = `+${rewardForMission} CRYSTALS`;
   rewardDetail.textContent = `BASE ${base}${weekly?(" • WEEKLY +"+weekly):""}`;
+  // re-enable start button for next day
+  startBtn.disabled = false;
   showScreen("reward");
 }
 
@@ -955,7 +985,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
   bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
   bindClick(shopReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(CONFIG.STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); }});
   bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
-  bindClick(resetBtn, ()=>{ if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){ running=false; paused=false; showScreen("title"); refreshTitleUI(); }});
+  bindClick(resetBtn, ()=>{ // abort handler clears countdown and stops mission
+    if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){
+      // clear countdown if running
+      if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; countdownEl.style.display = "none"; }
+      running=false; paused=false;
+      // re-enable start button
+      startBtn.disabled = false;
+      showScreen("title"); refreshTitleUI();
+    }
+  });
   bindClick(rewardBox, ()=>{ openReward(); });
   bindClick(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleUI(); });
 
