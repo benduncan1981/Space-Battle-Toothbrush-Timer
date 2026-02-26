@@ -3,200 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Plaque Invaders: Crystal Sector – Ultra Edition</title>
+    <title>Plaque Invaders: Ultra Stable Edition</title>
     <style>
-        :root { --gold: #ffcc00; --rebel: #ff3333; --empire: #33ff33; --sky: #00f2ff; --bg: #000205; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; outline: none; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--bg); font-family: 'Arial Black', sans-serif; color: white; touch-action: none; }
-        
-        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%); z-index: 10; height: 100dvh; touch-action: none; }
+        :root { --gold: #ffcc00; --rebel: #ff3333; --blue: #00f2ff; --bg: #000; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; color: #fff; touch-action: none; }
+        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 10; height: 100svh; background: #000; }
         .screen.active { display: flex; }
-
-        h1 { font-size: 2.5rem; margin: 0; color: var(--gold); text-shadow: 0 0 20px var(--gold); font-style: italic; text-transform: uppercase; letter-spacing: -2px; }
-
-        /* FIX: High-priority button styles for Safari/Edge touch */
-        .btn-ui { 
-            background: #fff; border: none; color: #000; padding: 22px; font-size: 1.1rem; border-radius: 50px; font-weight: 900; 
-            text-transform: uppercase; width: 100%; max-width: 280px; box-shadow: 0 6px 0 #999; margin: 12px 0; 
-            display: block; cursor: pointer; pointer-events: auto !important; position: relative; z-index: 5000; touch-action: manipulation;
-        }
-        .btn-ui:active { transform: translateY(4px); box-shadow: 0 2px 0 #666; background: var(--gold); }
-        .btn-alt { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; box-shadow: none; }
-
-        #hud { position: absolute; top: 50px; left: 0; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 50; pointer-events: none; }
-        #timer { font-size: 2.8rem; font-weight: 900; color: #fff; font-family: monospace; }
-        
-        .game-controls { position: absolute; bottom: 40px; left: 0; width: 100%; padding: 0 25px; display: flex; justify-content: space-between; z-index: 5000; pointer-events: none; }
-        .ctrl-node { width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.25); border: 2px solid #fff; color: #fff; font-weight: 900; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; pointer-events: auto !important; backdrop-filter: blur(5px); touch-action: manipulation; cursor: pointer; }
-
-        #boss-hud { position: absolute; top: 120px; left: 50%; transform: translateX(-50%); width: 75%; display: none; z-index: 50; }
-        .hp-track { width: 100%; height: 12px; background: #300; border-radius: 6px; border: 2px solid #f00; overflow: hidden; margin-top: 5px; }
-        #hp-current { width: 100%; height: 100%; background: #f00; }
-
-        canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-        #shop-scroll { width: 100%; flex-grow: 1; overflow-y: auto; margin: 20px 0; -webkit-overflow-scrolling: touch; }
+        .btn { background: #fff; border: none; color: #000; padding: 20px 40px; font-size: 1.2rem; border-radius: 50px; font-weight: 900; text-transform: uppercase; margin: 10px; cursor: pointer; width: 260px; box-shadow: 0 5px 0 #999; position: relative; z-index: 500; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #666; }
+        #hud { position: absolute; top: 40px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; pointer-events: none; z-index: 50; }
+        #timer { font-size: 2.5rem; font-weight: 900; font-family: monospace; }
+        #boss-bar { position: absolute; top: 100px; width: 70%; height: 10px; background: #300; border: 1px solid red; display: none; z-index: 50; }
+        #boss-hp { width: 100%; height: 100%; background: red; transition: width 0.1s; }
+        canvas { position: absolute; inset: 0; z-index: 1; image-rendering: pixelated; }
     </style>
 </head>
 <body>
-
     <div id="scr-menu" class="screen active">
-        <h1>PLAQUE<br>INVADERS</h1>
-        <div style="margin: 15px 0; color: var(--sky);">💎 <span id="stat-c">0</span> | STREAK: <span id="stat-s">0</span></div>
-        <div class="btn-ui" id="trigger-start">ENGAGE MISSION</div>
-        <div class="btn-ui btn-alt" id="trigger-shop">HANGAR</div>
+        <h1 style="color:var(--gold); font-size:2.5rem; margin:0;">PLAQUE INVADERS</h1>
+        <p style="color:var(--blue)">CRYSTALS: <span id="val-c">0</span> | STREAK: <span id="val-s">0</span></p>
+        <div class="btn" id="btn-start">START MISSION</div>
+        <div class="btn" id="btn-shop" style="background:none; color:#fff; border:1px solid #fff; box-shadow:none;">SHOP</div>
     </div>
-
     <div id="scr-game" class="screen" style="background:transparent; padding:0;">
-        <div id="hud">
-            <div id="timer">02:00</div>
-            <div style="color:var(--gold); font-weight:900;">💎 <span id="game-c">0</span></div>
-        </div>
-        <div id="boss-hud">
-            <div style="color:red; font-size:0.7rem; font-weight:900;">CORE TARGET: DEATH STAR</div>
-            <div class="hp-track"><div id="hp-current"></div></div>
-        </div>
-        <div class="game-controls">
-            <div class="ctrl-node" id="trigger-pause">PAUSE</div>
-            <div class="ctrl-node" id="trigger-quit" style="border-color:var(--rebel)">QUIT</div>
-        </div>
-        <canvas id="stage"></canvas>
+        <div id="hud"><div id="timer">02:00</div><div id="g-c" style="color:var(--gold)">0 💎</div></div>
+        <div id="boss-bar"><div id="boss-hp"></div></div>
+        <canvas id="cvs"></canvas>
     </div>
-
-    <div id="scr-hangar" class="screen">
-        <h1>HANGAR</h1>
-        <div id="shop-scroll"></div>
-        <div class="btn-ui" id="trigger-hangar-back">RETURN</div>
-    </div>
-
     <div id="scr-loot" class="screen">
-        <h1>SECTOR CLEAR</h1>
-        <div id="reward-crate" style="font-size:7rem; margin:30px 0; filter: drop-shadow(0 0 20px gold); cursor:pointer;">📦</div>
-        <div id="loot-label">Tap to claim salvage!</div>
-        <div class="btn-ui" id="trigger-done" style="display:none">CONTINUE</div>
+        <h1 style="color:var(--gold)">MISSION COMPLETE</h1>
+        <div id="box" style="font-size:5rem; margin:20px; cursor:pointer;">📦</div>
+        <p id="loot-txt">Tap the box!</p>
+        <div class="btn" id="btn-done" style="display:none">CONTINUE</div>
     </div>
 
 <script>
-const gState = { crystals: 0, streak: 0, active: false, paused: false, time: 120, selected: "ship_xwing", owned: ["ship_xwing"] };
-const SHIPS = [
-    { id: "ship_xwing", name: "Red 5 X-Wing", cost: 0, color: "#fff", laser: "#ff3333" },
-    { id: "ship_falcon", name: "Millennium", cost: 200, color: "#ccc", laser: "#00f2ff" }
-];
+const state = { crys: 0, streak: 0, active: false, time: 120, hp: 100 };
+const cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d', { alpha: false });
+let ents = [], stars = [], boss = null, frame = 0, lastS = 0, lastF = 0;
+let pilot = { x: 0, tx: 0, mt: 0 };
 
-const canvas = document.getElementById('stage'), ctx = canvas.getContext('2d');
-let entities = [], stars = [], boss = null, lastFire = 0, lastSpawn = 0, frameId = 0;
-let pilot = { x: 0, targetX: 0, moveTime: 0 };
+const Sfx = {
+    ctx: null,
+    play(f, t, d, v) {
+        if(!this.ctx) return;
+        try {
+            const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, this.ctx.currentTime);
+            g.gain.setValueAtTime(v, this.ctx.currentTime);
+            g.gain.linearRampToValueAtTime(0, this.ctx.currentTime + d);
+            o.connect(g); g.connect(this.ctx.destination);
+            o.start(); o.stop(this.ctx.currentTime + d);
+        } catch(e) {}
+    },
+    boot() { 
+        if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+        if(this.ctx.state === 'suspended') this.ctx.resume(); 
+    }
+};
 
-const AudioFX = (() => {
-    let audioCtx = null;
-    const play = (f,t,d,v,r=0) => { if(!audioCtx)return; const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f,audioCtx.currentTime); if(r)o.frequency.exponentialRampToValueAtTime(r,audioCtx.currentTime+d); g.gain.setValueAtTime(v,audioCtx.currentTime); g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+d); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+d); };
-    return {
-        unlock: () => { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); },
-        laser: () => play(800,'sawtooth',0.1,0.03,100),
-        boom: () => play(100,'triangle',0.5,0.1,20),
-        win: () => [523, 659, 783, 1046].forEach((f,i)=>setTimeout(()=>play(f,'sine',0.4,0.05),i*150))
-    };
-})();
-
-/** FIX: Universal Touch/Click Handler for Safari & Edge **/
-function bind(id, action) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const safeExecute = (e) => {
-        if (e) { e.preventDefault(); e.stopPropagation(); }
-        AudioFX.unlock();
-        action();
-    };
-    el.addEventListener('touchstart', safeExecute, { passive: false });
-    el.addEventListener('click', (e) => { if (e.pointerType !== 'touch') safeExecute(e); });
+function resize() {
+    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+    pilot.x = pilot.tx = cvs.width / 2;
+    stars = [];
+    for(let i=0; i<60; i++) stars.push({x: Math.random()*cvs.width, y: Math.random()*cvs.height, s: Math.random()*3+1});
 }
-
-function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; pilot.x = pilot.targetX = canvas.width / 2; }
-window.addEventListener('resize', resize); resize();
-
-function spawn() {
-    const elap = 120 - gState.time;
-    if(elap > 90) return;
-    const big = elap > 45;
-    entities.push({ type: big?'d':'t', x: Math.random()*(canvas.width-80)+40, y:-100, w:big?110:40, h:big?160:30, hp:big?18:1, speed:big?1.3:5, f:0 });
-}
+window.onresize = resize; resize();
 
 function loop(t) {
-    if(!gState.active || gState.paused) return;
-    ctx.fillStyle = "#000205"; ctx.fillRect(0,0,canvas.width,canvas.height);
-
-    stars.forEach(s => { s.y += s.z * 2.5; if(s.y > canvas.height) s.y = 0; ctx.fillStyle=`rgba(255,255,255,${s.z/4})`; ctx.fillRect(s.x,s.y,s.z/2,s.z/2); });
+    if(!state.active) return;
     
-    gState.time -= 1/60;
-    document.getElementById('timer').innerText = `${Math.floor(gState.time/60)}:${Math.floor(gState.time%60).toString().padStart(2,'0')}`;
+    // Low-cost background clear
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, cvs.width, cvs.height);
 
-    if (t > pilot.moveTime) { pilot.targetX = 60 + Math.random() * (canvas.width - 120); pilot.moveTime = t + 600 + Math.random() * 1000; }
-    pilot.x += (pilot.targetX - pilot.x) * 0.05;
+    // Optimized Stars
+    ctx.fillStyle = "#444";
+    stars.forEach(s => {
+        s.y += s.s * 2; if(s.y > cvs.height) s.y = 0;
+        ctx.fillRect(s.x, s.y, 1, 1);
+    });
 
-    if(t - lastSpawn > (gState.time > 90 ? 800 : 1600)) { spawn(); lastSpawn = t; }
-    if(t - lastFire > 200) { entities.push({type:'l', x:pilot.x, y:canvas.height-110, speed:-16}); AudioFX.laser(); lastFire = t; }
+    state.time -= 1/60;
+    if(state.time <= 0) return win();
+    document.getElementById('timer').innerText = `${Math.floor(state.time/60)}:${Math.floor(state.time%60).toString().padStart(2,'0')}`;
 
-    if(gState.time < 30 && !boss) { boss = { x:canvas.width/2, y:-200, r:160, hp:500, max:500, f:0 }; document.getElementById('boss-hud').style.display='block'; }
+    // Pilot Logic
+    if(t > pilot.mt) { pilot.tx = 50 + Math.random()*(cvs.width-100); pilot.mt = t + 1000; }
+    pilot.x += (pilot.tx - pilot.x) * 0.05;
+
+    // Entity Processing (Aggressive Cleanup)
+    if(t - lastS > 1500 && state.time > 30) {
+        ents.push({type:'e', x: Math.random()*cvs.width, y:-50, w:30, h:20, s:3, hp:1});
+        lastS = t;
+    }
+    if(t - lastF > 250) {
+        ents.push({type:'l', x: pilot.x, y: cvs.height-80, s:-12});
+        Sfx.play(800, 'square', 0.1, 0.02);
+        lastF = t;
+    }
+
+    if(state.time < 30 && !boss) {
+        boss = {x: cvs.width/2, y:-100, hp:300, max:300};
+        document.getElementById('boss-bar').style.display = 'block';
+    }
+
     if(boss) {
-        if(boss.y < 220) boss.y += 0.8; boss.x = canvas.width/2 + Math.sin(t/1200)*70;
-        ctx.fillStyle = boss.f > 0 ? '#fff' : '#444'; if(boss.f > 0) boss.f--;
-        ctx.beginPath(); ctx.arc(boss.x, boss.y, boss.r, 0, 7); ctx.fill();
-        ctx.fillStyle="#222"; ctx.beginPath(); ctx.arc(boss.x-50, boss.y-50, 45, 0, 7); ctx.fill();
-        document.getElementById('hp-current').style.width = (boss.hp/boss.max*100) + "%";
+        if(boss.y < 150) boss.y++;
+        boss.x = cvs.width/2 + Math.sin(t/1000)*50;
+        ctx.fillStyle = "#555"; ctx.beginPath(); ctx.arc(boss.x, boss.y, 60, 0, 7); ctx.fill();
+        document.getElementById('boss-hp').style.width = (boss.hp/boss.max*100) + "%";
     }
 
-    for(let i=entities.length-1; i>=0; i--) {
-        const e = entities[i]; e.y += e.speed || 0;
+    for(let i=ents.length-1; i>=0; i--) {
+        const e = ents[i]; e.y += e.s;
         if(e.type === 'l') {
-            const ship = SHIPS.find(s=>s.id===gState.selected);
-            ctx.fillStyle = ship.laser; ctx.fillRect(e.x-2, e.y, 4, 25);
-            if(boss && Math.hypot(e.x-boss.x, e.y-boss.y) < boss.r) { boss.hp--; boss.f=3; entities.splice(i,1); continue; }
-            entities.forEach((en, j) => {
-                if(en.type !== 'l' && Math.abs(e.x-en.x) < en.w/2 && Math.abs(e.y-en.y) < en.h/2) {
-                    en.hp--; en.f=3; entities.splice(i,1);
-                    if(en.hp<=0) { AudioFX.boom(); entities.splice(j,1); gState.crystals+=5; document.getElementById('game-c').innerText = gState.crystals; }
-                }
-            });
-        } else {
-            ctx.fillStyle = e.f > 0 ? "#fff" : (e.type==='t'?'#777':'#999');
-            if(e.type==='t') { ctx.fillRect(e.x-e.w/2, e.y-e.h/2, 4, e.h); ctx.fillRect(e.x+e.w/2-4, e.y-e.h/2, 4, e.h); ctx.fillRect(e.x-e.w/2, e.y-2, e.w, 4); }
-            else { ctx.beginPath(); ctx.moveTo(e.x, e.y+e.h/2); ctx.lineTo(e.x-e.w/2, e.y-e.h/2); ctx.lineTo(e.x+e.w/2, e.y-e.h/2); ctx.fill(); }
-            if(e.f > 0) e.f--;
-        }
-        if(e.y > canvas.height+200 || e.y < -300) entities.splice(i,1);
+            ctx.fillStyle = "red"; ctx.fillRect(e.x-1, e.y, 2, 15);
+            if(boss && Math.hypot(e.x-boss.x, e.y-boss.y) < 60) { boss.hp--; ents.splice(i,1); continue; }
+            ents.forEach((en, j) => {
+                if(en.type === 'e' && Math.hypot(e.x-en.x, e.y-en.y)  cvs.height + 100) ents.splice(i, 1);
     }
 
-    const ship = SHIPS.find(s=>s.id===gState.selected);
-    ctx.fillStyle = ship.color; ctx.fillRect(pilot.x-4, canvas.height-130, 8, 45); ctx.fillRect(pilot.x-30, canvas.height-95, 60, 4);
-    
-    if(gState.time > 0) frameId = requestAnimationFrame(loop); else finish();
+    // Hero
+    ctx.fillStyle = "#fff"; ctx.fillRect(pilot.x-2, cvs.height-100, 4, 30);
+    ctx.fillRect(pilot.x-20, cvs.height-80, 40, 4);
+
+    frame = requestAnimationFrame(loop);
 }
 
-function nav(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id==='scr-menu'){document.getElementById('stat-c').innerText=gState.crystals; document.getElementById('stat-s').innerText=gState.streak;} }
-function run() { gState.active=true; gState.paused=false; gState.time=120; entities=[]; boss=null; document.getElementById('game-c').innerText="0"; document.getElementById('boss-hud').style.display='none'; nav('scr-game'); stars=[]; for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, z:Math.random()*3+1}); loop(0); }
-function finish() { gState.active=false; cancelAnimationFrame(frameId); nav('scr-loot'); document.getElementById('trigger-done').style.display='none'; document.getElementById('loot-label').innerText="Tap to claim salvage!"; }
+function win() {
+    state.active = false; cancelAnimationFrame(frame);
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('scr-loot').classList.add('active');
+    document.getElementById('btn-done').style.display = 'none';
+}
 
-// BINDINGS (Hard-coded IDs to match UI)
-bind('trigger-start', run);
-bind('trigger-shop', () => {
-    const list = document.getElementById('shop-scroll'); list.innerHTML = "";
-    SHIPS.forEach(s => {
-        const d = document.createElement('div');
-        d.style = "background:rgba(255,255,255,0.1); margin:10px 0; padding:18px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;";
-        d.innerHTML = `<div style="text-align:left"><b>${s.name}</b><br><small>${gState.owned.includes(s.id)?'OWNED':s.cost+' 💎'}</small></div>`;
-        const b = document.createElement('div'); b.style="background:white; color:black; padding:10px; border-radius:8px; font-size:0.7rem; font-weight:900; cursor:pointer;";
-        b.innerText = gState.selected===s.id?"EQUIPPED":(gState.owned.includes(s.id)?"SELECT":"BUY");
-        b.onclick = () => { if(gState.owned.includes(s.id)){gState.selected=s.id;}else if(gState.crystals>=s.cost){gState.crystals-=s.cost; gState.owned.push(s.id); gState.selected=s.id;} localStorage.setItem('pi_vFinal', JSON.stringify(gState)); nav('scr-hangar'); };
-        d.appendChild(b); list.appendChild(d);
-    });
-    nav('scr-hangar');
+function bind(id, cb) {
+    const el = document.getElementById(id);
+    el.addEventListener('touchstart', (e) => { e.preventDefault(); Sfx.boot(); cb(); });
+    el.addEventListener('click', (e) => { if(!('ontouchstart' in window)) { Sfx.boot(); cb(); } });
+}
+
+bind('btn-start', () => {
+    state.active = true; state.time = 120; ents = []; boss = null;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('scr-game').classList.add('active');
+    requestAnimationFrame(loop);
 });
-bind('trigger-hangar-back', () => nav('scr-menu'));
-bind('trigger-pause', () => { gState.paused = !gState.paused; document.getElementById('trigger-pause').innerText = gState.paused?"RESUME":"PAUSE"; if(!gState.paused) loop(performance.now()); });
-bind('trigger-quit', () => { gState.active=false; nav('scr-menu'); });
-bind('reward-crate', () => { AudioFX.win(); gState.crystals+=150; gState.streak++; document.getElementById('loot-label').innerText="+150 CRYSTALS!"; document.getElementById('trigger-done').style.display='block'; localStorage.setItem('pi_vFinal', JSON.stringify(gState)); });
-bind('trigger-done', () => nav('scr-menu'));
 
-const data = localStorage.getItem('pi_vFinal'); if(data) Object.assign(gState, JSON.parse(data)); nav('scr-menu');
+bind('box', () => {
+    Sfx.play(400, 'sine', 0.5, 0.1);
+    state.crys += 100; state.streak++;
+    document.getElementById('loot-txt').innerText = "+100 CRYSTALS CLAIMED!";
+    document.getElementById('btn-done').style.display = 'block';
+    localStorage.setItem('pi_ultra_stable', JSON.stringify({c:state.crys, s:state.streak}));
+});
+
+bind('btn-done', () => location.reload());
+
+const save = localStorage.getItem('pi_ultra_stable');
+if(save) { const d = JSON.parse(save); state.crys = d.c; state.streak = d.s; }
+document.getElementById('val-c').innerText = state.crys;
+document.getElementById('val-s').innerText = state.streak;
 </script>
 </body>
 </html>
