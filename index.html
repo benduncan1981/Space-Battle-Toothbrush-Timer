@@ -1,117 +1,767 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Plaque Invaders: Crystal Sector – Ultra Edition</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Plaque Invaders: Crystal Sector — Premium</title>
 <style>
-:root { --gold:#ffcc00; --rebel:#ff3333; --empire:#33ff33; --sky:#00f2ff; --bg:#000; }
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
-body,html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:'Arial Black',sans-serif; touch-action:none; }
-.screen { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:radial-gradient(circle at center,#1a1a2e 0%,#000 100%); z-index:100; height:100svh; }
-.screen.active { display:flex; }
-h1 { font-size:2.5rem;margin:0;color:var(--gold);text-shadow:0 0 20px var(--gold);text-transform:uppercase;font-style:italic; }
-.btn-core { background:#fff;border:none;color:#000;padding:25px;font-size:1.2rem;border-radius:50px;font-weight:900;text-transform:uppercase;width:100%;max-width:280px;box-shadow:0 8px 0 #888;margin:15px 0;display:block;cursor:pointer;position:relative; z-index:9999; touch-action:manipulation;}
-.btn-core:active { transform:translateY(4px); box-shadow:0 2px 0 #444; background:var(--gold); }
-#hud { position:absolute; top:50px; left:0; width:100%; padding:0 25px; display:flex; justify-content:space-between; z-index:50; pointer-events:none; }
-#timer { font-size:3rem; font-weight:900; color:#fff; font-family:monospace; }
-#boss-ui { position:absolute; top:120px; left:50%; transform:translateX(-50%); width:80%; display:none; z-index:50; }
-.hp-outer { width:100%; height:15px; background:#300; border:2px solid #f00; border-radius:10px; overflow:hidden; }
-#hp-inner { width:100%; height:100%; background:#f00; transition:0.1s; }
-canvas { position:absolute; inset:0; z-index:1; pointer-events:none; }
-.game-nav { position:absolute; bottom:40px; left:0; width:100%; padding:0 25px; display:flex; justify-content:space-between; z-index:9999; pointer-events:none; }
-.ctrl-btn { width:75px; height:75px; border-radius:50%; background:rgba(255,255,255,0.2); border:3px solid #fff; color:#fff; font-weight:900; font-size:0.8rem; display:flex; align-items:center; justify-content:center; pointer-events:auto !important; cursor:pointer; }
+:root{
+  --bg:#020312; --panel:#071026; --neon-cyan:#00f2ff; --neon-mag:#c04aff; --neon-gold:#ffd24a;
+  --hud-bg:rgba(0,0,0,0.45);
+  --ui-radius:14px;
+  --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,#001026 0%,var(--bg) 60%);font-family:var(--font-sans);color:#e8fbff;overflow:hidden}
+#app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;padding:14px}
+.screen.active{display:flex}
+.title-card{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:18px;padding:14px;border:1px solid rgba(127,91,255,0.12);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+h1{margin:6px 0;font-size:1.6rem;line-height:1;color:var(--neon-gold);text-shadow:0 0 12px rgba(255,210,74,0.25)}
+.subtitle{font-size:0.85rem;color:#bfefff;opacity:0.9;margin-bottom:8px}
+.row{display:flex;gap:8px;width:100%}
+.col{flex:1}
+.input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(0,255,255,0.12);background:rgba(0,0,10,0.6);color:#e8fbff;font-weight:700;text-align:center}
+.stats{display:flex;gap:8px;margin:8px 0}
+.stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(0,255,255,0.06)}
+.stat .label{font-size:0.7rem;opacity:0.8}
+.stat .value{font-size:1.05rem;font-weight:800}
+.btn{appearance:none;border:0;padding:12px 14px;border-radius:999px;background:linear-gradient(135deg,var(--neon-cyan),#7f5bff);color:#021;font-weight:900;box-shadow:0 6px 18px rgba(127,91,255,0.12);font-size:1rem;cursor:pointer;touch-action:manipulation}
+.btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.08);color:#e8fbff}
+.small{font-size:0.8rem;opacity:0.85}
+#shop-list{width:100%;max-height:52vh;overflow:auto;padding:6px;margin:6px 0;border-radius:12px}
+.shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.03);margin:6px 0}
+.preview{width:56px;height:44px;border-radius:8px;background:#02061a;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.preview .ship{width:34px;height:20px;border-radius:3px}
+.preview .laser{width:6px;height:20px;border-radius:3px;position:absolute;left:50%;transform:translateX(-50%);top:6px}
+.hud{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:40}
+.hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(0,255,255,0.06);font-weight:800;pointer-events:auto}
+#game-canvas{position:absolute;inset:0;display:block;touch-action:none;background:transparent;z-index:1}
+.mission-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:50}
+.center-count{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:3.2rem;text-shadow:0 0 12px rgba(0,255,255,0.12);pointer-events:none}
+.controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
+.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:10px 12px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
+.boss-bar{position:absolute;top:72px;left:50%;transform:translateX(-50%);width:70%;height:12px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
+.boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#ff4a4a,#ffea4a);transition:width 0.12s linear}
+.reward-box{width:140px;height:140px;border-radius:16px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(179,107,255,0.9);cursor:pointer}
+.spark{position:absolute;width:10px;height:10px;border-radius:3px;background:radial-gradient(circle,#f0f,#90f);box-shadow:0 0 8px #f0f}
+.small-note{font-size:0.8rem;opacity:0.85}
+@media (max-width:420px){h1{font-size:1.4rem}.center-count{font-size:2.6rem}}
 </style>
 </head>
 <body>
+<div id="app">
+  <!-- Title -->
+  <div id="screen-title" class="screen active">
+    <div class="title-card">
+      <h1>Plaque Invaders<br><small style="font-size:0.6rem;color:#bfefff;display:block;margin-top:6px">Crystal Sector — Premium</small></h1>
+      <p class="subtitle">Brush for 2 minutes. Clear the sector. Earn crystals and customise your ship.</p>
+      <div style="margin:8px 0">
+        <input id="playerName" class="input" placeholder="Pilot name" maxlength="16" />
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Crystals</div><div id="statCrystals" class="value">0</div></div>
+        <div class="stat"><div class="label">Streak</div><div id="statStreak" class="value">0</div></div>
+        <div class="stat"><div class="label">Missions</div><div id="statMissions" class="value">0</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="startBtn" class="btn" style="flex:1">Start Mission</button>
+        <button id="shopBtn" class="btn alt" style="flex:1">Shop</button>
+      </div>
+      <p class="small-note" style="margin-top:10px">Tip: Make brushing fun — follow the mission phases and collect crystals!</p>
+    </div>
+  </div>
 
-<div id="scr-menu" class="screen active">
-<h1>PLAQUE INVADERS</h1>
-<div style="margin:20px 0;color:var(--sky);font-weight:bold;">💎 <span id="val-c">0</span> | STREAK: <span id="val-s">0</span></div>
-<div class="btn-core" id="btn-start">ENGAGE</div>
-<div class="btn-core" id="btn-shop" style="background:none;color:#fff;border:2px solid #fff;box-shadow:none;">HANGAR</div>
-</div>
+  <!-- Shop -->
+  <div id="screen-shop" class="screen">
+    <div class="title-card" style="max-width:520px">
+      <h1 style="color:var(--neon-cyan)">Crystal Shipyard</h1>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0">
+        <div class="small-note">Owned cosmetics only affect visuals.</div>
+        <div class="small-note">Crystals: <span id="shopCrystals">0</span></div>
+      </div>
+      <div id="shop-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="shopBack" class="btn alt" style="flex:1">Back</button>
+        <button id="shopReset" class="btn" style="flex:1;background:linear-gradient(135deg,#ff7a7a,#ffb86b)">Reset Data</button>
+      </div>
+    </div>
+  </div>
 
-<div id="scr-game" class="screen" style="background:transparent;padding:0;">
-<div id="hud">
-<div id="timer">02:00</div>
-<div style="color:var(--gold); font-weight:900;">💎 <span id="g-c">0</span></div>
-</div>
-<div id="boss-ui">
-<div style="color:red;font-size:0.7rem;font-weight:900;letter-spacing:2px;">CORE TARGET: DEATH STAR</div>
-<div class="hp-outer"><div id="hp-inner"></div></div>
-</div>
-<div class="game-nav">
-<div class="ctrl-btn" id="ctrl-pause">PAUSE</div>
-<div class="ctrl-btn" id="ctrl-quit" style="border-color:var(--rebel)">QUIT</div>
-</div>
-<canvas id="stage"></canvas>
-</div>
+  <!-- Mission -->
+  <div id="screen-mission" class="screen" style="background:transparent;padding:0">
+    <canvas id="game-canvas"></canvas>
+    <div class="hud">
+      <div class="box" id="hudName">Pilot</div>
+      <div class="box" id="hudTimer">02:00</div>
+      <div class="box" id="hudCrystals">0</div>
+    </div>
+    <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
+    <div class="mission-overlay">
+      <div class="center-count" id="countdown">5</div>
+      <div class="controls">
+        <button id="pauseBtn" class="control-btn">Pause</button>
+        <button id="resetBtn" class="control-btn" style="background:#ff6b6b">Reset</button>
+      </div>
+    </div>
+  </div>
 
-<div id="scr-loot" class="screen">
-<h1>VICTORY</h1>
-<div id="box" style="font-size:8rem;margin:30px 0;filter:drop-shadow(0 0 20px gold);">📦</div>
-<div id="loot-msg">Tap cargo to claim!</div>
-<div class="btn-core" id="btn-done" style="display:none">CONTINUE</div>
+  <!-- Reward -->
+  <div id="screen-reward" class="screen">
+    <div class="title-card" style="max-width:420px;align-items:center">
+      <h1 style="color:#c0a0ff">Mission Complete</h1>
+      <div id="rewardBox" class="reward-box" title="Tap to open"></div>
+      <div style="margin-top:12px;text-align:center">
+        <div id="rewardText" style="font-size:1.1rem;font-weight:800">+0 Crystals</div>
+        <div id="rewardDetail" class="small-note" style="margin-top:6px">Tap the box to reveal your reward</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;width:100%">
+        <button id="rewardBack" class="btn" style="flex:1">Back to Title</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-const state={crystals:0,streak:0,active:false,paused:false,time:120};
-const cvs=document.getElementById('stage'),ctx=cvs.getContext('2d');
-let stars=[],entities=[],boss=null,lastSpawn=0,lastFire=0,frameId=0,pilot={x:0,tx:0,mt:0};
+/* ============================================================
+   Persistent state and defaults
+   ============================================================ */
+const STORAGE_KEY = "plaque_invaders_premium_v1";
+const defaultState = {
+  name: "Oscar",
+  crystals: 0,
+  streak: 0,
+  lastPlayDate: null,
+  missions: 0,
+  owned: { ship: ["basic"], laser: ["neon-blue"], trail: ["ion-blue"], hyperspace: ["warp-default"] },
+  selected: { ship: "basic", laser: "neon-blue", trail: "ion-blue", hyperspace: "warp-default" }
+};
+let state = loadState();
 
-// Audio
-const AudioFX={ctx:null,unlock(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();if(this.ctx.state==='suspended')this.ctx.resume();},laser(){this.play(700,'sawtooth',0.2,0.08);},impact(){this.play(150,'square',0.1,0.2);},win(){this.play(880,'sine',0.2);setTimeout(()=>this.play(1320,'sine',0.4),100);},play(f,t,d,v,r=0){if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t;o.frequency.setValueAtTime(f,this.ctx.currentTime);if(r)o.frequency.exponentialRampToValueAtTime(r,this.ctx.currentTime+d);g.gain.setValueAtTime(v,this.ctx.currentTime);g.gain.linearRampToValueAtTime(0,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d);}};
-function tap(id,action){const el=document.getElementById(id);if(!el)return;const execute=e=>{if(e){e.preventDefault();e.stopPropagation();}AudioFX.unlock();action();};el.addEventListener('touchstart',execute,{passive:false});el.addEventListener('click',e=>{if(!('ontouchstart' in window))execute(e);});}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return structuredClone(defaultState);
+    const parsed = JSON.parse(raw);
+    return Object.assign(structuredClone(defaultState), parsed);
+  }catch(e){ return structuredClone(defaultState); }
+}
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 
-function resize(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;pilot.x=pilot.tx=cvs.width/2;}
-window.onresize=resize;resize();
+/* ============================================================
+   DOM refs
+   ============================================================ */
+const screens = {
+  title: document.getElementById("screen-title"),
+  shop: document.getElementById("screen-shop"),
+  mission: document.getElementById("screen-mission"),
+  reward: document.getElementById("screen-reward")
+};
+const playerNameInput = document.getElementById("playerName");
+const statCrystals = document.getElementById("statCrystals");
+const statStreak = document.getElementById("statStreak");
+const statMissions = document.getElementById("statMissions");
+const startBtn = document.getElementById("startBtn");
+const shopBtn = document.getElementById("shopBtn");
+const shopList = document.getElementById("shop-list");
+const shopCrystals = document.getElementById("shopCrystals");
+const shopBack = document.getElementById("shopBack");
+const shopReset = document.getElementById("shopReset");
 
-function spawn(){const heavy=Math.random()<0.3;entities.push({type:heavy?'d':'t',x:Math.random()*(cvs.width-80)+40,y:-150,w:heavy?120:45,h:heavy?180:35,hp:heavy?20:1,speed:heavy?1.5:5,f:0});}
+const canvas = document.getElementById("game-canvas");
+const ctx = canvas.getContext("2d");
+const hudName = document.getElementById("hudName");
+const hudTimer = document.getElementById("hudTimer");
+const hudCrystals = document.getElementById("hudCrystals");
+const countdownEl = document.getElementById("countdown");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+const bossBar = document.getElementById("bossBar");
+const bossFill = document.getElementById("bossFill");
 
-function loop(t){
-if(!state.active||state.paused){frameId=requestAnimationFrame(loop);return;}
-ctx.fillStyle="#000105";ctx.fillRect(0,0,cvs.width,cvs.height);
+const rewardBox = document.getElementById("rewardBox");
+const rewardText = document.getElementById("rewardText");
+const rewardDetail = document.getElementById("rewardDetail");
+const rewardBack = document.getElementById("rewardBack");
 
-// stars
-if(stars.length<80) for(let i=stars.length;i<80;i++) stars.push({x:Math.random()*cvs.width,y:Math.random()*cvs.height,z:Math.random()*3+1});
-stars.forEach(s=>{s.y+=s.z*2;if(s.y>cvs.height)s.y=0;ctx.fillStyle="#444";ctx.fillRect(s.x,s.y,s.z/2,s.z/2);});
+/* ============================================================
+   Cosmetic definitions (compact)
+   ============================================================ */
+const shipSkins = [
+  {id:"basic",name:"Standard Interceptor",cost:0,color:"#4af"},
+  {id:"crystal-falcon",name:"Crystal Falcon",cost:80,color:"#c04aff"},
+  {id:"nebula-phantom",name:"Nebula Phantom",cost:120,color:"#0ff"},
+  {id:"ion-viper",name:"Ion Viper",cost:160,color:"#ffea4a"},
+  {id:"retro-delta",name:"Retro Delta",cost:200,color:"#7fff7a"}
+];
+const laserDefs = [
+  {id:"neon-blue",name:"Neon Blue",cost:0,color:"#4af"},
+  {id:"plasma-magenta",name:"Plasma Magenta",cost:60,color:"#ff4fff"},
+  {id:"solar-gold",name:"Solar Gold",cost:80,color:"#ffd94a"}
+];
+const trailDefs = [
+  {id:"ion-blue",name:"Ion Blue",cost:0,color:"#4af"},
+  {id:"quantum-purple",name:"Quantum Purple",cost:60,color:"#c04aff"},
+  {id:"nova-orange",name:"Nova Orange",cost:80,color:"#ff9a4a"}
+];
+const hyperspaceDefs = [
+  {id:"warp-default",name:"Warp Tunnel",cost:0,star:"#8ff",streak:"#0ff"},
+  {id:"nebula-violet",name:"Nebula Violet",cost:80,star:"#f8f",streak:"#c0f"}
+];
 
-// pilot movement
-if(t>pilot.mt){pilot.tx=60+Math.random()*(cvs.width-120);pilot.mt=t+800+Math.random()*1000;}
-pilot.x+=(pilot.tx-pilot.x)*0.05;
-
-// spawn entities
-if(t-lastSpawn>1000){spawn();lastSpawn=t;}
-if(t-lastFire>200){entities.push({type:'l',x:pilot.x,y:cvs.height-110,speed:-15});AudioFX.laser();lastFire=t;}
-
-// boss logic
-if(state.time<30&&!boss){boss={x:cvs.width/2,y:-200,r:160,hp:600,max:600,f:0,lt:0};document.getElementById('boss-ui').style.display='block';}
-if(boss){if(boss.y<250)boss.y+=0.8;boss.x=cvs.width/2+Math.sin(t/1200)*60;ctx.fillStyle=boss.f>0?'#fff':'#333';if(boss.f>0)boss.f--;ctx.beginPath();ctx.arc(boss.x,boss.y,boss.r,0,7);ctx.fill();ctx.fillStyle="#111";ctx.beginPath();ctx.arc(boss.x-50,boss.y-50,45,0,7);ctx.fill();document.getElementById('hp-inner').style.width=(boss.hp/boss.max*100)+"%";}
-
-// entities
-for(let i=entities.length-1;i>=0;i--){const e=entities[i];e.y+=e.speed||0;if(e.type==='l'){ctx.fillStyle="#f33";ctx.fillRect(e.x-2,e.y,4,30);if(boss&&Math.hypot(e.x-boss.x,e.y-boss.y)<boss.r){boss.hp--;boss.f=3;entities.splice(i,1);continue;}entities.forEach((en,j)=>{if(en.type!=='l'&&Math.abs(e.x-en.x)<en.w/2&&Math.abs(e.y-en.y)<en.h/2){en.hp--;en.f=3;entities.splice(i,1);if(en.hp<=0){AudioFX.impact();entities.splice(j,1);state.crystals+=10;document.getElementById('g-c').innerText=state.crystals;}}});}else{ctx.fillStyle=e.f>0?"#fff":(e.type==='t'?'#555':'#888');if(e.type==='t'){ctx.fillRect(e.x-e.w/2,e.y-e.h/2,5,e.h);ctx.fillRect(e.x+e.w/2-5,e.y-e.h/2,5,e.h);ctx.fillRect(e.x-e.w/2,e.y-2,e.w,4);}else{ctx.beginPath();ctx.moveTo(e.x,e.y+e.h/2);ctx.lineTo(e.x-e.w/2,e.y-e.h/2);ctx.lineTo(e.x+e.w/2,e.y-e.h/2);ctx.fill();}if(e.f>0)e.f--;}if(e.y>cvs.height+200||e.y<-300)entities.splice(i,1);}
-
-// draw hero
-ctx.fillStyle="#fff";ctx.fillRect(pilot.x-4,cvs.height-130,8,45);ctx.fillRect(pilot.x-30,cvs.height-95,60,4);
-
-state.time-=1/60;
-if(state.time>0)frameId=requestAnimationFrame(loop);else finish();
+/* ============================================================
+   UI helpers
+   ============================================================ */
+function showScreen(name){
+  Object.values(screens).forEach(s=>s.classList.remove("active"));
+  screens[name].classList.add("active");
+}
+function refreshTitle(){
+  playerNameInput.value = state.name;
+  statCrystals.textContent = state.crystals;
+  statStreak.textContent = state.streak;
+  statMissions.textContent = state.missions;
+}
+function refreshShop(){
+  shopCrystals.textContent = state.crystals;
+  shopList.innerHTML = "";
+  const all = [
+    ...shipSkins.map(x=>({type:"ship",...x})),
+    ...laserDefs.map(x=>({type:"laser",...x})),
+    ...trailDefs.map(x=>({type:"trail",...x})),
+    ...hyperspaceDefs.map(x=>({type:"hyperspace",...x}))
+  ];
+  all.forEach(item=>{
+    const row = document.createElement("div"); row.className="shop-item";
+    const preview = document.createElement("div"); preview.className="preview";
+    if(item.type==="ship"){
+      const s = document.createElement("div"); s.className="ship"; s.style.background=item.color; s.style.clipPath="polygon(50% 0, 90% 40%, 70% 100%, 30% 100%, 10% 40%)";
+      preview.appendChild(s);
+    } else if(item.type==="laser"){
+      const l = document.createElement("div"); l.className="laser"; l.style.background=item.color; preview.appendChild(l);
+    } else {
+      preview.style.background = "linear-gradient(180deg, rgba(255,255,255,0.02), transparent)";
+    }
+    const info = document.createElement("div"); info.style.flex="1"; info.style.margin="0 8px";
+    const name = document.createElement("div"); name.textContent = item.name; name.style.fontWeight="800";
+    const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" crystals"):" • Default"); meta.style.fontSize="0.8rem"; meta.style.opacity="0.85";
+    info.appendChild(name); info.appendChild(meta);
+    const actions = document.createElement("div");
+    const owned = state.owned[item.type] && state.owned[item.type].includes(item.id);
+    const selected = state.selected[item.type]===item.id;
+    const btn = document.createElement("button"); btn.className="btn"; btn.style.padding="8px 10px; font-size:0.85rem";
+    if(owned){ btn.textContent = selected?"Selected":"Select"; btn.onclick = ()=>{ state.selected[item.type]=item.id; saveState(); refreshShop(); } }
+    else { btn.textContent = "Buy"; btn.onclick = ()=>{ if(state.crystals>=item.cost){ state.crystals-=item.cost; state.owned[item.type].push(item.id); state.selected[item.type]=item.id; saveState(); refreshShop(); refreshTitle(); } else { flashMsg("Not enough crystals"); } } }
+    actions.appendChild(btn);
+    row.appendChild(preview); row.appendChild(info); row.appendChild(actions);
+    shopList.appendChild(row);
+  });
 }
 
-function nav(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+/* ============================================================
+   Audio: WebAudio simple synths
+   ============================================================ */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}
+function playTone(freq,type= "sine",dur=0.12,vol=0.12){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+function beep(){ playTone(880,"sine",0.08,0.12) }
+function laserSound(){ playTone(1400,"sawtooth",0.06,0.06) }
+function bossHitSound(){ playTone(320,"square",0.12,0.16) }
+function explosionSound(){ playTone(120,"triangle",0.28,0.18); setTimeout(()=>playTone(220,"sine",0.18,0.12),80) }
+function rewardChime(){ playTone(900,"sine",0.12,0.12); setTimeout(()=>playTone(1200,"sine",0.12,0.12),120) }
 
-function startMission(){state.active=false;state.paused=false;state.time=5;nav('scr-game');let countdown=5;const preCount=setInterval(()=>{document.getElementById('timer').innerText=countdown;countdown--;if(countdown<0){clearInterval(preCount);state.time=120;state.active=true;loop(performance.now());}},1000);}
-function finish(){state.active=false;cancelAnimationFrame(frameId);nav('scr-loot');document.getElementById('btn-done').style.display='block';state.crystals+=50;state.streak++;document.getElementById('val-c').innerText=state.crystals;document.getElementById('val-s').innerText=state.streak;localStorage.setItem('pi_final',JSON.stringify(state));}
+/* ============================================================
+   Canvas & engine setup
+   ============================================================ */
+let DPR = Math.max(1, window.devicePixelRatio || 1);
+function resizeCanvas(){
+  DPR = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.floor(window.innerWidth * DPR);
+  canvas.height = Math.floor(window.innerHeight * DPR);
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-tap('btn-start',startMission);
-tap('btn-shop',()=>alert("Hangar accessing... (Crystals: "+state.crystals+")"));
-tap('ctrl-pause',()=>{state.paused=!state.paused;document.getElementById('ctrl-pause').innerText=state.paused?"RESUME":"PAUSE";if(!state.paused)loop(performance.now());});
-tap('ctrl-quit',()=>{state.active=false;nav('scr-menu');});
-tap('btn-done',()=>nav('scr-menu'));
+/* ============================================================
+   Game runtime variables (delta-time driven)
+   ============================================================ */
+let lastTime = performance.now();
+let rafId = null;
+let running = false;
+let paused = false;
+let countdown = 5;
+let missionTime = 120; // seconds
+let countdownActive = false;
+let spawnTimer = 0;
+let spawnInterval = 1.2;
+let enemies = [];
+let lasers = [];
+let sparks = [];
+let particles = [];
+let boss = null;
+let bossActive = false;
+let bossDisplayHp = 1;
+let rewardForMission = 0;
 
-// load saved state
-const d=localStorage.getItem('pi_final');if(d)Object.assign(state,JSON.parse(d));document.getElementById('val-c').innerText=state.crystals;document.getElementById('val-s').innerText=state.streak;
+/* Pools */
+const MAX_SPARKS = 120;
+for(let i=0;i<MAX_SPARKS;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,color:"#fff"});
+
+/* ============================================================
+   Utility helpers
+   ============================================================ */
+function rand(min,max){ return min + Math.random()*(max-min) }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)) }
+function nowDateISO(){ return new Date().toISOString().slice(0,10) }
+function flashMsg(txt){ /* simple alert fallback */ try{ navigator.vibrate && navigator.vibrate(30); }catch(e){} alert(txt) }
+
+/* ============================================================
+   Gameplay: spawn enemies, lasers, collisions, phases
+   ============================================================ */
+function startCountdown(){
+  ensureAudio();
+  countdown = 5; countdownActive = true;
+  countdownEl.textContent = countdown;
+  countdownEl.style.display = "block";
+  playBeepSequence(5);
+  let cInt = setInterval(()=>{
+    countdown--;
+    if(countdown<=0){ clearInterval(cInt); countdownActive=false; countdownEl.style.display="none"; beginMission(); }
+    else { countdownEl.textContent = countdown; beep(); }
+  },1000);
+}
+function playBeepSequence(n){
+  for(let i=0;i<n;i++) setTimeout(()=>beep(), i*900);
+}
+
+/* Mission start */
+function beginMission(){
+  running = true; paused = false;
+  missionTime = 120;
+  spawnTimer = 0;
+  enemies.length = 0; lasers.length = 0;
+  boss = null; bossActive = false; bossDisplayHp = 1;
+  rewardForMission = 0;
+  hudName.textContent = state.name || defaultState.name;
+  hudCrystals.textContent = state.crystals;
+  bossBar.style.display = "none";
+  // ensure RAF running
+  lastTime = performance.now();
+  if(!rafId) rafId = requestAnimationFrame(loop);
+}
+
+/* Spawn enemy */
+function spawnEnemy(phase){
+  // phase influences size and hp
+  const w = (phase<3)? 36 : 60;
+  const h = (phase<3)? 24 : 40;
+  const hp = (phase<2)? 1 : (phase<3?2:4);
+  const speed = 40 + phase*20 + Math.random()*20;
+  const x = rand(40, window.innerWidth - 40);
+  enemies.push({x,y:-40, vx:0, vy:speed, w,h,hp,hitTimer:0, type:"enemy"});
+}
+
+/* Fire lasers (auto) */
+function fireLasers(){
+  const shipX = window.innerWidth/2;
+  const shipY = window.innerHeight*0.78;
+  const laserColor = (laserDefs.find(l=>l.id===state.selected.laser)||laserDefs[0]).color;
+  lasers.push({x:shipX-8,y:shipY-20,vx:0,vy:-420,color:laserColor,life:1});
+  lasers.push({x:shipX+8,y:shipY-20,vx:0,vy:-420,color:laserColor,life:1});
+  laserSound();
+}
+
+/* Spawn boss */
+function spawnBoss(){
+  bossActive = true;
+  boss = {x:window.innerWidth/2, y:-160, vx:0, vy:0, r:120, hp:1.0, maxHp:1.0, flash:0};
+  // boss hp represented 1.0 -> 0.0 over 30s; we will reduce target based on time
+  bossBar.style.display = "block";
+}
+
+/* Sparks pool */
+function spawnSparks(x,y,color,count=8){
+  for(let i=0;i<sparks.length && count>0;i++){
+    const s = sparks[i];
+    if(!s.alive){
+      s.alive=true; s.x=x; s.y=y; s.vx=rand(-120,120); s.vy=rand(-200,-40); s.life=rand(0.28,0.6); s.color=color;
+      count--;
+    }
+  }
+}
+
+/* ============================================================
+   Collision & update logic (delta-time)
+   ============================================================ */
+let laserCooldown = 0;
+function update(dt){
+  // clamp dt
+  dt = Math.min(dt, 0.1);
+  if(!running) return;
+
+  // mission timer
+  if(!paused){
+    missionTime -= dt;
+    missionTime = Math.max(0, missionTime);
+    hudTimer.textContent = formatTime(Math.ceil(missionTime));
+  }
+
+  // phases
+  const elapsed = 120 - missionTime;
+  const phase = (elapsed < 30) ? 1 : (elapsed < 60) ? 2 : (elapsed < 90) ? 3 : 4;
+  // adjust spawn interval
+  spawnInterval = phase===1?1.2:phase===2?0.9:phase===3?0.6:0.45;
+
+  // spawn enemies (not during boss)
+  if(!bossActive && !paused){
+    spawnTimer += dt;
+    if(spawnTimer >= spawnInterval){
+      spawnTimer = 0;
+      // spawn pattern: multiple small enemies in later phases
+      const count = phase>=3? (Math.random()>0.6?2:1) : 1;
+      for(let i=0;i<count;i++) spawnEnemy(phase);
+    }
+  }
+
+  // auto-fire lasers at a rate depending on phase
+  laserCooldown -= dt;
+  const fireRate = phase>=3?0.18:0.26;
+  if(laserCooldown <= 0 && !paused){
+    fireLasers();
+    laserCooldown = fireRate;
+  }
+
+  // update enemies
+  for(let i=enemies.length-1;i>=0;i--){
+    const e = enemies[i];
+    e.y += e.vy * dt;
+    if(e.hitTimer>0) e.hitTimer -= dt;
+    // remove if off-screen
+    if(e.y - e.h > window.innerHeight + 60) enemies.splice(i,1);
+  }
+
+  // update lasers and collisions
+  for(let i=lasers.length-1;i>=0;i--){
+    const L = lasers[i];
+    L.y += L.vy * dt;
+    // check boss collision first
+    if(bossActive && boss){
+      const dx = L.x - boss.x, dy = L.y - boss.y;
+      const dist = Math.hypot(dx,dy);
+      if(dist < boss.r){
+        // stop laser at collision point, spawn sparks, damage boss
+        spawnSparks(L.x, L.y, "#ffccaa", 10);
+        boss.flash = 0.12;
+        // boss hp reduces over final 30s; we simulate hits as well
+        boss.hp = clamp(boss.hp - 0.0025, 0, 1); // small per-hit reduction
+        bossDisplayHp = boss.hp;
+        bossHitSound();
+        lasers.splice(i,1);
+        continue;
+      }
+    }
+    // check enemies
+    let hit = false;
+    for(let j=enemies.length-1;j>=0;j--){
+      const E = enemies[j];
+      if(Math.abs(L.x - E.x) < E.w/1.6 && Math.abs(L.y - E.y) < E.h/1.6){
+        // hit
+        spawnSparks(L.x, L.y, "#ffd24a", 8);
+        E.hp -= 1;
+        E.hitTimer = 0.12;
+        lasers.splice(i,1);
+        hit = true;
+        if(E.hp <= 0){
+          // explosion
+          spawnSparks(E.x, E.y, "#ff9a4a", 14);
+          explosionSound();
+          // award small crystals
+          state.crystals += 1;
+          hudCrystals.textContent = state.crystals;
+          enemies.splice(j,1);
+        }
+        break;
+      }
+    }
+    if(hit) continue;
+    // remove if off-screen
+    if(L.y < -40) lasers.splice(i,1);
+  }
+
+  // update sparks
+  for(let i=0;i<sparks.length;i++){
+    const s = sparks[i];
+    if(!s.alive) continue;
+    s.life -= dt;
+    s.x += s.vx * dt;
+    s.y += s.vy * dt;
+    s.vy += 400 * dt;
+    if(s.life <= 0) s.alive = false;
+  }
+
+  // boss movement & health interpolation
+  if(bossActive && boss){
+    if(boss.y < window.innerHeight*0.25) boss.y += 60 * dt;
+    boss.x += Math.sin(performance.now()/800) * 20 * dt;
+    // boss target hp reduces over last 30s automatically
+    const remaining = missionTime;
+    if(remaining <= 30){
+      const t = remaining / 30; // 1 -> 0
+      const targetHp = t;
+      boss.hp += (targetHp - boss.hp) * 0.08;
+      bossDisplayHp += (boss.hp - bossDisplayHp) * 0.12;
+      bossFill.style.width = (bossDisplayHp*100).toFixed(1) + "%";
+      if(bossDisplayHp <= 0.02){
+        // boss defeated early
+        spawnSparks(boss.x, boss.y, "#fff", 40);
+        explosionSound();
+        bossActive = false; boss = null; bossBar.style.display = "none";
+        // award big crystals
+        state.crystals += 40;
+        hudCrystals.textContent = state.crystals;
+      }
+    }
+    if(boss.flash > 0) boss.flash -= dt;
+  }
+
+  // mission end
+  if(missionTime <= 0 && running){
+    endMission();
+  }
+}
+
+/* ============================================================
+   Render function (always called by RAF)
+   ============================================================ */
+function render(){
+  // clear
+  ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+  const W = canvas.width/DPR, H = canvas.height/DPR;
+
+  // hyperspace background (streaks)
+  ctx.fillStyle = "#000814";
+  ctx.fillRect(0,0,W,H);
+  // stars
+  for(let i=0;i<120;i++){
+    const x = (i*37 + (performance.now()/12)) % W;
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(x, (i*23)%H, 1, 1);
+  }
+
+  // planets (simple drifting circles)
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = "rgba(80,40,160,0.08)";
+  ctx.beginPath(); ctx.ellipse(W*0.18, H*0.18, 60, 60, 0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(W*0.78, H*0.28, 40, 40, 0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // enemies
+  enemies.forEach(e=>{
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    if(e.hitTimer>0){ ctx.globalAlpha = 0.9; ctx.fillStyle = "#fff"; }
+    else ctx.fillStyle = "#8aa";
+    if(e.w>50){
+      ctx.beginPath(); ctx.moveTo(0,-e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.lineTo(e.w/2,e.h/2); ctx.closePath(); ctx.fill();
+    } else {
+      ctx.fillRect(-e.w/2, -e.h/2, e.w, e.h);
+    }
+    ctx.restore();
+  });
+
+  // lasers
+  lasers.forEach(l=>{
+    ctx.save();
+    ctx.fillStyle = l.color;
+    ctx.shadowColor = l.color;
+    ctx.shadowBlur = 8;
+    ctx.fillRect(l.x-2, l.y, 4, 22);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  // sparks
+  for(let i=0;i<sparks.length;i++){
+    const s = sparks[i];
+    if(!s.alive) continue;
+    ctx.save();
+    ctx.globalAlpha = clamp(s.life,0,1);
+    ctx.fillStyle = s.color;
+    ctx.beginPath(); ctx.ellipse(s.x, s.y, 3, 3, 0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  // player ship (center bottom)
+  const shipX = W/2, shipY = H*0.78;
+  const shipColor = (shipSkins.find(s=>s.id===state.selected.ship)||shipSkins[0]).color;
+  ctx.save();
+  ctx.translate(shipX, shipY);
+  ctx.fillStyle = shipColor;
+  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(18,6); ctx.lineTo(6,18); ctx.lineTo(-6,18); ctx.lineTo(-18,6); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "#fff"; ctx.fillRect(-4,-6,8,10);
+  ctx.restore();
+
+  // engine trail particles (simple)
+  ctx.fillStyle = (trailDefs.find(t=>t.id===state.selected.trail)||trailDefs[0]).color;
+  ctx.globalAlpha = 0.6;
+  ctx.beginPath(); ctx.ellipse(shipX, shipY+22, 10, 22, 0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // boss
+  if(bossActive && boss){
+    ctx.save();
+    ctx.translate(boss.x, boss.y);
+    if(boss.flash>0){ ctx.globalAlpha = 0.9; ctx.fillStyle = "#fff"; } else ctx.fillStyle = "#333";
+    ctx.beginPath(); ctx.ellipse(0,0,boss.r,boss.r*0.6,0,0,Math.PI*2); ctx.fill();
+    // core
+    ctx.fillStyle = "#ff4a4a"; ctx.beginPath(); ctx.arc(0,0,28,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  // HUD updates
+  hudCrystals.textContent = state.crystals;
+}
+
+/* ============================================================
+   RAF loop (always running to keep responsiveness)
+   ============================================================ */
+function loop(ts){
+  const dt = (ts - lastTime)/1000;
+  lastTime = ts;
+  // always render for responsiveness
+  render();
+  // update only when running and not paused
+  if(running && !paused){
+    update(dt);
+  }
+  rafId = requestAnimationFrame(loop);
+}
+
+/* ============================================================
+   Mission end and reward calculation
+   ============================================================ */
+function endMission(){
+  running = false;
+  paused = false;
+  // compute streak
+  const today = nowDateISO();
+  const last = state.lastPlayDate;
+  if(last === today){
+    // same day, do not increment
+  } else {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    if(last === yesterday) state.streak = (state.streak||0) + 1;
+    else state.streak = 1;
+    state.lastPlayDate = today;
+  }
+  state.missions = (state.missions||0) + 1;
+  // reward: 10 * streak (min 1) and weekly bonus
+  const base = 10 * Math.max(1, state.streak);
+  const weekly = (state.streak % 7 === 0) ? 100 : 0;
+  rewardForMission = base + weekly;
+  state.crystals += rewardForMission;
+  saveState();
+  // show reward screen
+  rewardText.textContent = `+${rewardForMission} Crystals`;
+  rewardDetail.textContent = `Base ${base}${weekly?(" • Weekly bonus +"+weekly):""}`;
+  showScreen("reward");
+}
+
+/* ============================================================
+   Reward box interaction (animated)
+   ============================================================ */
+let rewardOpened = false;
+function openReward(){
+  if(rewardOpened) return;
+  rewardOpened = true;
+  rewardChime();
+  // simple sparkle animation: spawn DOM spark elements
+  for(let i=0;i<18;i++){
+    const s = document.createElement("div"); s.className="spark";
+    const rect = rewardBox.getBoundingClientRect();
+    s.style.left = (rect.left + rect.width/2) + "px";
+    s.style.top = (rect.top + rect.height/2) + "px";
+    document.body.appendChild(s);
+    const tx = rand(-120,120), ty = rand(-160,-40);
+    s.animate([
+      { transform: `translate(0px,0px) scale(0.6)`, opacity:1 },
+      { transform: `translate(${tx}px,${ty}px) scale(1.1)`, opacity:0 }
+    ], { duration: 700 + Math.random()*300, easing: "cubic-bezier(.2,.8,.2,1)" });
+    setTimeout(()=>s.remove(), 1200);
+  }
+  // show text and enable back
+  rewardText.style.transform = "scale(1.06)";
+  setTimeout(()=>{ rewardText.style.transform = ""; }, 300);
+  document.getElementById("rewardBack").focus();
+}
+
+/* ============================================================
+   Format time
+   ============================================================ */
+function formatTime(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,"0");
+  const s = Math.floor(sec%60).toString().padStart(2,"0");
+  return `${m}:${s}`;
+}
+
+/* ============================================================
+   Input bindings (touch-safe)
+   ============================================================ */
+function bindTap(el, fn){
+  let last = 0;
+  el.addEventListener("pointerdown", (e)=>{ const t = performance.now(); if(t - last < 250) return; last = t; e.preventDefault(); fn(e); }, {passive:false});
+}
+bindTap(startBtn, ()=>{ state.name = (playerNameInput.value.trim()||state.name); saveState(); startCountdown(); showScreen("mission"); });
+bindTap(shopBtn, ()=>{ refreshShop(); showScreen("shop"); });
+bindTap(shopBack, ()=>{ showScreen("title"); refreshTitle(); });
+bindTap(shopReset, ()=>{ if(confirm("Reset all saved data?")){ localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitle(); refreshShop(); }});
+bindTap(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "Resume" : "Pause"; });
+bindTap(resetBtn, ()=>{ if(confirm("Abort mission and return to title?")){ running=false; paused=false; showScreen("title"); refreshTitle(); }});
+bindTap(rewardBox, ()=>{ openReward(); });
+bindTap(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitle(); });
+
+playerNameInput.addEventListener("change", ()=>{ state.name = playerNameInput.value.trim() || state.name; saveState(); });
+
+/* ============================================================
+   Initialisation & boot
+   ============================================================ */
+function init(){
+  // load state into UI
+  refreshTitle();
+  refreshShop();
+  hudName.textContent = state.name;
+  hudCrystals.textContent = state.crystals;
+  // ensure RAF running for responsiveness
+  lastTime = performance.now();
+  if(!rafId) rafId = requestAnimationFrame(loop);
+  // small auto-save on visibility change
+  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") saveState(); });
+  // unlock audio on first touch
+  document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
+}
+init();
+
+/* ============================================================
+   Minor polish: keyboard fallback and safe unload
+   ============================================================ */
+window.addEventListener("beforeunload", ()=>{ saveState(); });
 </script>
 </body>
 </html>
