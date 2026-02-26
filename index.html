@@ -3,11 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>PLAQUE INVADERS — OPERATION: SAUCER FALL</title>
+<title>PLAQUE INVADERS — OPERATION: SAUCER FALL (UPDATED)</title>
 <style>
-/* (All CSS identical to your last working file with HUD, shop, mission, reward, admin, and status bars)
-   Kept unchanged except minor layout for announcement banner and large timer anchor.
-*/
 :root{
   --bg-top:#00020a; --bg-bottom:#001026;
   --accent-cyan:#00F2FF; --accent-mag:#C04AFF; --accent-gold:#FFD24A;
@@ -30,12 +27,14 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .stat .value{font-size:1rem;font-weight:900}
 .btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation}
 .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#E8FBFF}
-#game-canvas{position:absolute;inset:0;z-index:1;touch-action:none;background:transparent}
+#three-container{position:absolute;inset:0;z-index:1;pointer-events:none}
+#game-canvas{position:absolute;inset:0;z-index:2;touch-action:none;background:transparent}
+#uiTimerLarge{position:fixed;left:50%;top:6%;transform:translateX(-50%);z-index:9998;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-weight:900;font-size:56px;letter-spacing:1px;padding:8px 14px;border-radius:10px;text-align:center;pointer-events:none;color:#fff}
+#announcementBanner{position:fixed;left:50%;top:12%;transform:translateX(-50%);z-index:9999;padding:12px 20px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;pointer-events:none;opacity:0;white-space:pre-line;transition:opacity 220ms ease, transform 260ms cubic-bezier(.2,.9,.2,1)}
 .hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:60}
 .hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
 .hud .left{display:flex;gap:8px;align-items:center}
 #phaseBadge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-mag),#7F5BFF);font-weight:900;font-size:0.72rem;letter-spacing:1px}
-#timerBig{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-weight:900; font-size:1.4rem; letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(0,255,255,0.10)}
 #progressBar{width:240px;height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
 #progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold));transition:width 120ms linear}
 .label-small{font-size:0.66rem;opacity:0.85}
@@ -56,8 +55,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .status-fill{height:100%;width:100%;background:linear-gradient(90deg,#4AF,#7F5BFF);transition:width 120ms linear}
 .status-label{font-size:0.66rem;opacity:0.9}
 .debug{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;font-size:12px;z-index:999;color:#fff}
-#announcementBanner{pointer-events:none}
-#uiTimerLarge{pointer-events:none}
 @media (max-width:420px){
   .card{padding:12px}
   .title{font-size:1.2rem}
@@ -67,7 +64,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 </style>
 </head>
 <body>
-<!-- TITLE -->
+<div id="three-container" aria-hidden="true"></div>
+<canvas id="game-canvas" aria-hidden="true"></canvas>
+
+<div id="uiTimerLarge">02:00</div>
+<div id="announcementBanner"></div>
+
 <div id="screen-title" class="screen active" role="main" aria-label="Title screen">
   <div class="card" role="region" aria-label="Mission briefing">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
@@ -77,7 +79,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
       </div>
       <div style="text-align:right;min-width:140px">
         <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">PILOT: <span id="pilotNameDisplay">BEN</span></div>
-        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.2</div>
+        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.3</div>
       </div>
     </div>
 
@@ -99,7 +101,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- SHOP -->
 <div id="screen-shop" class="screen" role="dialog" aria-label="Shipyard">
   <div class="card" style="width:100%;max-width:820px">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
@@ -117,10 +118,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- MISSION -->
 <div id="screen-mission" class="screen" style="background:transparent;padding:0" role="application" aria-label="Mission">
-  <canvas id="game-canvas" aria-hidden="true"></canvas>
-
   <div class="hud" aria-hidden="false">
     <div class="left">
       <div class="box" aria-label="Pilot"><div class="label-small">PILOT</div><div id="hudName">BEN</div></div>
@@ -157,7 +155,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- REWARD -->
 <div id="screen-reward" class="screen" role="dialog" aria-label="Reward">
   <div class="card" style="align-items:center">
     <div style="font-weight:900;font-size:1.2rem;color:#C0A0FF">SECTOR CLEARED</div>
@@ -173,7 +170,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="screen-admin" class="screen" role="dialog" aria-label="Admin dashboard">
   <div class="card" style="width:100%;max-width:720px">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -206,18 +202,21 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- Announcement banner and large timer placeholders (created by UIManager if missing) -->
-<div id="announcementBanner" aria-hidden="true"></div>
-<div id="uiTimerLarge" aria-hidden="true"></div>
-
 <div id="debug" class="debug" style="display:none" aria-hidden="true"></div>
+
+<!-- three.js and helpers -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
 <script>
 /* =========================
-   Your original game code starts here
-   (player, canvas, pools, shop, admin, audio helpers, rendering, RAF loop, etc.)
-   This block is intentionally preserved from your last working file.
-   Only minimal wiring changes are made later to integrate the new systems.
+   Full single-file game with integrated visual upgrade
+   - Keeps original gameplay, shop, admin, persistence, and controls
+   - Adds: ZoneManager, GameFlowController, BossStateMachine, UIManager, RenderBridge (three.js background + boss)
+   - All integration points are internal; drop-in replacement for your previous file.
    ========================= */
 
 /* CONFIG */
@@ -229,8 +228,8 @@ const CONFIG = {
   SPAWN_RATES: { phase1: 0.9, phase2: 0.7, phase3: 0.55, phase4: 0.45 },
   BOSS_HP: 1.0,
   REWARD_BASE: 10,
-  STORAGE_KEY: "plaque_invaders_state_v2",
-  ADMIN_KEY: "plaque_invaders_admin_pin_v2"
+  STORAGE_KEY: "plaque_invaders_state_v3",
+  ADMIN_KEY: "plaque_invaders_admin_pin_v3"
 };
 
 /* State persistence */
@@ -277,7 +276,6 @@ const startBtn = document.getElementById("startBtn");
 const shopBtn = document.getElementById("shopBtn");
 const shopList = document.getElementById("shop-list");
 const shopCrystals = document.getElementById("shopCrystals");
-const shopBack = document.getElementById("shopBack");
 
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d", { alpha: true });
@@ -311,6 +309,8 @@ const applyAdmin = document.getElementById("applyAdmin");
 const adminBack = document.getElementById("adminBack");
 const adminReset = document.getElementById("adminReset");
 
+const uiTimerLarge = document.getElementById("uiTimerLarge");
+const announcementBanner = document.getElementById("announcementBanner");
 const debugEl = document.getElementById("debug");
 
 /* Cosmetics */
@@ -370,11 +370,10 @@ for(let i=0;i<CONFIG.PARTICLE_LIMITS.debris;i++) debris.push({alive:false,x:0,y:
 /* Ship */
 let ship = { x: window.innerWidth/2, y: window.innerHeight*0.78, targetX: window.innerWidth/2, speed: 160, nextMoveAt:0 };
 
-/* Player defensive stats (new) */
-/* Values are normalized 0.0 - 1.0. They will never be allowed to reach zero to keep it playful. */
-let playerShield = 1.0; // visual force field strength
-let playerHP = 1.0;     // health bar
-const MIN_VISIBLE_STAT = 0.12; // never drop below this to keep it non-threatening
+/* Player defensive stats */
+let playerShield = 1.0;
+let playerHP = 1.0;
+const MIN_VISIBLE_STAT = 0.12;
 
 /* Audio helpers */
 let audioCtx = null;
@@ -530,9 +529,12 @@ function enemyFire(enemy){
   enemyFireSound();
 }
 
-/* Hyperspace visuals (simple fallback) */
+/* Hyperspace visuals (fallback uses RenderBridge if available) */
 function playHyperspaceAnimation(opts = {duration:1000, chroma:true}){
-  // Simple built-in hyperspace animation: overlay streaks + whoosh SFX + subtle zoom
+  if(window.RenderBridge && typeof RenderBridge.playHyperspace === 'function'){
+    RenderBridge.playHyperspace(opts.duration || 1000);
+    return;
+  }
   const dur = opts.duration || 1000;
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = 9997; overlay.style.pointerEvents = 'none';
@@ -587,11 +589,407 @@ function spawnBoss(){
   boss = {x:window.innerWidth/2, y:-420, vx:0, vy:0, r:220, hp:CONFIG.BOSS_HP, displayHp:CONFIG.BOSS_HP, flash:0};
   bossBar.style.display = "block";
   bossFill.style.width = "100%";
+  // spawn 3D boss if RenderBridge available
+  if(window.RenderBridge && typeof RenderBridge.spawnBossModel === 'function'){
+    const m = RenderBridge.spawnBossModel();
+    boss._three = m;
+  }
 }
 
-/* Update loop */
+/* =========================
+   UIManager + AnnouncementBanner
+   ========================= */
+const UIManager = (function(){
+  const bannerEl = announcementBanner;
+  const timerEl = uiTimerLarge;
+
+  function styleFor(type){
+    if(type==='Warning') return {bg:'linear-gradient(90deg,#FFB86B,#FF6B6B)', color:'#1b0b0b', sfx:'whoosh-warning'};
+    if(type==='Phase') return {bg:'linear-gradient(90deg,#7F5BFF,#C04AFF)', color:'#fff', sfx:'whoosh-phase'};
+    if(type==='Boss') return {bg:'linear-gradient(90deg,#FF4A4A,#FFD24A)', color:'#111', sfx:'whoosh-boss'};
+    return {bg:'rgba(0,0,0,0.6)', color:'#fff', sfx:null};
+  }
+  function ShowAnnouncement(text, opts = {}){
+    const duration = (opts.duration || 1000);
+    const style = styleFor(opts.style || 'Phase');
+    bannerEl.textContent = text + (opts.subtitle ? ('\n' + opts.subtitle) : '');
+    bannerEl.style.background = style.bg;
+    bannerEl.style.color = style.color;
+    bannerEl.style.padding = opts.subtitle ? '14px 22px' : '10px 18px';
+    bannerEl.style.transform = 'translateX(-50%) translateY(-8px)';
+    bannerEl.style.opacity = '1';
+    if(opts.sfx && typeof playSfx === 'function') playSfx(opts.sfx);
+    setTimeout(()=>{ bannerEl.style.opacity = '0'; bannerEl.style.transform = 'translateX(-50%) translateY(-26px)'; }, duration);
+  }
+  function UpdateTimerDisplay(seconds){
+    const mm = String(Math.floor(seconds/60)).padStart(2,'0');
+    const ss = String(Math.floor(seconds%60)).padStart(2,'0');
+    timerEl.textContent = `${mm}:${ss}`;
+    if(seconds <= 10) timerEl.style.color = '#FF4A4A';
+    else if(seconds <= 30) timerEl.style.color = '#FF9A4A';
+    else timerEl.style.color = '#FFFFFF';
+    const small = document.getElementById('timerBig');
+    if(small) small.textContent = `${mm}:${ss}`;
+  }
+  return { ShowAnnouncement, UpdateTimerDisplay };
+})();
+
+/* =========================
+   ZoneManager
+   ========================= */
+const ZoneManager = (function(){
+  const zones = [
+    { id: 'alpha', background: {stars:1, tint:'#0ff'}, music: 'synthA', enemyPool: ['tie','drone'], spawnRate: 0.9, difficultyMultiplier: 1.0, palette: {primary:'#00dfff',accent:'#7f5bff'} },
+    { id: 'beta',  background: {stars:1.2, tint:'#c0f'}, music: 'synthB', enemyPool: ['tie-heavy','drone-fast'], spawnRate: 0.7, difficultyMultiplier: 1.2, palette: {primary:'#c04aff',accent:'#ffd24a'} },
+    { id: 'gamma', background: {stars:1.4, tint:'#fa8'}, music: 'synthC', enemyPool: ['destroyer','drone-heavy'], spawnRate: 0.55, difficultyMultiplier: 1.45, palette: {primary:'#ff9a4a',accent:'#ff4a4a'} },
+  ];
+  let currentIndex = 0;
+  function LoadZone(index){
+    currentIndex = Math.max(0, Math.min(index, zones.length-1));
+    const z = zones[currentIndex];
+    if(typeof applyZoneVisuals === 'function') applyZoneVisuals(z.background, z.palette);
+    window.GameSettings = window.GameSettings || {};
+    GameSettings.currentEnemyPool = z.enemyPool.slice();
+    GameSettings.spawnRateBase = z.spawnRate;
+    GameSettings.difficultyMultiplier = z.difficultyMultiplier;
+    if(window.RenderBridge && typeof RenderBridge.applyPalette === 'function') RenderBridge.applyPalette(z.palette);
+    console.info('ZoneManager: Loaded zone', z.id);
+    return z;
+  }
+  function GetNextZone(){
+    return zones[(currentIndex + 1) % zones.length];
+  }
+  function GetCurrentZone(){ return zones[currentIndex]; }
+  return { LoadZone, GetNextZone, GetCurrentZone, zones };
+})();
+
+/* =========================
+   GameFlowController
+   ========================= */
+const GameFlowController = (function(){
+  let mainTimer = CONFIG.TOTAL_TIME;
+  let runningFlow = false;
+  let scheduled = [];
+  let lastTick = performance.now();
+  let phaseIndex = 0;
+
+  function scheduleEvents(){
+    scheduled = [];
+    const total = CONFIG.TOTAL_TIME;
+    [90,60,30].forEach(rem => {
+      const elapsedAt = total - rem;
+      if(elapsedAt >= 0 && elapsedAt <= total) scheduled.push({type:'hyperspace', at: elapsedAt});
+    });
+    scheduled.sort((a,b)=>a.at-b.at);
+  }
+
+  function Start(){
+    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:5000, style:'Warning'});
+    ZoneManager.LoadZone(0);
+    scheduleEvents();
+    phaseIndex = 0;
+    runningFlow = true;
+    mainTimer = CONFIG.TOTAL_TIME;
+    lastTick = performance.now();
+    UIManager.UpdateTimerDisplay(mainTimer);
+    setTimeout(()=>{ if(typeof beginMission === 'function') beginMission(); }, 5000);
+  }
+
+  function updateFlow(){
+    if(!runningFlow) return;
+    const now = performance.now();
+    const dt = (now - lastTick)/1000;
+    lastTick = now;
+    mainTimer = Math.max(0, mainTimer - dt);
+    UIManager.UpdateTimerDisplay(Math.ceil(mainTimer));
+    const elapsed = CONFIG.TOTAL_TIME - mainTimer;
+    while(scheduled.length && elapsed >= scheduled[0].at){
+      const ev = scheduled.shift();
+      if(ev.type === 'hyperspace') runHyperspaceSequence();
+    }
+    if(mainTimer <= CONFIG.PHASE_LENGTH && typeof BossStateMachine !== 'undefined' && !BossStateMachine.isActive()){
+      runBossIntro();
+    }
+    if(mainTimer <= 0){
+      runningFlow = false;
+      if(typeof onMissionEnd === 'function') onMissionEnd();
+    }
+  }
+
+  function runHyperspaceSequence(){
+    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:900, style:'Warning'});
+    setTimeout(()=>{
+      playHyperspaceAnimation({duration:1000, chroma:true});
+      setTimeout(()=>{
+        const next = ZoneManager.GetNextZone();
+        const idx = ZoneManager.zones.findIndex(z=>z.id===next.id);
+        ZoneManager.LoadZone(idx);
+        phaseIndex++;
+        UIManager.ShowAnnouncement('Begin Phase ' + Math.min(phaseIndex+1,4), {duration:1000, style:'Phase'});
+      }, 1000);
+    }, 200);
+  }
+
+  function runBossIntro(){
+    UIManager.ShowAnnouncement('Boss Approaching', {duration:900, style:'Boss'});
+    setTimeout(()=>{
+      if(BossStateMachine && typeof BossStateMachine.spawnBoss === 'function'){
+        BossStateMachine.spawnBoss(CONFIG.BOSS_HP);
+      } else {
+        spawnBoss && spawnBoss();
+      }
+    }, 600);
+  }
+
+  function ForceHyperspace(){ runHyperspaceSequence(); }
+  function SetTimer(seconds){ mainTimer = Math.max(0, seconds); UIManager.UpdateTimerDisplay(Math.ceil(mainTimer)); }
+  function getTimer(){ return mainTimer; }
+
+  return { Start, updateFlow, ForceHyperspace, SetTimer, getTimer };
+})();
+
+/* =========================
+   BossStateMachine
+   ========================= */
+const BossStateMachine = (function(){
+  let bossObj = null;
+  let state = 'Idle';
+  let hp = 1.0;
+  let maxHp = 1.0;
+
+  function spawnBoss(hpValue = 1.0){
+    if(typeof spawnBoss === 'function'){
+      spawnBoss();
+      setTimeout(()=>{ if(window.boss){ bossObj = window.boss; hp = bossObj.hp; maxHp = bossObj.hp; bossObj.active = true; } }, 60);
+    } else {
+      bossObj = { x: window.innerWidth/2, y: -300, active:false, hp: hpValue, maxHp: hpValue };
+      hp = hpValue; maxHp = hpValue;
+      const introDur = 700;
+      const start = performance.now();
+      const introTick = () => {
+        const t = (performance.now() - start)/introDur;
+        bossObj.y = -300 + Math.min(1, t) * (window.innerHeight*0.22 + 300);
+        if(t < 1) requestAnimationFrame(introTick);
+        else { bossObj.active = true; if(typeof onBossSpawned === 'function') onBossSpawned(bossObj); }
+      };
+      introTick();
+    }
+    state = 'Idle';
+    return bossObj;
+  }
+
+  function isActive(){ return !!(window.boss && window.boss.active) || (!!bossObj && bossObj.active && state !== 'Death'); }
+
+  function ApplyDamage(damage){
+    const target = window.boss || bossObj;
+    if(!target || state === 'Death') return;
+    hp = clamp((target.hp || hp) - damage, 0, (target.maxHp || maxHp));
+    if(target) target.hp = hp;
+    state = 'HitReact';
+    if(typeof spawnSparks === 'function') spawnSparks(target.x || (window.innerWidth/2), target.y || (window.innerHeight*0.22), '#FFD2FF', 18);
+    if(typeof startScreenShake === 'function') startScreenShake(10, 220);
+    if(typeof playSfx === 'function') playSfx('boss-hit');
+    // dispatch 3D visual event for RenderBridge
+    window.dispatchEvent(new CustomEvent('bossHitVisual', { detail: 1.0 }));
+    setTimeout(()=>{
+      if(hp <= 0.001){
+        state = 'Death';
+        runDeath(target);
+      } else {
+        const pct = (hp / (target.maxHp || maxHp)) * 100;
+        if(pct <= 33) applyBossVisualStage(3);
+        else if(pct <= 66) applyBossVisualStage(2);
+        else applyBossVisualStage(1);
+        state = 'Idle';
+      }
+    }, 80);
+  }
+
+  function applyBossVisualStage(stage){
+    if(typeof setBossVisualStage === 'function') setBossVisualStage(stage);
+    if(stage === 2) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF9A4A', 24);
+    if(stage === 3) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF4A4A', 48);
+  }
+
+  function runDeath(target){
+    if(typeof playSfx === 'function') playSfx('boss-death');
+    if(typeof spawnSparks === 'function') spawnSparks(target.x || ship.x, target.y || ship.y, '#C0A0FF', 400);
+    if(typeof spawnDebris === 'function') spawnDebris(target.x || ship.x, target.y || ship.y, '#C0A0FF', 240);
+    if(typeof startScreenShake === 'function') startScreenShake(48, 1600);
+    if(typeof setCinematicSlow === 'function') setCinematicSlow(0.18);
+    setTimeout(()=>{
+      if(typeof setCinematicSlow === 'function') setCinematicSlow(1.0);
+      if(typeof onBossDeath === 'function') onBossDeath(target);
+      if(window.boss){ bossActive = false; boss = null; bossBar.style.display = "none"; }
+      bossObj = null;
+    }, 1600);
+  }
+
+  function getHp(){ return (window.boss && window.boss.hp) ? window.boss.hp : (bossObj ? bossObj.hp : hp); }
+  return { spawnBoss, ApplyDamage, isActive, getHp };
+})();
+
+/* =========================
+   Minimal SFX mapping
+   ========================= */
+window.playSfx = window.playSfx || function(name){
+  if(name === 'whoosh-warning') playOsc(600,'sine',0.18,0.12);
+  if(name === 'whoosh-phase')   playOsc(900,'sine',0.18,0.12);
+  if(name === 'whoosh-boss')    playOsc(420,'sawtooth',0.28,0.18);
+  if(name === 'boss-hit')       playOsc(320,'square',0.08,0.12);
+  if(name === 'boss-death')     bigExplode && bigExplode();
+};
+
+/* =========================
+   RenderBridge (three.js hybrid background + boss)
+   ========================= */
+const RenderBridge = (function(){
+  let renderer, scene, camera, composer, clock, container;
+  let stars, bossMesh, bloomPass;
+  let width = window.innerWidth, height = window.innerHeight;
+  const params = { bloomStrength: 0.9, bloomRadius: 0.6, bloomThreshold: 0.2 };
+
+  function init(containerEl){
+    container = containerEl || document.getElementById('three-container') || document.body;
+    clock = new THREE.Clock();
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    container.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 5000);
+    camera.position.set(0, 0, 900);
+
+    scene.add(new THREE.AmbientLight(0x223344, 0.6));
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(-1, 1, 0.5).normalize();
+    scene.add(dir);
+
+    const starCount = 1600;
+    const starGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(starCount * 3);
+    const sizes = new Float32Array(starCount);
+    for(let i=0;i<starCount;i++){
+      positions[i*3+0] = (Math.random()-0.5) * 4200;
+      positions[i*3+1] = (Math.random()-0.5) * 2200;
+      positions[i*3+2] = -Math.random() * 3000;
+      sizes[i] = Math.random() * 2.4 + 0.6;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    starGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    const starMat = new THREE.PointsMaterial({ color: 0x88ccff, size: 2.2, sizeAttenuation: true, transparent: true, opacity: 0.95 });
+    stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+
+    composer = new THREE.EffectComposer(renderer);
+    const renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(width, height), params.bloomStrength, params.bloomRadius, params.bloomThreshold);
+    composer.addPass(bloomPass);
+
+    window.addEventListener('resize', onResize);
+  }
+
+  function onResize(){
+    width = window.innerWidth; height = window.innerHeight;
+    camera.aspect = width / height; camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+    composer.setSize(width, height);
+  }
+
+  function applyPalette(palette){
+    if(palette && palette.primary){
+      scene.fog = new THREE.Fog(new THREE.Color(palette.primary), 400, 2200);
+      stars.material.color = new THREE.Color(palette.accent || palette.primary);
+    }
+  }
+
+  function spawnBossModel(){
+    const geo = new THREE.IcosahedronGeometry(220, 5);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xff7fb0,
+      metalness: 0.2,
+      roughness: 0.35,
+      emissive: 0x220022,
+      emissiveIntensity: 0.6,
+      envMapIntensity: 0.6
+    });
+    bossMesh = new THREE.Mesh(geo, mat);
+    bossMesh.position.set(0, -900, -120);
+    bossMesh.scale.set(0.8,0.8,0.8);
+    scene.add(bossMesh);
+    gsap.to(bossMesh.position, { y: -120, duration: 0.9, ease: "power2.out" });
+    gsap.to(bossMesh.scale, { x:1, y:1, z:1, duration: 0.9, ease: "back.out(1.2)" });
+    return bossMesh;
+  }
+
+  function applyBossHitVisual(intensity = 1.0){
+    if(!bossMesh) return;
+    const orig = bossMesh.material.emissiveIntensity || 0.6;
+    bossMesh.material.emissive = new THREE.Color(0xffd2ff);
+    gsap.to(bossMesh.material, { emissiveIntensity: orig + 1.2 * intensity, duration: 0.06, yoyo:true, repeat:1, onComplete: ()=>{ bossMesh.material.emissive = new THREE.Color(0x220022); } });
+    gsap.to(bossMesh.position, { x: "+=" + (6 * intensity), yoyo:true, repeat:1, duration: 0.08, ease:"sine.inOut" });
+  }
+
+  function playHyperspace(duration = 1000){
+    const origZ = camera.position.z;
+    const dur = duration;
+    gsap.to(camera.position, { z: origZ - 220, duration: dur/1000 * 0.5, ease: "power2.in", yoyo:true, repeat:1 });
+    const start = performance.now();
+    const streakTick = () => {
+      const t = (performance.now() - start) / dur;
+      const pos = stars.geometry.attributes.position.array;
+      for(let i=0;i<pos.length/3;i++){
+        pos[i*3+2] += 1200 * (0.6 + Math.sin(t*Math.PI*2)*0.4) * (1/60);
+        if(pos[i*3+2] > 200) pos[i*3+2] = -3000 + Math.random()*200;
+      }
+      stars.geometry.attributes.position.needsUpdate = true;
+      if((performance.now() - start) < dur) requestAnimationFrame(streakTick);
+    };
+    streakTick();
+    if(scene.fog){
+      gsap.to(scene.fog.color, { r: 0.9, g: 0.7, b: 1.0, duration: dur/1000 * 0.5, yoyo:true, repeat:1 });
+    }
+    if(typeof playSfx === 'function') playSfx('whoosh-phase');
+  }
+
+  function update(dt){
+    if(stars) stars.rotation.y += dt * 0.002;
+    if(bossMesh){
+      bossMesh.rotation.y += dt * 0.18;
+      bossMesh.rotation.x += dt * 0.06;
+    }
+    composer.render(dt);
+  }
+
+  function bossDamageFeedback(amount){
+    applyBossHitVisual(amount);
+  }
+
+  function dispose(){
+    window.removeEventListener('resize', onResize);
+    if(renderer && renderer.domElement && container) container.removeChild(renderer.domElement);
+    renderer = null; scene = null; camera = null; composer = null;
+  }
+
+  return { init, applyPalette, spawnBossModel, playHyperspace, update, bossDamageFeedback, dispose };
+})();
+
+/* Initialize RenderBridge */
+RenderBridge.init(document.getElementById('three-container'));
+
+/* Hook boss hit visuals to RenderBridge */
+window.addEventListener('bossHitVisual', (e)=>{ RenderBridge.bossDamageFeedback(e.detail || 1.0); });
+
+/* =========================
+   Main update & render loop
+   ========================= */
 let bgScroll = 0;
 let laserTimer = 0;
+
 function update(dt){
   dt = Math.min(dt, 0.12) * cinematicSlow;
   if(!running) return;
@@ -600,7 +998,6 @@ function update(dt){
     missionTime -= dt;
     missionTime = Math.max(0, missionTime);
     hudTimer.textContent = formatTime(Math.ceil(missionTime));
-    // Also update UIManager large timer if present
     if(window.UIManager && UIManager.UpdateTimerDisplay) UIManager.UpdateTimerDisplay(Math.ceil(missionTime));
     const progress = (CONFIG.TOTAL_TIME - missionTime) / CONFIG.TOTAL_TIME;
     progressFill.style.width = (progress*100).toFixed(2) + "%";
@@ -621,7 +1018,6 @@ function update(dt){
   const tick = Math.floor(elapsed/CONFIG.PHASE_LENGTH);
   if(tick > hyperspaceTick){
     hyperspaceTick = tick;
-    // Hyperspace is now controlled by GameFlowController; keep this as a fallback
   }
 
   if(!bossActive && !paused){
@@ -704,19 +1100,14 @@ function update(dt){
     b.y += b.vy * dt;
     b.life -= dt;
     if(Math.hypot(b.x - ship.x, b.y - ship.y) < 18){
-      // Player takes damage: reduce shield first, then HP; never drop below MIN_VISIBLE_STAT
-      const damage = rand(0.06, 0.14); // small playful damage
+      const damage = rand(0.06, 0.14);
       if(playerShield > MIN_VISIBLE_STAT + 0.001){
         playerShield = clamp(playerShield - damage, MIN_VISIBLE_STAT, 1.0);
       } else {
-        // shield low, reduce HP a bit
         playerHP = clamp(playerHP - (damage * 0.6), MIN_VISIBLE_STAT, 1.0);
       }
-      // update HUD bars
       shieldFillEl.style.width = (playerShield * 100).toFixed(1) + "%";
       hpFillEl.style.width = (playerHP * 100).toFixed(1) + "%";
-
-      // visual feedback
       spawnSparks(ship.x, ship.y, "#FF6B6B", 12);
       startScreenShake(8,300);
       enemyBullets.splice(i,1);
@@ -783,7 +1174,6 @@ function update(dt){
   }
 }
 
-/* Render */
 function render(){
   canvas.style.transform = `translate(${screenShake.x||0}px, ${screenShake.y||0}px)`;
   ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
@@ -813,13 +1203,6 @@ function render(){
     gg.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = gg; ctx.beginPath(); ctx.ellipse(gx,gy,rad,rad*0.6,0,0,Math.PI*2); ctx.fill();
   }
-
-  const p1x = W*0.18;
-  const p1y = ((bgScroll*0.6) % (H + 300)) - 150;
-  ctx.save(); ctx.globalAlpha = 0.95;
-  const pg = ctx.createLinearGradient(p1x-80,p1y,p1x+80,p1y); pg.addColorStop(0,"#2a1b4a"); pg.addColorStop(1,"#0b2a3a");
-  ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(p1x, p1y, 80, 80, 0,0,Math.PI*2); ctx.fill();
-  ctx.restore();
 
   enemies.forEach(e=>{
     if(e.type==="tie" || e.type==="tie-heavy"){
@@ -867,7 +1250,6 @@ function render(){
     ctx.restore();
   }
 
-  // Force field visual around player (new)
   const shieldAlpha = clamp(playerShield, 0.12, 1.0);
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
@@ -880,7 +1262,6 @@ function render(){
   ctx.fillStyle = grd;
   ctx.ellipse(ship.x, ship.y, fieldRadius, fieldRadius*0.6, 0, 0, Math.PI*2);
   ctx.fill();
-  // ring
   ctx.lineWidth = 2 + (shieldAlpha * 3);
   ctx.strokeStyle = `rgba(0,200,255,${0.6 * shieldAlpha})`;
   ctx.beginPath(); ctx.ellipse(ship.x, ship.y, fieldRadius, fieldRadius*0.6, 0, 0, Math.PI*2); ctx.stroke();
@@ -906,8 +1287,8 @@ function loop(ts){
   try{
     render();
     if(running && !paused) update(dt);
-    // NEW: update GameFlowController (schedules hyperspace, boss spawn, timer UI)
     if(window.GameFlowController && typeof GameFlowController.updateFlow === 'function') GameFlowController.updateFlow();
+    if(window.RenderBridge && typeof RenderBridge.update === 'function') RenderBridge.update(dt);
   }catch(e){
     console.error('Runtime error in loop', e);
   }
@@ -926,29 +1307,17 @@ function markCompletedToday(){
   saveState();
 }
 
-/* START COUNTDOWN and BEGIN MISSION (kept for compatibility but LAUNCH now uses GameFlowController.Start) */
+/* START COUNTDOWN and BEGIN MISSION */
 function startCountdown(){
   if(!canPlayToday()){ alert("MISSION ALREADY COMPLETED TODAY. TRY AGAIN TOMORROW."); return; }
-
-  // switch UI immediately so menu disappears
   showScreen("mission");
-
-  // disable start to prevent double-start
   startBtn.disabled = true;
-
-  // ensure audio unlocked
   try{ ensureAudio(); }catch(e){}
-
-  // show countdown on mission screen
   countdown = 5;
   countdownEl.textContent = countdown;
   countdownEl.style.display = "block";
-
   playBeepSequence(5);
-
-  // clear any existing interval just in case
   if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-
   countdownInterval = setInterval(()=>{
     countdown--;
     if(countdown <= 0){
@@ -964,18 +1333,14 @@ function startCountdown(){
 function playBeepSequence(n){ for(let i=0;i<n;i++) setTimeout(()=>beep(), i*900); }
 
 function beginMission(){
-  // ensure mission screen visible
   showScreen("mission");
-
   running = true; paused = false; cinematicSlow = 1.0;
-
   missionTime = CONFIG.TOTAL_TIME; spawnTimer = 0; enemies.length = 0; lasers.length = 0; enemyBullets.length = 0; boss = null; bossActive = false; rewardForMission = 0; hyperspaceTick = -1;
   hudName.textContent = state.name || defaultState.name;
   hudCrystals.textContent = state.crystals;
   bossBar.style.display = "none";
   ship.x = window.innerWidth/2; ship.y = window.innerHeight*0.78; ship.targetX = ship.x; ship.nextMoveAt = 0;
   lastTime = performance.now();
-  // reset player defensive stats for each mission to full (but keep playful minimum)
   playerShield = 1.0;
   playerHP = 1.0;
   shieldFillEl.style.width = "100%";
@@ -998,7 +1363,6 @@ function finishMission(){
   saveState();
   rewardText.textContent = `+${rewardForMission} CRYSTALS`;
   rewardDetail.textContent = `BASE ${base}${weekly?(" • WEEKLY +"+weekly):""}`;
-  // re-enable start button for next day
   startBtn.disabled = false;
   showScreen("reward");
 }
@@ -1045,31 +1409,19 @@ function fireLasers(){
 
 /* Bind UI actions after DOM ready */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // LAUNCH now starts GameFlowController (new system) which handles precount and main timer
   bindClick(startBtn, ()=>{
     state.name = (playerName.value.trim().toUpperCase() || state.name);
     saveState();
     refreshTitleUI();
-    // show mission screen immediately and disable start
     showScreen("mission");
     startBtn.disabled = true;
-    // Start the new flow controller (precount + main timer + scheduled hyperspace)
     if(window.GameFlowController && typeof GameFlowController.Start === 'function') GameFlowController.Start();
-    else startCountdown(); // fallback
+    else startCountdown();
   });
   bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
-  bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+  bindClick(document.getElementById('shopBack'), ()=>{ showScreen("title"); refreshTitleUI(); });
   bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
-  bindClick(resetBtn, ()=>{ // abort handler clears countdown and stops mission
-    if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){
-      // clear countdown if running
-      if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; countdownEl.style.display = "none"; }
-      running=false; paused=false;
-      // re-enable start button
-      startBtn.disabled = false;
-      showScreen("title"); refreshTitleUI();
-    }
-  });
+  bindClick(resetBtn, ()=>{ if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; countdownEl.style.display = "none"; } running=false; paused=false; startBtn.disabled = false; showScreen("title"); refreshTitleUI(); } });
   bindClick(rewardBox, ()=>{ openReward(); });
   bindClick(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleUI(); });
 
@@ -1080,7 +1432,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   bindClick(applyAdmin, ()=>{ const c = parseInt(adminCrystals.value||"0"); const s = parseInt(adminStreak.value||"0"); if(!isNaN(c)){ state.crystals = c; } if(!isNaN(s)){ state.streak = s; } saveState(); refreshTitleUI(); alert("ADMIN CHANGES APPLIED"); });
   bindClick(adminBack, ()=>{ showScreen("title"); refreshTitleUI(); });
 
-  // RESET DATA moved to adminReset
   bindClick(adminReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(CONFIG.STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); alert("DATA RESET"); showScreen("title"); } });
 
   playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim().toUpperCase() || state.name; saveState(); refreshTitleUI(); });
@@ -1104,414 +1455,15 @@ document.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='d'){ debug
 /* Save on unload */
 window.addEventListener("beforeunload", ()=>{ saveState(); });
 
-/* =========================
-   New modular systems (ZoneManager, UIManager, GameFlowController, BossStateMachine, DebugHooks)
-   - These are integrated with the existing code above via small APIs.
-   - They are intentionally modular and documented inline.
-   ========================= */
+/* Expose debug console commands */
+window.ForceHyperspace = function(){ if(window.GameFlowController) GameFlowController.ForceHyperspace(); };
+window.SpawnBoss = function(){ if(BossStateMachine && BossStateMachine.spawnBoss) BossStateMachine.spawnBoss(1.0); else spawnBoss(); };
+window.SetTimer = function(s){ if(window.GameFlowController) GameFlowController.SetTimer(s); else missionTime = s; UIManager.UpdateTimerDisplay(Math.ceil(s)); };
 
-/* -------------------------
-   UIManager + AnnouncementBanner
-   - API: UIManager.ShowAnnouncement(text, opts)
-   - API: UIManager.UpdateTimerDisplay(seconds)
-   ------------------------- */
-const UIManager = (function(){
-  const bannerEl = document.getElementById('announcementBanner') || (function createBanner(){
-    const el = document.getElementById('announcementBanner') || document.createElement('div');
-    el.id = 'announcementBanner';
-    el.style.position = 'fixed';
-    el.style.left = '50%';
-    el.style.top = '12%';
-    el.style.transform = 'translateX(-50%)';
-    el.style.zIndex = 9999;
-    el.style.padding = '12px 20px';
-    el.style.borderRadius = '12px';
-    el.style.fontWeight = '900';
-    el.style.fontSize = '20px';
-    el.style.textAlign = 'center';
-    el.style.pointerEvents = 'none';
-    el.style.opacity = '0';
-    el.style.whiteSpace = 'pre-line';
-    el.style.transition = 'opacity 220ms ease, transform 260ms cubic-bezier(.2,.9,.2,1)';
-    document.body.appendChild(el);
-    return el;
-  })();
-
-  const timerEl = document.getElementById('uiTimerLarge') || (function createTimer(){
-    const t = document.getElementById('uiTimerLarge') || document.createElement('div');
-    t.id = 'uiTimerLarge';
-    t.style.position = 'fixed';
-    t.style.left = '50%';
-    t.style.top = '6%';
-    t.style.transform = 'translateX(-50%)';
-    t.style.zIndex = 9998;
-    t.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace';
-    t.style.fontWeight = '900';
-    t.style.fontSize = '56px';
-    t.style.letterSpacing = '1px';
-    t.style.padding = '8px 14px';
-    t.style.borderRadius = '10px';
-    t.style.textAlign = 'center';
-    t.style.pointerEvents = 'none';
-    t.style.color = '#fff';
-    document.body.appendChild(t);
-    return t;
-  })();
-
-  function styleFor(type){
-    if(type==='Warning') return {bg:'linear-gradient(90deg,#FFB86B,#FF6B6B)', color:'#1b0b0b', sfx:'whoosh-warning'};
-    if(type==='Phase') return {bg:'linear-gradient(90deg,#7F5BFF,#C04AFF)', color:'#fff', sfx:'whoosh-phase'};
-    if(type==='Boss') return {bg:'linear-gradient(90deg,#FF4A4A,#FFD24A)', color:'#111', sfx:'whoosh-boss'};
-    return {bg:'rgba(0,0,0,0.6)', color:'#fff', sfx:null};
-  }
-  function ShowAnnouncement(text, opts = {}){
-    const duration = (opts.duration || 1000);
-    const style = styleFor(opts.style || 'Phase');
-    bannerEl.textContent = text + (opts.subtitle ? ('\n' + opts.subtitle) : '');
-    bannerEl.style.background = style.bg;
-    bannerEl.style.color = style.color;
-    bannerEl.style.padding = opts.subtitle ? '14px 22px' : '10px 18px';
-    bannerEl.style.transform = 'translateX(-50%) translateY(-8px)';
-    bannerEl.style.opacity = '1';
-    if(opts.sfx && typeof playSfx === 'function') playSfx(opts.sfx);
-    setTimeout(()=>{ bannerEl.style.opacity = '0'; bannerEl.style.transform = 'translateX(-50%) translateY(-26px)'; }, duration);
-  }
-  function UpdateTimerDisplay(seconds){
-    const mm = String(Math.floor(seconds/60)).padStart(2,'0');
-    const ss = String(Math.floor(seconds%60)).padStart(2,'0');
-    timerEl.textContent = `${mm}:${ss}`;
-    // color changes
-    if(seconds <= 10) timerEl.style.color = '#FF4A4A';
-    else if(seconds <= 30) timerEl.style.color = '#FF9A4A';
-    else timerEl.style.color = '#FFFFFF';
-    // also update small HUD timer for compatibility
-    const small = document.getElementById('timerBig');
-    if(small) small.textContent = `${mm}:${ss}`;
-  }
-  return { ShowAnnouncement, UpdateTimerDisplay };
-})();
-
-/* -------------------------
-   ZoneManager
-   - Data-driven zones
-   - API: ZoneManager.LoadZone(index), ZoneManager.GetNextZone(), ZoneManager.GetCurrentZone()
-   ------------------------- */
-const ZoneManager = (function(){
-  const zones = [
-    { id: 'alpha', background: {stars:1, tint:'#0ff'}, music: 'synthA', enemyPool: ['tie','drone'], spawnRate: 0.9, difficultyMultiplier: 1.0, palette: {primary:'#00dfff',accent:'#7f5bff'} },
-    { id: 'beta',  background: {stars:1.2, tint:'#c0f'}, music: 'synthB', enemyPool: ['tie-heavy','drone-fast'], spawnRate: 0.7, difficultyMultiplier: 1.2, palette: {primary:'#c04aff',accent:'#ffd24a'} },
-    { id: 'gamma', background: {stars:1.4, tint:'#fa8'}, music: 'synthC', enemyPool: ['destroyer','drone-heavy'], spawnRate: 0.55, difficultyMultiplier: 1.45, palette: {primary:'#ff9a4a',accent:'#ff4a4a'} },
-  ];
-  let currentIndex = 0;
-
-  function LoadZone(index){
-    currentIndex = Math.max(0, Math.min(index, zones.length-1));
-    const z = zones[currentIndex];
-    // Integration points: apply visuals, audio, and spawn settings
-    if(typeof applyZoneVisuals === 'function') applyZoneVisuals(z.background, z.palette);
-    if(typeof AudioManager !== 'undefined' && AudioManager.playTrack) AudioManager.playTrack(z.music);
-    // expose spawn settings to game
-    window.GameSettings = window.GameSettings || {};
-    GameSettings.currentEnemyPool = z.enemyPool.slice();
-    GameSettings.spawnRateBase = z.spawnRate;
-    GameSettings.difficultyMultiplier = z.difficultyMultiplier;
-    console.info('ZoneManager: Loaded zone', z.id);
-    return z;
-  }
-  function GetNextZone(){
-    return zones[(currentIndex + 1) % zones.length];
-  }
-  function GetCurrentZone(){ return zones[currentIndex]; }
-  return { LoadZone, GetNextZone, GetCurrentZone, zones };
-})();
-
-/* -------------------------
-   GameFlowController
-   - Orchestrates precount, main timer, scheduled phase events, hyperspace sequence, boss spawn
-   - API: GameFlowController.Start(), ForceHyperspace(), SetTimer(seconds), updateFlow()
-   - Calls your existing beginMission() when main timer starts
-   ------------------------- */
-const GameFlowController = (function(){
-  let mainTimer = CONFIG.TOTAL_TIME;
-  let runningFlow = false;
-  let scheduled = [];
-  let lastTick = performance.now();
-  let phaseIndex = 0;
-
-  function scheduleEvents(){
-    scheduled = [];
-    const total = CONFIG.TOTAL_TIME;
-    // schedule hyperspace at 90,60,30 remaining -> compute elapsed times
-    [90,60,30].forEach(rem => {
-      const elapsedAt = total - rem;
-      if(elapsedAt >= 0 && elapsedAt <= total) scheduled.push({type:'hyperspace', at: elapsedAt});
-    });
-    // sort by at
-    scheduled.sort((a,b)=>a.at-b.at);
-  }
-
-  function Start(){
-    // Precount: show "Prepare for hyperspace" for 5s, then start main timer and call beginMission()
-    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:5000, style:'Warning'});
-    // ensure zone 0 loaded initially
-    ZoneManager.LoadZone(0);
-    scheduleEvents();
-    phaseIndex = 0;
-    runningFlow = true;
-    mainTimer = CONFIG.TOTAL_TIME;
-    lastTick = performance.now();
-    // show mission HUD timer immediately
-    UIManager.UpdateTimerDisplay(mainTimer);
-    // call beginMission after 5s (precount)
-    setTimeout(()=>{ if(typeof beginMission === 'function') beginMission(); }, 5000);
-  }
-
-  function updateFlow(){
-    if(!runningFlow) return;
-    const now = performance.now();
-    const dt = (now - lastTick)/1000;
-    lastTick = now;
-    mainTimer = Math.max(0, mainTimer - dt);
-    UIManager.UpdateTimerDisplay(Math.ceil(mainTimer));
-    // check scheduled events by elapsed time
-    const elapsed = CONFIG.TOTAL_TIME - mainTimer;
-    while(scheduled.length && elapsed >= scheduled[0].at){
-      const ev = scheduled.shift();
-      if(ev.type === 'hyperspace') runHyperspaceSequence();
-    }
-    // boss spawn when timer <= 30s
-    if(mainTimer <= CONFIG.PHASE_LENGTH && typeof BossStateMachine !== 'undefined' && !BossStateMachine.isActive()){
-      // spawn boss with intro
-      runBossIntro();
-    }
-    if(mainTimer <= 0){
-      runningFlow = false;
-      // mission end hook
-      if(typeof onMissionEnd === 'function') onMissionEnd();
-    }
-  }
-
-  function runHyperspaceSequence(){
-    // Warning banner (short), then hyperspace animation, then load next zone and show phase banner
-    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:900, style:'Warning'});
-    setTimeout(()=>{
-      // play hyperspace animation (camera zoom + streak overlay)
-      playHyperspaceAnimation({duration: 1000, chroma:true});
-      // after animation, load next zone
-      setTimeout(()=>{
-        const next = ZoneManager.GetNextZone();
-        const idx = ZoneManager.zones.findIndex(z=>z.id===next.id);
-        ZoneManager.LoadZone(idx);
-        phaseIndex++;
-        UIManager.ShowAnnouncement('Begin Phase ' + Math.min(phaseIndex+1,4), {duration:1000, style:'Phase'});
-      }, 1000);
-    }, 200);
-  }
-
-  function runBossIntro(){
-    UIManager.ShowAnnouncement('Boss Approaching', {duration:900, style:'Boss'});
-    setTimeout(()=>{
-      // spawn boss via BossStateMachine
-      if(BossStateMachine && typeof BossStateMachine.spawnBoss === 'function'){
-        BossStateMachine.spawnBoss(CONFIG.BOSS_HP);
-      } else {
-        // fallback to existing spawnBoss
-        spawnBoss && spawnBoss();
-      }
-    }, 600);
-  }
-
-  function ForceHyperspace(){ runHyperspaceSequence(); }
-  function SetTimer(seconds){ mainTimer = Math.max(0, seconds); UIManager.UpdateTimerDisplay(Math.ceil(mainTimer)); }
-  function getTimer(){ return mainTimer; }
-
-  return { Start, updateFlow, ForceHyperspace, SetTimer, getTimer };
-})();
-
-/* -------------------------
-   BossStateMachine
-   - States: Idle, HitReact, PhaseTransition, Enraged, Death
-   - API: spawnBoss(hp), ApplyDamage(d), isActive(), getHp()
-   - Uses existing spawnSparks, spawnDebris, startScreenShake, playSfx, setCinematicSlow hooks if available
-   ------------------------- */
-const BossStateMachine = (function(){
-  let bossObj = null;
-  let state = 'Idle';
-  let hp = 1.0;
-  let maxHp = 1.0;
-
-  function spawnBoss(hpValue = 1.0){
-    // Use existing spawnBoss() to create boss object if present, otherwise create minimal bossObj
-    if(typeof spawnBoss === 'function'){
-      spawnBoss(); // existing function sets bossActive and boss global
-      // wait a tick for boss to be created
-      setTimeout(()=>{ if(window.boss){ bossObj = boss; hp = bossObj.hp; maxHp = bossObj.hp; bossObj.active = true; } }, 60);
-    } else {
-      bossObj = { x: window.innerWidth/2, y: -300, active:false, hp: hpValue, maxHp: hpValue };
-      hp = hpValue; maxHp = hpValue;
-      // intro drop
-      const introDur = 700;
-      const start = performance.now();
-      const introTick = () => {
-        const t = (performance.now() - start)/introDur;
-        bossObj.y = -300 + Math.min(1, t) * (window.innerHeight*0.22 + 300);
-        if(t < 1) requestAnimationFrame(introTick);
-        else { bossObj.active = true; if(typeof onBossSpawned === 'function') onBossSpawned(bossObj); }
-      };
-      introTick();
-    }
-    state = 'Idle';
-    return bossObj;
-  }
-
-  function isActive(){ return !!(window.boss && window.boss.active) || (!!bossObj && bossObj.active && state !== 'Death'); }
-
-  function ApplyDamage(damage){
-    // Accept damage in normalized 0..1 scale
-    const target = window.boss || bossObj;
-    if(!target || state === 'Death') return;
-    // apply damage
-    hp = clamp((target.hp || hp) - damage, 0, (target.maxHp || maxHp));
-    if(target) target.hp = hp;
-    // hit react visuals
-    state = 'HitReact';
-    // 0.08s white flash, red tint, small particle burst, brief camera shake
-    if(typeof spawnSparks === 'function') spawnSparks(target.x || (window.innerWidth/2), target.y || (window.innerHeight*0.22), '#FFD2FF', 18);
-    if(typeof startScreenShake === 'function') startScreenShake(10, 220);
-    if(typeof playSfx === 'function') playSfx('boss-hit');
-    // schedule post-hit
-    setTimeout(()=>{
-      if(hp <= 0.001){
-        state = 'Death';
-        runDeath(target);
-      } else {
-        // visual stages by HP
-        const pct = (hp / (target.maxHp || maxHp)) * 100;
-        if(pct <= 33) applyBossVisualStage(3);
-        else if(pct <= 66) applyBossVisualStage(2);
-        else applyBossVisualStage(1);
-        state = 'Idle';
-      }
-    }, 80);
-  }
-
-  function applyBossVisualStage(stage){
-    // stage 1: normal, stage 2: cracks/smoke, stage 3: heavy sparks
-    if(typeof setBossVisualStage === 'function') setBossVisualStage(stage);
-    // fallback: small particle burst to hint damage
-    if(stage === 2) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF9A4A', 24);
-    if(stage === 3) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF4A4A', 48);
-  }
-
-  function runDeath(target){
-    if(typeof playSfx === 'function') playSfx('boss-death');
-    if(typeof spawnSparks === 'function') spawnSparks(target.x || ship.x, target.y || ship.y, '#C0A0FF', 400);
-    if(typeof spawnDebris === 'function') spawnDebris(target.x || ship.x, target.y || ship.y, '#C0A0FF', 240);
-    if(typeof startScreenShake === 'function') startScreenShake(48, 1600);
-    // slow motion if supported
-    if(typeof setCinematicSlow === 'function') setCinematicSlow(0.18);
-    setTimeout(()=>{
-      if(typeof setCinematicSlow === 'function') setCinematicSlow(1.0);
-      // finalize death: call existing onBossDeath if present
-      if(typeof onBossDeath === 'function') onBossDeath(target);
-      // clear global boss if used
-      if(window.boss){ bossActive = false; boss = null; bossBar.style.display = "none"; }
-      bossObj = null;
-    }, 1600);
-  }
-
-  function getHp(){ return (window.boss && window.boss.hp) ? window.boss.hp : (bossObj ? bossObj.hp : hp); }
-  return { spawnBoss, ApplyDamage, isActive, getHp };
-})();
-
-/* -------------------------
-   Minimal SFX mapping and helpers (map to existing playOsc/bigExplode)
-   - playSfx(name) used by new modules; maps to existing audio helpers
-   ------------------------- */
-window.playSfx = window.playSfx || function(name){
-  if(name === 'whoosh-warning') playOsc(600,'sine',0.18,0.12);
-  if(name === 'whoosh-phase')   playOsc(900,'sine',0.18,0.12);
-  if(name === 'whoosh-boss')    playOsc(420,'sawtooth',0.28,0.18);
-  if(name === 'boss-hit')       playOsc(320,'square',0.08,0.12);
-  if(name === 'boss-death')     bigExplode && bigExplode();
-};
-
-/* -------------------------
-   Integration helper stubs (optional to override in your code)
-   - applyZoneVisuals(background, palette)
-   - setBossVisualStage(stage)
-   - setCinematicSlow(value)
-   - onBossSpawned(bossObj), onBossDeath(bossObj), onMissionEnd()
-   These are intentionally no-ops here; override in your main code if you want custom visuals.
-   ------------------------- */
-window.applyZoneVisuals = window.applyZoneVisuals || function(background, palette){
-  // Default: set a global palette used by render code (your render loop can read RenderPalette)
-  window.RenderPalette = palette || window.RenderPalette;
-  window.BackgroundParams = background || window.BackgroundParams;
-  console.info('applyZoneVisuals applied', background, palette);
-};
-window.setBossVisualStage = window.setBossVisualStage || function(stage){
-  // Default: small console hint; you can implement sprite cracks/smoke here
-  console.info('Boss visual stage', stage);
-};
-window.setCinematicSlow = window.setCinematicSlow || function(v){
-  cinematicSlow = v;
-};
-
-/* -------------------------
-   Debug hooks and console commands
-   - Toggle overlay with D, console commands: ForceHyperspace(), SpawnBoss(), SetTimer(seconds)
-   ------------------------- */
-(function DebugHooks(){
-  let dbg = document.getElementById('zoneDebugOverlay');
-  if(!dbg){
-    dbg = document.createElement('div'); dbg.id = 'zoneDebugOverlay';
-    dbg.style.position = 'fixed'; dbg.style.left = '8px'; dbg.style.top = '8px'; dbg.style.zIndex = 99999;
-    dbg.style.background = 'rgba(0,0,0,0.6)'; dbg.style.color = '#fff'; dbg.style.padding = '8px 10px'; dbg.style.borderRadius = '8px';
-    dbg.style.fontSize = '12px'; dbg.style.display = 'none';
-    document.body.appendChild(dbg);
-  }
-  let visible = false;
-  function update(){
-    const zone = ZoneManager.GetCurrentZone();
-    const phase = Math.ceil((CONFIG.TOTAL_TIME - (GameFlowController.getTimer ? GameFlowController.getTimer() : missionTime)) / CONFIG.PHASE_LENGTH) + 1;
-    const bossHp = (BossStateMachine.getHp) ? BossStateMachine.getHp() : 0;
-    dbg.innerText = `Zone:${zone ? zone.id : 'n/a'}\nPhase:${phase}\nTimer:${Math.ceil(GameFlowController.getTimer ? GameFlowController.getTimer() : missionTime)}\nBossHP:${(bossHp*100).toFixed(0)}%\nEnemies:${(typeof enemies !== 'undefined' ? enemies.length : 'n/a')}`;
-  }
-  setInterval(()=>{ if(visible) update(); }, 400);
-  document.addEventListener('keydown', (e)=>{
-    if(e.key.toLowerCase() === 'd'){ visible = !visible; dbg.style.display = visible ? 'block' : 'none'; update(); }
-  });
-  // console commands
-  window.ForceHyperspace = GameFlowController.ForceHyperspace;
-  window.SpawnBoss = function(){ if(BossStateMachine.spawnBoss) BossStateMachine.spawnBoss(1.0); };
-  window.SetTimer = GameFlowController.SetTimer;
-})();
-
-/* =========================
-   Wiring checklist (short)
-   - Ensure these functions/objects exist or map them to your systems:
-     • GameFlowController.Start() — called by LAUNCH button (already wired)
-     • GameFlowController.updateFlow() — called each RAF loop (wired)
-     • ZoneManager.LoadZone(index) — loads palette/enemy pool (provided)
-     • UIManager.ShowAnnouncement(text, opts) — used for banners (provided)
-     • UIManager.UpdateTimerDisplay(seconds) — updates large timer (provided)
-     • BossStateMachine.spawnBoss(hp) and .ApplyDamage(d) — used for boss lifecycle (provided)
-     • playSfx(name) — mapped to existing audio helpers (provided)
-     • applyZoneVisuals(background,palette) — override to change background rendering (stub provided)
-     • setBossVisualStage(stage) — override to show cracks/smoke (stub provided)
-     • setCinematicSlow(value) — sets cinematicSlow (provided)
-   - Enemy spawn code should read window.GameSettings.currentEnemyPool and GameSettings.spawnRateBase if you want zone-specific pools (GameSettings is set by ZoneManager.LoadZone).
-   ========================= */
-
-/* =========================
-   Test plan (brief)
-   1. Press LAUNCH → mission screen appears, "Prepare for hyperspace" banner shows for 5s, then main timer starts at 02:00.
-   2. Watch timer color: normal → orange when <30s → red when <10s.
-   3. At 90s, 60s, 30s remaining you should see a short warning, hyperspace animation, zone load, and "Begin Phase X" banner.
-   4. At ≤30s the boss intro runs and boss becomes active; hitting boss triggers hit react and visual stages.
-   5. Toggle debug overlay with D; run ForceHyperspace(), SpawnBoss(), SetTimer(45) in console to verify hooks.
-   ========================= */
+/* Minimal stubs for optional hooks (override in your code if desired) */
+window.applyZoneVisuals = window.applyZoneVisuals || function(background, palette){ window.RenderPalette = palette || window.RenderPalette; window.BackgroundParams = background || window.BackgroundParams; };
+window.setBossVisualStage = window.setBossVisualStage || function(stage){ console.info('Boss visual stage', stage); };
+window.setCinematicSlow = window.setCinematicSlow || function(v){ cinematicSlow = v; };
 
 </script>
 </body>
