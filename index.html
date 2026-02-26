@@ -3,98 +3,105 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>PLAQUE INVADERS — OPERATION SAUCER FALL (FIXED)</title>
+<title>PLAQUE INVADERS — SAUCER FINALE (SAFARI FIXED)</title>
 <style>
 :root{
   --bg-top:#00020a; --bg-bottom:#001026;
   --accent-cyan:#00F2FF; --accent-mag:#C04AFF; --accent-gold:#FFD24A;
   --hud-bg: rgba(0,0,0,0.64);
   --glass: rgba(255,255,255,0.03);
-  --ui-radius:14px;
-  --display: "SF Pro Display", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --ui-radius:12px;
+  --display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));font-family:var(--display);color:#E8FBFF;overflow:hidden;text-transform:uppercase}
-.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:14px}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));font-family:var(--display);color:#E8FBFF;overflow:hidden;text-transform:uppercase;-webkit-font-smoothing:antialiased}
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px}
 .screen.active{display:flex}
-.card{width:100%;max-width:920px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
-.title{font-weight:900;font-size:2rem;color:var(--accent-gold);text-shadow:0 0 18px rgba(255,210,74,0.18);letter-spacing:-1px}
-.lead{font-size:0.95rem;color:#BFEFFF;opacity:0.95;margin-top:6px}
+.card{width:100%;max-width:920px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
+.title{font-weight:900;font-size:1.8rem;color:var(--accent-gold);text-shadow:0 0 12px rgba(255,210,74,0.14);letter-spacing:-0.5px}
+.lead{font-size:0.9rem;color:#BFEFFF;opacity:0.95;margin-top:6px}
 .row{display:flex;gap:10px}
-.input{width:100%;padding:12px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#E8FBFF;font-weight:800;text-align:center}
-.statbar{display:flex;gap:10px;margin:12px 0}
-.stat{flex:1;background:var(--hud-bg);padding:10px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
-.stat .label{font-size:0.72rem;opacity:0.85}
-.stat .value{font-size:1.1rem;font-weight:900}
-.btn{appearance:none;border:0;padding:12px 14px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 10px 30px rgba(127,91,255,0.12);font-size:1rem;cursor:pointer;touch-action:manipulation}
+.input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#E8FBFF;font-weight:800;text-align:center}
+.statbar{display:flex;gap:8px;margin:12px 0}
+.stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
+.stat .label{font-size:0.68rem;opacity:0.85}
+.stat .value{font-size:1rem;font-weight:900}
+.btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation}
 .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#E8FBFF}
 #game-canvas{position:absolute;inset:0;z-index:1;touch-action:none;background:transparent}
-.hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:60}
-.hud .box{background:var(--hud-bg);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
-.hud .left{display:flex;gap:10px;align-items:center}
-#phaseBadge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-mag),#7F5BFF);font-weight:900;font-size:0.78rem;letter-spacing:1px}
-#timerBig{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-weight:900; font-size:1.6rem; letter-spacing:1px; color:#fff; text-shadow:0 0 18px rgba(0,255,255,0.12)}
-#progressBar{width:300px;height:12px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:60}
+.hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
+.hud .left{display:flex;gap:8px;align-items:center}
+#phaseBadge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-mag),#7F5BFF);font-weight:900;font-size:0.72rem;letter-spacing:1px}
+#timerBig{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-weight:900; font-size:1.4rem; letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(0,255,255,0.10)}
+#progressBar{width:240px;height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
 #progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold));transition:width 120ms linear}
-.label-small{font-size:0.68rem;opacity:0.85}
-.phase-banner{position:absolute;left:50%;top:18px;transform:translateX(-50%);padding:8px 14px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));backdrop-filter: blur(6px);font-weight:900;letter-spacing:1px;z-index:70;display:none}
-.boss-bar{position:absolute;top:86px;left:50%;transform:translateX(-50%);width:72%;height:18px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
+.label-small{font-size:0.66rem;opacity:0.85}
+.phase-banner{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));backdrop-filter: blur(6px);font-weight:900;letter-spacing:1px;z-index:70;display:none}
+.boss-bar{position:absolute;top:74px;left:50%;transform:translateX(-50%);width:84%;max-width:980px;height:14px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
 .boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF4A4A,#FFEA4A);transition:width 120ms linear}
-.controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
-.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:10px 12px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
-.admin-link{position:absolute;left:14px;bottom:14px;z-index:80;pointer-events:auto}
-.shop-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:8px 0}
-.preview{width:84px;height:48px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.reward-box{width:160px;height:160px;border-radius:18px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 28px rgba(179,107,255,0.95);cursor:pointer}
-.spark{position:absolute;width:12px;height:12px;border-radius:4px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 14px #c0a0ff}
-.small-note{font-size:0.82rem;opacity:0.9}
-.debug{position:fixed;right:12px;bottom:12px;background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;font-size:12px;z-index:999;color:#fff}
+.controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
+.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
+.admin-link{position:absolute;left:10px;bottom:10px;z-index:80;pointer-events:auto}
+.shop-list{max-height:calc(100vh - 220px);overflow:auto;padding-right:6px;-webkit-overflow-scrolling:touch}
+.shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:8px 0}
+.preview{width:72px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.reward-box{width:140px;height:140px;border-radius:14px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(179,107,255,0.95);cursor:pointer}
+.spark{position:absolute;width:10px;height:10px;border-radius:4px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 12px #c0a0ff}
+.small-note{font-size:0.78rem;opacity:0.9}
+.debug{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;font-size:12px;z-index:999;color:#fff}
+@media (max-width:420px){
+  .card{padding:12px}
+  .title{font-size:1.2rem}
+  #progressBar{width:160px}
+  .shop-list{max-height:calc(100vh - 260px)}
+}
 </style>
 </head>
 <body>
-<!-- TITLE / BRIEFING -->
-<div id="screen-title" class="screen active">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
+<!-- TITLE -->
+<div id="screen-title" class="screen active" role="main" aria-label="Title screen">
+  <div class="card" role="region" aria-label="Mission briefing">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
         <div class="title">PLAQUE INVADERS — OPERATION: SAUCER FALL</div>
-        <div class="lead">BRIEFING: NAVIGATE THE COSMIC CORRIDOR, DISPATCH ESCALATING HOSTILES, AND NEUTRALISE THE CYBER SAUCER BEFORE IT EMITS A SYSTEMIC PULSE.</div>
+        <div class="lead">BRIEFING: NAVIGATE THE COSMIC CORRIDOR, DISPATCH ESCALATING HOSTILES, AND NEUTRALISE THE CYBER SAUCER.</div>
       </div>
-      <div style="text-align:right">
+      <div style="text-align:right;min-width:140px">
         <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">PILOT: <span id="pilotNameDisplay">BEN</span></div>
-        <div style="font-size:0.8rem;opacity:0.9">VERSION 1.3</div>
+        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.3</div>
       </div>
     </div>
 
-    <div style="margin-top:12px;display:flex;gap:10px">
-      <input id="playerName" class="input" placeholder="ENTER CALLSIGN" maxlength="16" />
-      <button id="startBtn" class="btn" type="button">LAUNCH MISSION</button>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <input id="playerName" class="input" placeholder="ENTER CALLSIGN" maxlength="16" aria-label="Pilot callsign" />
+      <button id="startBtn" class="btn" type="button" aria-label="Launch mission">LAUNCH MISSION</button>
     </div>
 
-    <div class="statbar">
+    <div class="statbar" style="margin-top:10px">
       <div class="stat"><div class="label-small">CRYSTALS</div><div id="statCrystals" class="value">0</div></div>
       <div class="stat"><div class="label-small">STREAK (DAYS)</div><div id="statStreak" class="value">0</div></div>
-      <div class="stat"><div class="label-small">MISSIONS COMPLETED</div><div id="statMissions" class="value">0</div></div>
+      <div class="stat"><div class="label-small">MISSIONS</div><div id="statMissions" class="value">0</div></div>
     </div>
 
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button id="shopBtn" class="btn alt" style="flex:1">SHIPYARD</button>
-      <button id="adminOpen" class="btn alt" style="flex:1">ADMIN DASHBOARD</button>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <button id="shopBtn" class="btn alt" style="flex:1;min-width:140px">SHIPYARD</button>
+      <button id="adminOpen" class="btn alt" style="flex:1;min-width:140px">ADMIN DASHBOARD</button>
     </div>
   </div>
 </div>
 
 <!-- SHOP -->
-<div id="screen-shop" class="screen">
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:900;font-size:1.2rem;color:var(--accent-cyan)">SHIPYARD — COSMETICS</div>
+<div id="screen-shop" class="screen" role="dialog" aria-label="Shipyard">
+  <div class="card" style="width:100%;max-width:820px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-weight:900;font-size:1.05rem;color:var(--accent-cyan)">SHIPYARD — COSMETICS</div>
       <div style="text-align:right">
         <div class="small-note">CRYSTALS: <span id="shopCrystals">0</span></div>
       </div>
     </div>
 
-    <div id="shop-list" style="margin-top:12px"></div>
+    <div class="shop-list" id="shop-list" aria-live="polite" style="margin-top:12px"></div>
 
     <div style="display:flex;gap:8px;margin-top:12px">
       <button id="shopBack" class="btn alt" style="flex:1">BACK</button>
@@ -104,13 +111,13 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 </div>
 
 <!-- MISSION -->
-<div id="screen-mission" class="screen" style="background:transparent;padding:0">
-  <canvas id="game-canvas"></canvas>
+<div id="screen-mission" class="screen" style="background:transparent;padding:0" role="application" aria-label="Mission">
+  <canvas id="game-canvas" aria-hidden="true"></canvas>
 
-  <div class="hud">
+  <div class="hud" aria-hidden="false">
     <div class="left">
-      <div class="box"><div class="label-small">PILOT</div><div id="hudName">BEN</div></div>
-      <div class="box"><div class="label-small">PHASE</div><div id="phaseBadge">PHASE 1</div></div>
+      <div class="box" aria-label="Pilot"><div class="label-small">PILOT</div><div id="hudName">BEN</div></div>
+      <div class="box" aria-label="Phase"><div class="label-small">PHASE</div><div id="phaseBadge">PHASE 1</div></div>
     </div>
 
     <div style="display:flex;align-items:center;gap:10px">
@@ -119,7 +126,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
         <div class="label-small" style="text-align:center">MISSION PROGRESS</div>
         <div id="progressBar"><div id="progressFill"></div></div>
       </div>
-      <div class="box"><div class="label-small">CRYSTALS</div><div id="hudCrystals">0</div></div>
+      <div class="box" aria-label="Crystals"><div class="label-small">CRYSTALS</div><div id="hudCrystals">0</div></div>
     </div>
   </div>
 
@@ -129,8 +136,8 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   <div class="mission-overlay">
     <div class="center-count" id="countdown" style="display:none">5</div>
     <div class="controls">
-      <button id="pauseBtn" class="control-btn">PAUSE</button>
-      <button id="resetBtn" class="control-btn" style="background:#ff6b6b">ABORT</button>
+      <button id="pauseBtn" class="control-btn" aria-label="Pause">PAUSE</button>
+      <button id="resetBtn" class="control-btn" style="background:#ff6b6b" aria-label="Abort">ABORT</button>
     </div>
   </div>
 
@@ -140,13 +147,13 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 </div>
 
 <!-- REWARD -->
-<div id="screen-reward" class="screen">
+<div id="screen-reward" class="screen" role="dialog" aria-label="Reward">
   <div class="card" style="align-items:center">
-    <div style="font-weight:900;font-size:1.4rem;color:#C0A0FF">SECTOR CLEARED</div>
-    <div style="height:18px"></div>
-    <div id="rewardBox" class="reward-box" title="Tap to open">📦</div>
+    <div style="font-weight:900;font-size:1.2rem;color:#C0A0FF">SECTOR CLEARED</div>
+    <div style="height:12px"></div>
+    <div id="rewardBox" class="reward-box" title="Tap to open" role="button" aria-label="Open reward">📦</div>
     <div style="margin-top:12px;text-align:center">
-      <div id="rewardText" style="font-size:1.1rem;font-weight:900">+0 CRYSTALS</div>
+      <div id="rewardText" style="font-size:1.05rem;font-weight:900">+0 CRYSTALS</div>
       <div id="rewardDetail" class="small-note" style="margin-top:6px">TAP THE CRATE TO CLAIM</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;width:100%">
@@ -155,11 +162,11 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<!-- ADMIN DASHBOARD -->
-<div id="screen-admin" class="screen">
+<!-- ADMIN -->
+<div id="screen-admin" class="screen" role="dialog" aria-label="Admin dashboard">
   <div class="card" style="width:100%;max-width:720px">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:900;font-size:1.2rem;color:var(--accent-gold)">ADMIN DASHBOARD</div>
+      <div style="font-weight:900;font-size:1.05rem;color:var(--accent-gold)">ADMIN DASHBOARD</div>
       <div style="text-align:right"><div class="small-note">LOCAL ONLY</div></div>
     </div>
 
@@ -170,7 +177,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
       <button id="savePin" class="btn">SAVE PIN</button>
     </div>
 
-    <hr style="margin:14px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
+    <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
 
     <div>
       <div class="label-small">MANUAL EDIT: CRYSTALS</div>
@@ -186,12 +193,10 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   </div>
 </div>
 
-<div id="debug" class="debug" style="display:none"></div>
+<div id="debug" class="debug" style="display:none" aria-hidden="true"></div>
 
 <script>
-/* =========================
-   Robust state load/save
-   ========================= */
+/* ===== Robust state load/save ===== */
 const STORAGE_KEY = "plaque_invaders_state_v2";
 const ADMIN_KEY = "plaque_invaders_admin_pin_v2";
 const defaultState = {
@@ -220,9 +225,7 @@ function saveState(){
 }
 let state = loadState();
 
-/* =========================
-   DOM refs
-   ========================= */
+/* ===== DOM refs ===== */
 const screens = {
   title: document.getElementById("screen-title"),
   shop: document.getElementById("screen-shop"),
@@ -272,9 +275,7 @@ const adminBack = document.getElementById("adminBack");
 
 const debugEl = document.getElementById("debug");
 
-/* =========================
-   Cosmetics store data
-   ========================= */
+/* ===== Cosmetics ===== */
 const cosmetics = [
   {type:"ship", id:"xwing", name:"X-WING", cost:0, color:"#4AF"},
   {type:"ship", id:"viper", name:"VIPER", cost:120, color:"#C04AFF"},
@@ -287,17 +288,26 @@ const cosmetics = [
   {type:"hyperspace", id:"nebula-violet", name:"NEBULA VIOLET", cost:80, star:"#F8F", streak:"#C0F"}
 ];
 
-/* =========================
-   Canvas & DPR clamp
-   ========================= */
+/* ===== Canvas & DPR ===== */
 let DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-function resizeCanvas(){ DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1)); canvas.width = Math.floor(window.innerWidth * DPR); canvas.height = Math.floor(window.innerHeight * DPR); canvas.style.width = window.innerWidth + "px"; canvas.style.height = window.innerHeight + "px"; ctx.setTransform(DPR,0,0,DPR,0,0); }
+function resizeCanvas(){
+  DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  // Use visualViewport when available to handle Safari UI chrome
+  const vw = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
+  const vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  canvas.width = Math.floor(vw * DPR);
+  canvas.height = Math.floor(vh * DPR);
+  canvas.style.width = vw + "px";
+  canvas.style.height = vh + "px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
 window.addEventListener("resize", resizeCanvas);
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', resizeCanvas);
+}
 resizeCanvas();
 
-/* =========================
-   Runtime variables and pools
-   ========================= */
+/* ===== Runtime & pools ===== */
 let lastTime = performance.now();
 let rafId = null;
 let running = false;
@@ -324,12 +334,9 @@ for(let i=0;i<MAX_SPARKS;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,
 const MAX_DEBRIS = 400;
 for(let i=0;i<MAX_DEBRIS;i++) debris.push({alive:false,x:0,y:0,vx:0,vy:0,rot:0,spin:0,life:0,color:"#fff",size:0});
 
-/* Ship state */
 let ship = { x: window.innerWidth/2, y: window.innerHeight*0.78, targetX: window.innerWidth/2, speed: 160, nextMoveAt:0 };
 
-/* =========================
-   Audio helpers (WebAudio)
-   ========================= */
+/* ===== Audio helpers ===== */
 let audioCtx = null;
 function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); }
 function playOsc(freq,type,dur,vol){ try{ ensureAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=type; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur);}catch(e){} }
@@ -340,17 +347,13 @@ function smallExplode(){ playOsc(180,"triangle",0.28,0.12); setTimeout(()=>playO
 function bigExplode(){ playOsc(60,"triangle",0.6,0.28); setTimeout(()=>playOsc(90,"triangle",0.5,0.22),120); setTimeout(()=>playOsc(140,"sawtooth",0.4,0.18),260) }
 function rewardChime(){ playOsc(900,"sine",0.12,0.12); setTimeout(()=>playOsc(1200,"sine",0.12,0.12),120); }
 
-/* =========================
-   Utility helpers
-   ========================= */
+/* ===== Utilities ===== */
 function rand(min,max){ return min + Math.random()*(max-min) }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)) }
 function nowISO(){ return new Date().toISOString().slice(0,10) }
 function showScreen(name){ Object.values(screens).forEach(s=>s.classList.remove("active")); screens[name].classList.add("active"); }
 
-/* =========================
-   Shop rendering & persistence
-   ========================= */
+/* ===== Shop rendering ===== */
 function refreshTitleUI(){
   playerName.value = state.name;
   pilotNameDisplay.textContent = state.name;
@@ -366,14 +369,14 @@ function renderShop(){
   cosmetics.forEach(item=>{
     const row = document.createElement("div"); row.className="shop-item";
     row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
-    const left = document.createElement("div"); left.style.display="flex"; left.style.alignItems="center"; left.style.gap="12px";
+    const left = document.createElement("div"); left.style.display="flex"; left.style.alignItems="center"; left.style.gap="10px";
     const preview = document.createElement("div"); preview.className="preview";
-    preview.style.width="84px"; preview.style.height="48px";
+    preview.style.width="72px"; preview.style.height="44px";
     if(item.type==="ship"){
-      const c = document.createElement("canvas"); c.width=160; c.height=80; c.style.width="84px"; c.style.height="48px";
+      const c = document.createElement("canvas"); c.width=144; c.height=88; c.style.width="72px"; c.style.height="44px";
       const cc = c.getContext("2d");
-      cc.clearRect(0,0,160,80);
-      drawPlayerShip(cc,80,40,0.6,0,item.color);
+      cc.clearRect(0,0,144,88);
+      drawPlayerShip(cc,72,44,0.6,0,item.color);
       preview.appendChild(c);
     } else {
       const sw = document.createElement("div"); sw.style.width="36px"; sw.style.height="28px"; sw.style.background=item.color || "#666"; sw.style.borderRadius="6px";
@@ -397,9 +400,7 @@ function renderShop(){
   });
 }
 
-/* =========================
-   Procedural drawing helpers (3D-ish)
-   ========================= */
+/* ===== Drawing helpers (player/enemy/boss) ===== */
 function drawPlayerShip(ctx,x,y,scale,rot,tint){
   ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
   const hull = ctx.createLinearGradient(-28,-18,28,22); hull.addColorStop(0,tint); hull.addColorStop(1,"#222");
@@ -449,9 +450,7 @@ function drawSaucerBoss(ctx,x,y,scale,rot){
   ctx.restore();
 }
 
-/* =========================
-   Particle & debris helpers
-   ========================= */
+/* ===== Particles ===== */
 function spawnSparks(x,y,color,count=18){
   for(let i=0;i<sparks.length && count>0;i++){
     const s = sparks[i];
@@ -471,9 +470,7 @@ function spawnDebris(x,y,color,count=24){
   }
 }
 
-/* =========================
-   Enemy firing logic (aimed bullets)
-   ========================= */
+/* ===== Enemy fire ===== */
 function enemyFire(enemy){
   const dx = ship.x - enemy.x;
   const dy = ship.y - enemy.y;
@@ -485,9 +482,7 @@ function enemyFire(enemy){
   enemyFireSound();
 }
 
-/* =========================
-   Hyperspace visuals (streaks) and banner
-   ========================= */
+/* ===== Hyperspace visuals ===== */
 function triggerHyperspace(){
   const overlay = document.createElement("div");
   overlay.style.position = "fixed"; overlay.style.inset = "0"; overlay.style.zIndex = 200; overlay.style.pointerEvents = "none";
@@ -519,9 +514,7 @@ function showPhaseBanner(phase){
   setTimeout(()=>{ phaseBanner.style.transition = "opacity 600ms ease, transform 600ms ease"; phaseBanner.style.opacity = "0"; phaseBanner.style.transform = "translateX(-50%) translateY(-26px)"; setTimeout(()=>phaseBanner.style.display="none",620); }, 900);
 }
 
-/* =========================
-   Screen shake helper
-   ========================= */
+/* ===== Screen shake ===== */
 function startScreenShake(intensity=18,duration=900){
   const start = performance.now();
   function step(){
@@ -536,9 +529,7 @@ function startScreenShake(intensity=18,duration=900){
   step();
 }
 
-/* =========================
-   Spawn & gameplay helpers
-   ========================= */
+/* ===== Spawn helpers ===== */
 function spawnEnemy(phase){
   const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie-heavy":"tie") : "destroyer";
   const scale = type==="destroyer"? 1.0 : (type==="tie-heavy"? 0.9 : 0.7);
@@ -553,9 +544,7 @@ function spawnBoss(){
   bossFill.style.width = "100%";
 }
 
-/* =========================
-   Update (delta-time)
-   ========================= */
+/* ===== Update loop ===== */
 let bgScroll = 0;
 let laserTimer = 0;
 function update(dt){
@@ -570,7 +559,6 @@ function update(dt){
     progressFill.style.width = (progress*100).toFixed(2) + "%";
   }
 
-  // ship movement
   ship.nextMoveAt -= dt;
   if(ship.nextMoveAt <= 0){
     ship.targetX = rand(80, window.innerWidth - 80);
@@ -579,12 +567,10 @@ function update(dt){
   }
   ship.x += (ship.targetX - ship.x) * clamp(6*dt, 0, 1);
 
-  // phases
   const elapsed = 120 - missionTime;
   const phase = (elapsed < 30) ? 1 : (elapsed < 60) ? 2 : (elapsed < 90) ? 3 : 4;
   phaseBadge.textContent = "PHASE " + phase;
 
-  // hyperspace tick
   const tick = Math.floor(elapsed/30);
   if(tick > hyperspaceTick){
     hyperspaceTick = tick;
@@ -593,7 +579,6 @@ function update(dt){
     showPhaseBanner(phase);
   }
 
-  // spawn enemies
   if(!bossActive && !paused){
     spawnTimer += dt;
     spawnInterval = phase===1?0.9:phase===2?0.7:phase===3?0.55:0.45;
@@ -604,7 +589,6 @@ function update(dt){
     }
   }
 
-  // auto-fire lasers
   laserTimer -= dt;
   const fireRate = phase>=3?0.14:0.22;
   if(laserTimer <= 0 && !paused){
@@ -612,7 +596,6 @@ function update(dt){
     laserTimer = fireRate;
   }
 
-  // enemies may fire occasionally
   enemies.forEach(e=>{
     e.fireCooldown -= dt;
     if(e.fireCooldown <= 0){
@@ -621,7 +604,6 @@ function update(dt){
     }
   });
 
-  // update enemies
   for(let i=enemies.length-1;i>=0;i--){
     const e = enemies[i];
     e.y += e.vy * dt;
@@ -630,11 +612,9 @@ function update(dt){
     if(e.y - 200 > window.innerHeight) enemies.splice(i,1);
   }
 
-  // update lasers and collisions
   for(let i=lasers.length-1;i>=0;i--){
     const L = lasers[i];
     L.y += L.vy * dt;
-    // boss collision
     if(bossActive && boss){
       const dx = L.x - boss.x, dy = L.y - boss.y;
       const dist = Math.hypot(dx,dy);
@@ -649,7 +629,6 @@ function update(dt){
         continue;
       }
     }
-    // enemy collision
     let hit = false;
     for(let j=enemies.length-1;j>=0;j--){
       const E = enemies[j];
@@ -674,7 +653,6 @@ function update(dt){
     if(L.y < -120) lasers.splice(i,1);
   }
 
-  // update enemy bullets
   for(let i=enemyBullets.length-1;i>=0;i--){
     const b = enemyBullets[i];
     b.x += b.vx * dt;
@@ -687,7 +665,6 @@ function update(dt){
     } else if(b.life <= 0 || b.y > window.innerHeight + 80) enemyBullets.splice(i,1);
   }
 
-  // update sparks
   for(let i=0;i<sparks.length;i++){
     const s = sparks[i];
     if(!s.alive) continue;
@@ -698,7 +675,6 @@ function update(dt){
     if(s.life <= 0) s.alive = false;
   }
 
-  // update debris
   for(let i=0;i<debris.length;i++){
     const d = debris[i];
     if(!d.alive) continue;
@@ -710,7 +686,6 @@ function update(dt){
     if(d.life <= 0) d.alive = false;
   }
 
-  // boss logic
   if(!bossActive && missionTime <= 30 && !paused){
     spawnBoss();
   }
@@ -735,7 +710,6 @@ function update(dt){
     if(boss.flash > 0) boss.flash -= dt;
   }
 
-  // mission end if time runs out and boss still alive -> force dramatic end
   if(missionTime <= 0 && running){
     if(bossActive && boss){
       bigExplode();
@@ -751,12 +725,9 @@ function update(dt){
   }
 }
 
-/* =========================
-   Render (canvas) — vertical background movement top->bottom
-   ========================= */
+/* ===== Render ===== */
 function render(){
   canvas.style.transform = `translate(${screenShake.x||0}px, ${screenShake.y||0}px)`;
-
   ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
   const W = canvas.width/DPR, H = canvas.height/DPR;
 
@@ -851,9 +822,7 @@ function render(){
   }
 }
 
-/* ============================================================
-   RAF loop
-   ============================================================ */
+/* ===== RAF loop ===== */
 function loop(ts){
   const dt = (ts - lastTime)/1000;
   lastTime = ts;
@@ -866,9 +835,7 @@ function loop(ts){
   rafId = requestAnimationFrame(loop);
 }
 
-/* ============================================================
-   Mission flow, one-play-per-day, and rewards
-   ============================================================ */
+/* ===== Mission flow & one-play-per-day ===== */
 function canPlayToday(){
   const today = nowISO();
   if(state.completedToday && state.lastPlayDate === today) return false;
@@ -922,9 +889,7 @@ function finishMission(){
   showScreen("reward");
 }
 
-/* ============================================================
-   Reward open visuals
-   ============================================================ */
+/* ===== Reward visuals ===== */
 let rewardOpened = false;
 function openReward(){
   if(rewardOpened) return;
@@ -942,25 +907,19 @@ function openReward(){
   }
 }
 
-/* ============================================================
-   Format time
-   ============================================================ */
+/* ===== Format time ===== */
 function formatTime(sec){ const m=Math.floor(sec/60).toString().padStart(2,"0"); const s=Math.floor(sec%60).toString().padStart(2,"0"); return `${m}:${s}`; }
 
-/* ============================================================
-   Robust input binding helper
-   ============================================================ */
+/* ===== Robust binding helper ===== */
 function bindClick(el, fn){
   if(!el) return;
   el.setAttribute('type','button');
   el.addEventListener('click', (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
-  el.addEventListener('pointerdown', (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
+  el.addEventListener('pointerup', (e)=>{ /* pointerup as fallback */ }, {passive:true});
   el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); fn(e); } });
 }
 
-/* ============================================================
-   Fire lasers (player auto-fire)
-   ============================================================ */
+/* ===== Fire lasers ===== */
 function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
@@ -970,59 +929,47 @@ function fireLasers(){
   laserSound();
 }
 
-/* ============================================================
-   Bind UI actions
-   ============================================================ */
-bindClick(startBtn, ()=>{
-  state.name = (playerName.value.trim().toUpperCase() || state.name);
-  saveState();
-  refreshTitleUI();
-  startCountdown();
-});
-bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
-bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
-bindClick(shopReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); }});
-bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
-bindClick(resetBtn, ()=>{ if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){ running=false; paused=false; showScreen("title"); refreshTitleUI(); }});
-bindClick(rewardBox, ()=>{ openReward(); });
-bindClick(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleUI(); });
+/* ===== Bind UI actions ===== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  bindClick(startBtn, ()=>{
+    state.name = (playerName.value.trim().toUpperCase() || state.name);
+    saveState();
+    refreshTitleUI();
+    startCountdown();
+  });
+  bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
+  bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+  bindClick(shopReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); }});
+  bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
+  bindClick(resetBtn, ()=>{ if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){ running=false; paused=false; showScreen("title"); refreshTitleUI(); }});
+  bindClick(rewardBox, ()=>{ openReward(); });
+  bindClick(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleUI(); });
 
-bindClick(adminOpen, ()=>{ const pin = localStorage.getItem(ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
-bindClick(adminQuick, ()=>{ const pin = localStorage.getItem(ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
+  bindClick(adminOpen, ()=>{ const pin = localStorage.getItem(ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
+  bindClick(adminQuick, ()=>{ const pin = localStorage.getItem(ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
 
-bindClick(savePinBtn, ()=>{ const p = adminPinInput.value.trim(); if(!/^\d{4,8}$/.test(p)){ alert("PIN MUST BE 4-8 DIGITS"); return; } localStorage.setItem(ADMIN_KEY, p); alert("PIN SAVED"); adminPinInput.value=""; });
-bindClick(applyAdmin, ()=>{ const c = parseInt(adminCrystals.value||"0"); const s = parseInt(adminStreak.value||"0"); if(!isNaN(c)){ state.crystals = c; } if(!isNaN(s)){ state.streak = s; } saveState(); refreshTitleUI(); alert("ADMIN CHANGES APPLIED"); });
-bindClick(adminBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+  bindClick(savePinBtn, ()=>{ const p = adminPinInput.value.trim(); if(!/^\d{4,8}$/.test(p)){ alert("PIN MUST BE 4-8 DIGITS"); return; } localStorage.setItem(ADMIN_KEY, p); alert("PIN SAVED"); adminPinInput.value=""; });
+  bindClick(applyAdmin, ()=>{ const c = parseInt(adminCrystals.value||"0"); const s = parseInt(adminStreak.value||"0"); if(!isNaN(c)){ state.crystals = c; } if(!isNaN(s)){ state.streak = s; } saveState(); refreshTitleUI(); alert("ADMIN CHANGES APPLIED"); });
+  bindClick(adminBack, ()=>{ showScreen("title"); refreshTitleUI(); });
 
-playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim().toUpperCase() || state.name; saveState(); refreshTitleUI(); });
+  playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim().toUpperCase() || state.name; saveState(); refreshTitleUI(); });
 
-/* ============================================================
-   Debug helpers and safe error logging
-   ============================================================ */
-window.addEventListener('error', e => console.error('Runtime error:', e.message, e.filename, e.lineno));
-window.addEventListener('unhandledrejection', e => console.error('Promise rejection:', e.reason));
-setInterval(()=>{ debugEl.textContent = `ENEMIES:${enemies.length} LASERS:${lasers.length} BULLETS:${enemyBullets.length} PARTICLES:${sparks.filter(s=>s.alive).length}`; }, 600);
-
-/* ============================================================
-   Boot & initialization
-   ============================================================ */
-function init(){
+  // initial UI
   refreshTitleUI();
   renderShop();
   hudName.textContent = state.name;
   hudCrystals.textContent = state.crystals;
   lastTime = performance.now();
   if(!rafId) rafId = requestAnimationFrame(loop);
-  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") saveState(); });
-  window.addEventListener("resize", ()=>{ resizeCanvas(); ship.x = Math.min(ship.x, window.innerWidth-40); ship.targetX = Math.min(ship.targetX, window.innerWidth-40); });
-  document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
-  document.addEventListener("keydown", (e)=>{ if(e.key.toLowerCase()==='d'){ debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none'; } });
-}
-init();
+});
 
-/* ============================================================
-   Safe unload
-   ============================================================ */
+/* ===== Debug & safe logging ===== */
+window.addEventListener('error', e => console.error('Runtime error:', e.message, e.filename, e.lineno));
+window.addEventListener('unhandledrejection', e => console.error('Promise rejection:', e.reason));
+setInterval(()=>{ debugEl.textContent = `ENEMIES:${enemies.length} LASERS:${lasers.length} BULLETS:${enemyBullets.length} PARTICLES:${sparks.filter(s=>s.alive).length}`; }, 600);
+document.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='d'){ debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none'; } });
+
+/* ===== Save on unload ===== */
 window.addEventListener("beforeunload", ()=>{ saveState(); });
 </script>
 </body>
