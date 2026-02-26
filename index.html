@@ -1,170 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Plaque Invaders: Ultra Stable Edition</title>
-    <style>
-        :root { --gold: #ffcc00; --rebel: #ff3333; --blue: #00f2ff; --bg: #000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: sans-serif; color: #fff; touch-action: none; }
-        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 10; height: 100svh; background: #000; }
-        .screen.active { display: flex; }
-        .btn { background: #fff; border: none; color: #000; padding: 20px 40px; font-size: 1.2rem; border-radius: 50px; font-weight: 900; text-transform: uppercase; margin: 10px; cursor: pointer; width: 260px; box-shadow: 0 5px 0 #999; position: relative; z-index: 500; }
-        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #666; }
-        #hud { position: absolute; top: 40px; width: 100%; padding: 0 20px; display: flex; justify-content: space-between; pointer-events: none; z-index: 50; }
-        #timer { font-size: 2.5rem; font-weight: 900; font-family: monospace; }
-        #boss-bar { position: absolute; top: 100px; width: 70%; height: 10px; background: #300; border: 1px solid red; display: none; z-index: 50; }
-        #boss-hp { width: 100%; height: 100%; background: red; transition: width 0.1s; }
-        canvas { position: absolute; inset: 0; z-index: 1; image-rendering: pixelated; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Plaque Invaders: Crystal Sector – Ultra Edition</title>
+<style>
+:root { --gold:#ffcc00; --rebel:#ff3333; --empire:#33ff33; --sky:#00f2ff; --bg:#000; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+body,html { margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:'Arial Black',sans-serif; touch-action:none; }
+.screen { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:radial-gradient(circle at center,#1a1a2e 0%,#000 100%); z-index:100; height:100svh; }
+.screen.active { display:flex; }
+h1 { font-size:2.5rem;margin:0;color:var(--gold);text-shadow:0 0 20px var(--gold);text-transform:uppercase;font-style:italic; }
+.btn-core { background:#fff;border:none;color:#000;padding:25px;font-size:1.2rem;border-radius:50px;font-weight:900;text-transform:uppercase;width:100%;max-width:280px;box-shadow:0 8px 0 #888;margin:15px 0;display:block;cursor:pointer;position:relative; z-index:9999; touch-action:manipulation;}
+.btn-core:active { transform:translateY(4px); box-shadow:0 2px 0 #444; background:var(--gold); }
+#hud { position:absolute; top:50px; left:0; width:100%; padding:0 25px; display:flex; justify-content:space-between; z-index:50; pointer-events:none; }
+#timer { font-size:3rem; font-weight:900; color:#fff; font-family:monospace; }
+#boss-ui { position:absolute; top:120px; left:50%; transform:translateX(-50%); width:80%; display:none; z-index:50; }
+.hp-outer { width:100%; height:15px; background:#300; border:2px solid #f00; border-radius:10px; overflow:hidden; }
+#hp-inner { width:100%; height:100%; background:#f00; transition:0.1s; }
+canvas { position:absolute; inset:0; z-index:1; pointer-events:none; }
+.game-nav { position:absolute; bottom:40px; left:0; width:100%; padding:0 25px; display:flex; justify-content:space-between; z-index:9999; pointer-events:none; }
+.ctrl-btn { width:75px; height:75px; border-radius:50%; background:rgba(255,255,255,0.2); border:3px solid #fff; color:#fff; font-weight:900; font-size:0.8rem; display:flex; align-items:center; justify-content:center; pointer-events:auto !important; cursor:pointer; }
+</style>
 </head>
 <body>
-    <div id="scr-menu" class="screen active">
-        <h1 style="color:var(--gold); font-size:2.5rem; margin:0;">PLAQUE INVADERS</h1>
-        <p style="color:var(--blue)">CRYSTALS: <span id="val-c">0</span> | STREAK: <span id="val-s">0</span></p>
-        <div class="btn" id="btn-start">START MISSION</div>
-        <div class="btn" id="btn-shop" style="background:none; color:#fff; border:1px solid #fff; box-shadow:none;">SHOP</div>
-    </div>
-    <div id="scr-game" class="screen" style="background:transparent; padding:0;">
-        <div id="hud"><div id="timer">02:00</div><div id="g-c" style="color:var(--gold)">0 💎</div></div>
-        <div id="boss-bar"><div id="boss-hp"></div></div>
-        <canvas id="cvs"></canvas>
-    </div>
-    <div id="scr-loot" class="screen">
-        <h1 style="color:var(--gold)">MISSION COMPLETE</h1>
-        <div id="box" style="font-size:5rem; margin:20px; cursor:pointer;">📦</div>
-        <p id="loot-txt">Tap the box!</p>
-        <div class="btn" id="btn-done" style="display:none">CONTINUE</div>
-    </div>
+
+<div id="scr-menu" class="screen active">
+<h1>PLAQUE INVADERS</h1>
+<div style="margin:20px 0;color:var(--sky);font-weight:bold;">💎 <span id="val-c">0</span> | STREAK: <span id="val-s">0</span></div>
+<div class="btn-core" id="btn-start">ENGAGE</div>
+<div class="btn-core" id="btn-shop" style="background:none;color:#fff;border:2px solid #fff;box-shadow:none;">HANGAR</div>
+</div>
+
+<div id="scr-game" class="screen" style="background:transparent;padding:0;">
+<div id="hud">
+<div id="timer">02:00</div>
+<div style="color:var(--gold); font-weight:900;">💎 <span id="g-c">0</span></div>
+</div>
+<div id="boss-ui">
+<div style="color:red;font-size:0.7rem;font-weight:900;letter-spacing:2px;">CORE TARGET: DEATH STAR</div>
+<div class="hp-outer"><div id="hp-inner"></div></div>
+</div>
+<div class="game-nav">
+<div class="ctrl-btn" id="ctrl-pause">PAUSE</div>
+<div class="ctrl-btn" id="ctrl-quit" style="border-color:var(--rebel)">QUIT</div>
+</div>
+<canvas id="stage"></canvas>
+</div>
+
+<div id="scr-loot" class="screen">
+<h1>VICTORY</h1>
+<div id="box" style="font-size:8rem;margin:30px 0;filter:drop-shadow(0 0 20px gold);">📦</div>
+<div id="loot-msg">Tap cargo to claim!</div>
+<div class="btn-core" id="btn-done" style="display:none">CONTINUE</div>
+</div>
 
 <script>
-const state = { crys: 0, streak: 0, active: false, time: 120, hp: 100 };
-const cvs = document.getElementById('cvs'), ctx = cvs.getContext('2d', { alpha: false });
-let ents = [], stars = [], boss = null, frame = 0, lastS = 0, lastF = 0;
-let pilot = { x: 0, tx: 0, mt: 0 };
+const state={crystals:0,streak:0,active:false,paused:false,time:120};
+const cvs=document.getElementById('stage'),ctx=cvs.getContext('2d');
+let stars=[],entities=[],boss=null,lastSpawn=0,lastFire=0,frameId=0,pilot={x:0,tx:0,mt:0};
 
-const Sfx = {
-    ctx: null,
-    play(f, t, d, v) {
-        if(!this.ctx) return;
-        try {
-            const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-            o.type = t; o.frequency.setValueAtTime(f, this.ctx.currentTime);
-            g.gain.setValueAtTime(v, this.ctx.currentTime);
-            g.gain.linearRampToValueAtTime(0, this.ctx.currentTime + d);
-            o.connect(g); g.connect(this.ctx.destination);
-            o.start(); o.stop(this.ctx.currentTime + d);
-        } catch(e) {}
-    },
-    boot() { 
-        if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
-        if(this.ctx.state === 'suspended') this.ctx.resume(); 
-    }
-};
+// Audio
+const AudioFX={ctx:null,unlock(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)();if(this.ctx.state==='suspended')this.ctx.resume();},laser(){this.play(700,'sawtooth',0.2,0.08);},impact(){this.play(150,'square',0.1,0.2);},win(){this.play(880,'sine',0.2);setTimeout(()=>this.play(1320,'sine',0.4),100);},play(f,t,d,v,r=0){if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type=t;o.frequency.setValueAtTime(f,this.ctx.currentTime);if(r)o.frequency.exponentialRampToValueAtTime(r,this.ctx.currentTime+d);g.gain.setValueAtTime(v,this.ctx.currentTime);g.gain.linearRampToValueAtTime(0,this.ctx.currentTime+d);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d);}};
+function tap(id,action){const el=document.getElementById(id);if(!el)return;const execute=e=>{if(e){e.preventDefault();e.stopPropagation();}AudioFX.unlock();action();};el.addEventListener('touchstart',execute,{passive:false});el.addEventListener('click',e=>{if(!('ontouchstart' in window))execute(e);});}
 
-function resize() {
-    cvs.width = window.innerWidth; cvs.height = window.innerHeight;
-    pilot.x = pilot.tx = cvs.width / 2;
-    stars = [];
-    for(let i=0; i<60; i++) stars.push({x: Math.random()*cvs.width, y: Math.random()*cvs.height, s: Math.random()*3+1});
-}
-window.onresize = resize; resize();
+function resize(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;pilot.x=pilot.tx=cvs.width/2;}
+window.onresize=resize;resize();
 
-function loop(t) {
-    if(!state.active) return;
-    
-    // Low-cost background clear
-    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, cvs.width, cvs.height);
+function spawn(){const heavy=Math.random()<0.3;entities.push({type:heavy?'d':'t',x:Math.random()*(cvs.width-80)+40,y:-150,w:heavy?120:45,h:heavy?180:35,hp:heavy?20:1,speed:heavy?1.5:5,f:0});}
 
-    // Optimized Stars
-    ctx.fillStyle = "#444";
-    stars.forEach(s => {
-        s.y += s.s * 2; if(s.y > cvs.height) s.y = 0;
-        ctx.fillRect(s.x, s.y, 1, 1);
-    });
+function loop(t){
+if(!state.active||state.paused){frameId=requestAnimationFrame(loop);return;}
+ctx.fillStyle="#000105";ctx.fillRect(0,0,cvs.width,cvs.height);
 
-    state.time -= 1/60;
-    if(state.time <= 0) return win();
-    document.getElementById('timer').innerText = `${Math.floor(state.time/60)}:${Math.floor(state.time%60).toString().padStart(2,'0')}`;
+// stars
+if(stars.length<80) for(let i=stars.length;i<80;i++) stars.push({x:Math.random()*cvs.width,y:Math.random()*cvs.height,z:Math.random()*3+1});
+stars.forEach(s=>{s.y+=s.z*2;if(s.y>cvs.height)s.y=0;ctx.fillStyle="#444";ctx.fillRect(s.x,s.y,s.z/2,s.z/2);});
 
-    // Pilot Logic
-    if(t > pilot.mt) { pilot.tx = 50 + Math.random()*(cvs.width-100); pilot.mt = t + 1000; }
-    pilot.x += (pilot.tx - pilot.x) * 0.05;
+// pilot movement
+if(t>pilot.mt){pilot.tx=60+Math.random()*(cvs.width-120);pilot.mt=t+800+Math.random()*1000;}
+pilot.x+=(pilot.tx-pilot.x)*0.05;
 
-    // Entity Processing (Aggressive Cleanup)
-    if(t - lastS > 1500 && state.time > 30) {
-        ents.push({type:'e', x: Math.random()*cvs.width, y:-50, w:30, h:20, s:3, hp:1});
-        lastS = t;
-    }
-    if(t - lastF > 250) {
-        ents.push({type:'l', x: pilot.x, y: cvs.height-80, s:-12});
-        Sfx.play(800, 'square', 0.1, 0.02);
-        lastF = t;
-    }
+// spawn entities
+if(t-lastSpawn>1000){spawn();lastSpawn=t;}
+if(t-lastFire>200){entities.push({type:'l',x:pilot.x,y:cvs.height-110,speed:-15});AudioFX.laser();lastFire=t;}
 
-    if(state.time < 30 && !boss) {
-        boss = {x: cvs.width/2, y:-100, hp:300, max:300};
-        document.getElementById('boss-bar').style.display = 'block';
-    }
+// boss logic
+if(state.time<30&&!boss){boss={x:cvs.width/2,y:-200,r:160,hp:600,max:600,f:0,lt:0};document.getElementById('boss-ui').style.display='block';}
+if(boss){if(boss.y<250)boss.y+=0.8;boss.x=cvs.width/2+Math.sin(t/1200)*60;ctx.fillStyle=boss.f>0?'#fff':'#333';if(boss.f>0)boss.f--;ctx.beginPath();ctx.arc(boss.x,boss.y,boss.r,0,7);ctx.fill();ctx.fillStyle="#111";ctx.beginPath();ctx.arc(boss.x-50,boss.y-50,45,0,7);ctx.fill();document.getElementById('hp-inner').style.width=(boss.hp/boss.max*100)+"%";}
 
-    if(boss) {
-        if(boss.y < 150) boss.y++;
-        boss.x = cvs.width/2 + Math.sin(t/1000)*50;
-        ctx.fillStyle = "#555"; ctx.beginPath(); ctx.arc(boss.x, boss.y, 60, 0, 7); ctx.fill();
-        document.getElementById('boss-hp').style.width = (boss.hp/boss.max*100) + "%";
-    }
+// entities
+for(let i=entities.length-1;i>=0;i--){const e=entities[i];e.y+=e.speed||0;if(e.type==='l'){ctx.fillStyle="#f33";ctx.fillRect(e.x-2,e.y,4,30);if(boss&&Math.hypot(e.x-boss.x,e.y-boss.y)<boss.r){boss.hp--;boss.f=3;entities.splice(i,1);continue;}entities.forEach((en,j)=>{if(en.type!=='l'&&Math.abs(e.x-en.x)<en.w/2&&Math.abs(e.y-en.y)<en.h/2){en.hp--;en.f=3;entities.splice(i,1);if(en.hp<=0){AudioFX.impact();entities.splice(j,1);state.crystals+=10;document.getElementById('g-c').innerText=state.crystals;}}});}else{ctx.fillStyle=e.f>0?"#fff":(e.type==='t'?'#555':'#888');if(e.type==='t'){ctx.fillRect(e.x-e.w/2,e.y-e.h/2,5,e.h);ctx.fillRect(e.x+e.w/2-5,e.y-e.h/2,5,e.h);ctx.fillRect(e.x-e.w/2,e.y-2,e.w,4);}else{ctx.beginPath();ctx.moveTo(e.x,e.y+e.h/2);ctx.lineTo(e.x-e.w/2,e.y-e.h/2);ctx.lineTo(e.x+e.w/2,e.y-e.h/2);ctx.fill();}if(e.f>0)e.f--;}if(e.y>cvs.height+200||e.y<-300)entities.splice(i,1);}
 
-    for(let i=ents.length-1; i>=0; i--) {
-        const e = ents[i]; e.y += e.s;
-        if(e.type === 'l') {
-            ctx.fillStyle = "red"; ctx.fillRect(e.x-1, e.y, 2, 15);
-            if(boss && Math.hypot(e.x-boss.x, e.y-boss.y) < 60) { boss.hp--; ents.splice(i,1); continue; }
-            ents.forEach((en, j) => {
-                if(en.type === 'e' && Math.hypot(e.x-en.x, e.y-en.y)  cvs.height + 100) ents.splice(i, 1);
-    }
+// draw hero
+ctx.fillStyle="#fff";ctx.fillRect(pilot.x-4,cvs.height-130,8,45);ctx.fillRect(pilot.x-30,cvs.height-95,60,4);
 
-    // Hero
-    ctx.fillStyle = "#fff"; ctx.fillRect(pilot.x-2, cvs.height-100, 4, 30);
-    ctx.fillRect(pilot.x-20, cvs.height-80, 40, 4);
-
-    frame = requestAnimationFrame(loop);
+state.time-=1/60;
+if(state.time>0)frameId=requestAnimationFrame(loop);else finish();
 }
 
-function win() {
-    state.active = false; cancelAnimationFrame(frame);
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('scr-loot').classList.add('active');
-    document.getElementById('btn-done').style.display = 'none';
-}
+function nav(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-function bind(id, cb) {
-    const el = document.getElementById(id);
-    el.addEventListener('touchstart', (e) => { e.preventDefault(); Sfx.boot(); cb(); });
-    el.addEventListener('click', (e) => { if(!('ontouchstart' in window)) { Sfx.boot(); cb(); } });
-}
+function startMission(){state.active=false;state.paused=false;state.time=5;nav('scr-game');let countdown=5;const preCount=setInterval(()=>{document.getElementById('timer').innerText=countdown;countdown--;if(countdown<0){clearInterval(preCount);state.time=120;state.active=true;loop(performance.now());}},1000);}
+function finish(){state.active=false;cancelAnimationFrame(frameId);nav('scr-loot');document.getElementById('btn-done').style.display='block';state.crystals+=50;state.streak++;document.getElementById('val-c').innerText=state.crystals;document.getElementById('val-s').innerText=state.streak;localStorage.setItem('pi_final',JSON.stringify(state));}
 
-bind('btn-start', () => {
-    state.active = true; state.time = 120; ents = []; boss = null;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('scr-game').classList.add('active');
-    requestAnimationFrame(loop);
-});
+tap('btn-start',startMission);
+tap('btn-shop',()=>alert("Hangar accessing... (Crystals: "+state.crystals+")"));
+tap('ctrl-pause',()=>{state.paused=!state.paused;document.getElementById('ctrl-pause').innerText=state.paused?"RESUME":"PAUSE";if(!state.paused)loop(performance.now());});
+tap('ctrl-quit',()=>{state.active=false;nav('scr-menu');});
+tap('btn-done',()=>nav('scr-menu'));
 
-bind('box', () => {
-    Sfx.play(400, 'sine', 0.5, 0.1);
-    state.crys += 100; state.streak++;
-    document.getElementById('loot-txt').innerText = "+100 CRYSTALS CLAIMED!";
-    document.getElementById('btn-done').style.display = 'block';
-    localStorage.setItem('pi_ultra_stable', JSON.stringify({c:state.crys, s:state.streak}));
-});
-
-bind('btn-done', () => location.reload());
-
-const save = localStorage.getItem('pi_ultra_stable');
-if(save) { const d = JSON.parse(save); state.crys = d.c; state.streak = d.s; }
-document.getElementById('val-c').innerText = state.crys;
-document.getElementById('val-s').innerText = state.streak;
+// load saved state
+const d=localStorage.getItem('pi_final');if(d)Object.assign(state,JSON.parse(d));document.getElementById('val-c').innerText=state.crystals;document.getElementById('val-s').innerText=state.streak;
 </script>
 </body>
 </html>
