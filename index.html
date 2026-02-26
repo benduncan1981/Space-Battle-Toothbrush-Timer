@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>PLAQUE INVADERS — OPERATION: SAUCER FALL (FIXED)</title>
+<title>PLAQUE INVADERS — OPERATION: SAUCER FALL (FINAL)</title>
 <style>
 :root{
   --bg-top:#00020a; --bg-bottom:#001026;
@@ -23,18 +23,18 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
 .stat .label{font-size:0.68rem;opacity:0.85}
 .stat .value{font-size:1rem;font-weight:900}
-.btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation;pointer-events:auto}
+.btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation;pointer-events:auto;z-index:1001}
 .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#E8FBFF}
-#three-container{position:absolute;inset:0;z-index:1;pointer-events:none}
+#three-container{position:absolute;inset:0;z-index:0;pointer-events:none}
 #game-canvas{
   position:absolute;
   inset:0;
-  z-index:2;               /* behind UI elements that have higher z-index */
+  z-index:1;
   touch-action:none;
   background:transparent;
-  pointer-events:none;     /* ignore clicks unless mission active */
+  pointer-events:none; /* toggled by showScreen */
 }
-#uiTimerLarge{position:fixed;left:50%;top:6%;transform:translateX(-50%);z-index:9998;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-weight:900;font-size:56px;letter-spacing:1px;padding:8px 14px;border-radius:10px;text-align:center;pointer-events:none;color:#fff}
+#uiTimerLarge{position:fixed;left:50%;top:6%;transform:translateX(-50%);z-index:9999;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-weight:900;font-size:56px;letter-spacing:1px;padding:8px 14px;border-radius:10px;text-align:center;pointer-events:none;color:#fff}
 #announcementBanner{position:fixed;left:50%;top:12%;transform:translateX(-50%);z-index:9999;padding:12px 20px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;pointer-events:none;opacity:0;white-space:pre-line;transition:opacity 220ms ease, transform 260ms cubic-bezier(.2,.9,.2,1)}
 .hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:60}
 .hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -47,12 +47,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .boss-bar{position:absolute;top:74px;left:50%;transform:translateX(-50%);width:84%;max-width:980px;height:14px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
 .boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF4A4A,#FFEA4A);transition:width 120ms linear}
 .controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
-.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
-.admin-link{position:absolute;right:10px;top:10px;z-index:80;pointer-events:auto}
+.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5);z-index:1001}
+.admin-link{position:absolute;right:10px;top:10px;z-index:1001;pointer-events:auto}
 .shop-list{max-height:calc(100vh - 220px);overflow:auto;padding-right:6px;-webkit-overflow-scrolling:touch}
 .shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:8px 0}
 .preview{width:72px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.reward-box{width:140px;height:140px;border-radius:14px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(179,107,255,0.95);cursor:pointer}
+.reward-box{width:140px;height:140px;border-radius:14px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(179,107,255,0.95);cursor:pointer;z-index:1001}
 .spark{position:absolute;width:10px;height:10px;border-radius:4px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 12px #c0a0ff}
 .small-note{font-size:0.78rem;opacity:0.9}
 .hud-right{display:flex;gap:8px;align-items:center}
@@ -210,7 +210,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 
 <div id="debug" class="debug" style="display:none" aria-hidden="true"></div>
 
-<!-- three.js and helpers -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/EffectComposer.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/postprocessing/RenderPass.js"></script>
@@ -218,8 +217,10 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
 <script>
-/* Single-file replacement: fixes unresponsive buttons by ensuring canvas ignores clicks except during mission.
-   This file contains the full game plus the visual bridge. Use as a drop-in replacement. */
+/* Final single-file game — complete, drop-in replacement.
+   Key fix: canvas pointer-events toggled by showScreen so UI buttons are responsive.
+   All systems integrated: ZoneManager, GameFlowController, BossStateMachine, UIManager, RenderBridge.
+*/
 
 /* CONFIG */
 const CONFIG = {
@@ -234,7 +235,7 @@ const CONFIG = {
   ADMIN_KEY: "plaque_invaders_admin_pin_v3"
 };
 
-/* State persistence */
+/* Persistence */
 const defaultState = {
   name: "BEN",
   crystals: 0,
@@ -331,7 +332,7 @@ window.addEventListener("resize", resizeCanvas);
 if(window.visualViewport) window.visualViewport.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-/* Utility: showScreen that toggles canvas pointer events */
+/* showScreen toggles canvas pointer events so UI remains clickable */
 function showScreen(name){
   Object.values(screens).forEach(s=>s.classList.remove("active"));
   if(screens[name]) screens[name].classList.add("active");
@@ -406,7 +407,7 @@ function rand(min,max){ return min + Math.random()*(max-min) }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)) }
 function nowISO(){ return new Date().toISOString().slice(0,10) }
 
-/* Shop UI */
+/* Cosmetics */
 const cosmetics = [
   {type:"ship", id:"xwing", name:"X-WING", cost:0, color:"#4AF"},
   {type:"ship", id:"viper", name:"VIPER", cost:120, color:"#C04AFF"},
@@ -419,53 +420,7 @@ const cosmetics = [
   {type:"hyperspace", id:"nebula-violet", name:"NEBULA VIOLET", cost:80, star:"#F8F", streak:"#C0F"}
 ];
 
-function refreshTitleUI(){
-  playerName.value = state.name;
-  pilotNameDisplay.textContent = state.name;
-  statCrystals.textContent = state.crystals;
-  statStreak.textContent = state.streak;
-  statMissions.textContent = state.missions;
-  hudName.textContent = state.name;
-  hudCrystals.textContent = state.crystals;
-  shopCrystals.textContent = state.crystals;
-}
-function renderShop(){
-  shopList.innerHTML = "";
-  cosmetics.forEach(item=>{
-    const row = document.createElement("div"); row.className="shop-item";
-    row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
-    const left = document.createElement("div"); left.style.display="flex"; left.style.alignItems="center"; left.style.gap="10px";
-    const preview = document.createElement("div"); preview.className="preview";
-    preview.style.width="72px"; preview.style.height="44px";
-    if(item.type==="ship"){
-      const c = document.createElement("canvas"); c.width=144; c.height=88; c.style.width="72px"; c.style.height="44px";
-      const cc = c.getContext("2d");
-      cc.clearRect(0,0,144,88);
-      drawPlayerShip(cc,72,44,0.6,0,item.color);
-      preview.appendChild(c);
-    } else {
-      const sw = document.createElement("div"); sw.style.width="36px"; sw.style.height="28px"; sw.style.background=item.color || "#666"; sw.style.borderRadius="6px";
-      preview.appendChild(sw);
-    }
-    left.appendChild(preview);
-    const info = document.createElement("div"); info.style.display="flex"; info.style.flexDirection="column";
-    const name = document.createElement("div"); name.textContent = item.name; name.style.fontWeight="900";
-    const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" CRYSTALS"):" • DEFAULT"); meta.style.fontSize="0.78rem"; meta.style.opacity="0.85";
-    info.appendChild(name); info.appendChild(meta);
-    left.appendChild(info);
-    const actions = document.createElement("div");
-    const owned = state.owned[item.type] && state.owned[item.type].includes(item.id);
-    const selected = state.selected[item.type]===item.id;
-    const btn = document.createElement("button"); btn.className="btn"; btn.style.padding="8px 10px; font-size:0.86rem";
-    if(owned){ btn.textContent = selected?"EQUIPPED":"EQUIP"; btn.onclick = ()=>{ state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } }
-    else { btn.textContent = "BUY"; btn.onclick = ()=>{ if(state.crystals >= item.cost){ state.crystals -= item.cost; state.owned[item.type].push(item.id); state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } else { alert("NOT ENOUGH CRYSTALS"); } } }
-    actions.appendChild(btn);
-    row.appendChild(left); row.appendChild(actions);
-    shopList.appendChild(row);
-  });
-}
-
-/* Drawing helpers (same as before) */
+/* Canvas drawing helpers */
 function drawPlayerShip(ctx,x,y,scale,rot,tint){
   ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
   const hull = ctx.createLinearGradient(-28,-18,28,22); hull.addColorStop(0,tint); hull.addColorStop(1,"#222");
@@ -547,7 +502,7 @@ function enemyFire(enemy){
   enemyFireSound();
 }
 
-/* Hyperspace visuals (uses RenderBridge if available) */
+/* Hyperspace visuals (fallback uses RenderBridge if available) */
 function playHyperspaceAnimation(opts = {duration:1000, chroma:true}){
   if(window.RenderBridge && typeof RenderBridge.playHyperspace === 'function'){
     RenderBridge.playHyperspace(opts.duration || 1000);
@@ -600,7 +555,7 @@ function spawnEnemy(phase){
   const scale = type==="destroyer"? 1.0 : (type==="tie-heavy"? 0.9 : 0.7);
   const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 200 - phase*10);
   const x = rand(80, window.innerWidth - 80);
-  enemies.push({x,y:-120,vx:0,vy:speed, type, scale, rot:rand(-0.2,0.2), hp: type==="destroyer"?6:(type==="tie-heavy"?2:1), fireCooldown: rand(0.6,2.4)});
+  enemies.push({x, y:-120, vx:0, vy:speed, type, scale, rot:rand(-0.2,0.2), hp: type==="destroyer"?6:(type==="tie-heavy"?2:1), fireCooldown: rand(0.6,2.4)});
 }
 function spawnBoss(){
   bossActive = true;
@@ -846,7 +801,7 @@ window.playSfx = window.playSfx || function(name){
   if(name === 'boss-death')     bigExplode && bigExplode();
 };
 
-/* RenderBridge (three.js hybrid) */
+/* RenderBridge (three.js hybrid background + boss) */
 const RenderBridge = (function(){
   let renderer, scene, camera, composer, clock, container;
   let stars, bossMesh, bloomPass;
@@ -1407,7 +1362,74 @@ function fireLasers(){
   laserSound();
 }
 
-/* Bind UI actions after DOM ready */
+/* Shop UI */
+function refreshTitleUI(){
+  playerName.value = state.name;
+  pilotNameDisplay.textContent = state.name;
+  statCrystals.textContent = state.crystals;
+  statStreak.textContent = state.streak;
+  statMissions.textContent = state.missions;
+  hudName.textContent = state.name;
+  hudCrystals.textContent = state.crystals;
+  shopCrystals.textContent = state.crystals;
+}
+function renderShop(){
+  shopList.innerHTML = "";
+  cosmetics.forEach(item=>{
+    const row = document.createElement("div"); row.className="shop-item";
+    row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
+    const left = document.createElement("div"); left.style.display="flex"; left.style.alignItems="center"; left.style.gap="10px";
+    const preview = document.createElement("div"); preview.className="preview";
+    preview.style.width="72px"; preview.style.height="44px";
+    if(item.type==="ship"){
+      const c = document.createElement("canvas"); c.width=144; c.height=88; c.style.width="72px"; c.style.height="44px";
+      const cc = c.getContext("2d");
+      cc.clearRect(0,0,144,88);
+      drawPlayerShip(cc,72,44,0.6,0,item.color);
+      preview.appendChild(c);
+    } else {
+      const sw = document.createElement("div"); sw.style.width="36px"; sw.style.height="28px"; sw.style.background=item.color || "#666"; sw.style.borderRadius="6px";
+      preview.appendChild(sw);
+    }
+    left.appendChild(preview);
+    const info = document.createElement("div"); info.style.display="flex"; info.style.flexDirection="column";
+    const name = document.createElement("div"); name.textContent = item.name; name.style.fontWeight="900";
+    const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" CRYSTALS"):" • DEFAULT"); meta.style.fontSize="0.78rem"; meta.style.opacity="0.85";
+    info.appendChild(name); info.appendChild(meta);
+    left.appendChild(info);
+    const actions = document.createElement("div");
+    const owned = state.owned[item.type] && state.owned[item.type].includes(item.id);
+    const selected = state.selected[item.type]===item.id;
+    const btn = document.createElement("button"); btn.className="btn"; btn.style.padding="8px 10px; font-size:0.86rem";
+    if(owned){ btn.textContent = selected?"EQUIPPED":"EQUIP"; btn.onclick = ()=>{ state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } }
+    else { btn.textContent = "BUY"; btn.onclick = ()=>{ if(state.crystals >= item.cost){ state.crystals -= item.cost; state.owned[item.type].push(item.id); state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } else { alert("NOT ENOUGH CRYSTALS"); } } }
+    actions.appendChild(btn);
+    row.appendChild(left); row.appendChild(actions);
+    shopList.appendChild(row);
+  });
+}
+
+/* Debug & logging */
+window.addEventListener('error', e => console.error('Runtime error:', e.message, e.filename, e.lineno));
+window.addEventListener('unhandledrejection', e => console.error('Promise rejection:', e.reason));
+setInterval(()=>{ debugEl.textContent = `ENEMIES:${enemies.length} LASERS:${lasers.length} BULLETS:${enemyBullets.length} PARTICLES:${sparks.filter(s=>s.alive).length} SHIELD:${(playerShield*100).toFixed(0)}% HP:${(playerHP*100).toFixed(0)}%`; }, 600);
+document.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='d'){ debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none'; } });
+
+/* Save on unload */
+window.addEventListener("beforeunload", ()=>{ saveState(); });
+
+/* Expose debug console commands */
+window.ForceHyperspace = function(){ if(window.GameFlowController) GameFlowController.ForceHyperspace(); };
+window.SpawnBoss = function(){ if(BossStateMachine && BossStateMachine.spawnBoss) BossStateMachine.spawnBoss(1.0); else spawnBoss(); };
+window.SetTimer = function(s){ if(window.GameFlowController) GameFlowController.SetTimer(s); else missionTime = s; UIManager.UpdateTimerDisplay(Math.ceil(s)); };
+
+/* Minimal stubs for optional hooks (override in your code if desired) */
+window.applyZoneVisuals = window.applyZoneVisuals || function(background, palette){ window.RenderPalette = palette || window.RenderPalette; window.BackgroundParams = background || window.BackgroundParams; };
+window.setBossVisualStage = window.setBossVisualStage || function(stage){ console.info('Boss visual stage', stage); };
+window.setCinematicSlow = window.setCinematicSlow || function(v){ cinematicSlow = v; };
+
+/* Binding UI actions */
+function bindClickSimple(id, fn){ const el = document.getElementById(id); if(el) bindClick(el, fn); }
 document.addEventListener('DOMContentLoaded', ()=>{
   bindClick(startBtn, ()=>{
     state.name = (playerName.value.trim().toUpperCase() || state.name);
@@ -1419,7 +1441,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     else startCountdown();
   });
   bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
-  bindClick(document.getElementById('shopBack'), ()=>{ showScreen("title"); refreshTitleUI(); });
+  bindClick('shopBack', ()=>{ showScreen("title"); refreshTitleUI(); });
   bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
   bindClick(resetBtn, ()=>{ if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){ if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; countdownEl.style.display = "none"; } running=false; paused=false; startBtn.disabled = false; showScreen("title"); refreshTitleUI(); } });
   bindClick(rewardBox, ()=>{ openReward(); });
@@ -1446,25 +1468,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
 });
 
-/* Debug & logging */
-window.addEventListener('error', e => console.error('Runtime error:', e.message, e.filename, e.lineno));
-window.addEventListener('unhandledrejection', e => console.error('Promise rejection:', e.reason));
-setInterval(()=>{ debugEl.textContent = `ENEMIES:${enemies.length} LASERS:${lasers.length} BULLETS:${enemyBullets.length} PARTICLES:${sparks.filter(s=>s.alive).length} SHIELD:${(playerShield*100).toFixed(0)}% HP:${(playerHP*100).toFixed(0)}%`; }, 600);
-document.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='d'){ debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none'; } });
-
-/* Save on unload */
-window.addEventListener("beforeunload", ()=>{ saveState(); });
-
-/* Console commands */
-window.ForceHyperspace = function(){ if(window.GameFlowController) GameFlowController.ForceHyperspace(); };
-window.SpawnBoss = function(){ if(BossStateMachine && BossStateMachine.spawnBoss) BossStateMachine.spawnBoss(1.0); else spawnBoss(); };
-window.SetTimer = function(s){ if(window.GameFlowController) GameFlowController.SetTimer(s); else missionTime = s; UIManager.UpdateTimerDisplay(Math.ceil(s)); };
-
-/* Minimal stubs for optional hooks */
-window.applyZoneVisuals = window.applyZoneVisuals || function(background, palette){ window.RenderPalette = palette || window.RenderPalette; window.BackgroundParams = background || window.BackgroundParams; };
-window.setBossVisualStage = window.setBossVisualStage || function(stage){ console.info('Boss visual stage', stage); };
-window.setCinematicSlow = window.setCinematicSlow || function(v){ cinematicSlow = v; };
-
+/* End of script */
 </script>
 </body>
 </html>
