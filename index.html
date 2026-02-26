@@ -1,38 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>Plaque Invaders — Upgraded</title>
+<title>Plaque Invaders — Death Star Finale (Premium)</title>
 <style>
 :root{
-  --bg-1:#020312; --bg-2:#07102a; --neon-cyan:#00f2ff; --neon-mag:#c04aff; --neon-gold:#ffd24a;
-  --panel:rgba(255,255,255,0.03);
-  --ui-radius:14px;
-  --font:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  --bg-0:#00040a; --bg-1:#001026; --accent-cyan:#00f2ff; --accent-mag:#c04aff; --accent-gold:#ffd24a;
+  --panel:rgba(255,255,255,0.03); --hud-bg:rgba(0,0,0,0.45);
+  --ui-radius:14px; --font:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));font-family:var(--font);color:#e8fbff;overflow:hidden}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var(--bg-1));font-family:var(--font);color:#e8fbff;overflow:hidden}
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:14px}
 .screen.active{display:flex}
-.card{width:100%;max-width:520px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
-h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(255,210,74,0.18)}
-.small{font-size:0.85rem;opacity:0.9}
+.card{width:100%;max-width:560px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(0,0,0,0.6)}
+h1{margin:0;font-size:1.6rem;color:var(--accent-gold);text-shadow:0 0 12px rgba(255,210,74,0.18)}
+.small{font-size:0.88rem;opacity:0.92}
 .row{display:flex;gap:8px}
 .input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#e8fbff;font-weight:700;text-align:center}
 .statbar{display:flex;gap:8px;margin:10px 0}
 .stat{flex:1;background:rgba(0,0,0,0.35);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
-.stat .label{font-size:0.7rem;opacity:0.8}
+.stat .label{font-size:0.72rem;opacity:0.8}
 .stat .value{font-size:1.05rem;font-weight:900}
-.btn{appearance:none;border:0;padding:12px 14px;border-radius:999px;background:linear-gradient(135deg,var(--neon-cyan),#7f5bff);color:#021;font-weight:900;box-shadow:0 8px 20px rgba(127,91,255,0.12);font-size:1rem;cursor:pointer;touch-action:manipulation}
+.btn{appearance:none;border:0;padding:12px 14px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7f5bff);color:#021;font-weight:900;box-shadow:0 8px 20px rgba(127,91,255,0.12);font-size:1rem;cursor:pointer;touch-action:manipulation}
 .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#e8fbff}
 #shop-list{max-height:52vh;overflow:auto;margin-top:8px;padding:6px}
 .shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:6px 0}
 .preview{width:56px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.2));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.preview .ship{width:34px;height:20px;border-radius:3px}
 .hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:40}
-.hud .box{background:rgba(0,0,0,0.45);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:800;pointer-events:auto}
-#game-canvas{position:absolute;inset:0;z-index:1;touch-action:none}
+.hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:800;pointer-events:auto;display:flex;align-items:center;gap:8px}
+.hud .left{display:flex;gap:8px;align-items:center}
+#phaseName{font-size:0.78rem;color:var(--accent-mag);font-weight:900;letter-spacing:1px}
+#progressBar{width:220px;height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
+#progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold))}
+#game-canvas{position:absolute;inset:0;z-index:1;touch-action:none;background:transparent}
 .mission-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;z-index:50}
 .center-count{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:3rem;text-shadow:0 0 12px rgba(0,255,255,0.12);pointer-events:none}
 .controls{position:absolute;bottom:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
@@ -40,7 +42,7 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 .boss-bar{position:absolute;top:72px;left:50%;transform:translateX(-50%);width:70%;height:12px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
 .boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#ff4a4a,#ffea4a);transition:width 0.12s linear}
 .reward-box{width:140px;height:140px;border-radius:16px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(179,107,255,0.9);cursor:pointer}
-.spark{position:absolute;width:10px;height:10px;border-radius:3px;background:radial-gradient(circle,#f0f,#90f);box-shadow:0 0 8px #f0f}
+.spark{position:absolute;width:10px;height:10px;border-radius:3px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 12px #c0a0ff}
 .small-note{font-size:0.8rem;opacity:0.85}
 @media (max-width:420px){h1{font-size:1.4rem}.center-count{font-size:2.2rem}}
 </style>
@@ -49,8 +51,8 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 <!-- Title -->
 <div id="screen-title" class="screen active">
   <div class="card">
-    <h1>Plaque Invaders — Upgraded</h1>
-    <p class="small">Brush for 2 minutes. Earn crystals. Ship moves left-right automatically; enemies spawn in waves; boss fight in final 30s.</p>
+    <h1>Plaque Invaders — Death Star Finale</h1>
+    <p class="small">Star Wars vibe: TIE fighters → Star Destroyers → Death Star boss. Hyperspace every 30s. Explosions, sparks, and a dramatic finale.</p>
     <div style="margin:10px 0">
       <input id="playerName" class="input" placeholder="Pilot name" maxlength="16" />
     </div>
@@ -69,7 +71,7 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 <!-- Shop -->
 <div id="screen-shop" class="screen">
   <div class="card">
-    <h1 style="color:var(--neon-cyan)">Crystal Shipyard</h1>
+    <h1 style="color:var(--accent-cyan)">Crystal Shipyard</h1>
     <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0">
       <div class="small-note">Cosmetics only.</div>
       <div class="small-note">Crystals: <span id="shopCrystals">0</span></div>
@@ -86,9 +88,15 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 <div id="screen-mission" class="screen" style="background:transparent;padding:0">
   <canvas id="game-canvas"></canvas>
   <div class="hud">
-    <div class="box" id="hudName">Pilot</div>
-    <div class="box" id="hudTimer">02:00</div>
-    <div class="box" id="hudCrystals">0</div>
+    <div class="left">
+      <div class="box" id="hudName">Pilot</div>
+      <div class="box" id="phaseName">PHASE 1 • TIE FIGHTERS</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="box" id="hudTimer">02:00</div>
+      <div id="progressBar"><div id="progressFill"></div></div>
+      <div class="box" id="hudCrystals">0</div>
+    </div>
   </div>
   <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
   <div class="mission-overlay">
@@ -103,7 +111,7 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 <!-- Reward -->
 <div id="screen-reward" class="screen">
   <div class="card" style="align-items:center">
-    <h1 style="color:#c0a0ff">Mission Complete</h1>
+    <h1 style="color:#c0a0ff">Sector Cleared</h1>
     <div id="rewardBox" class="reward-box" title="Tap to open">📦</div>
     <div style="margin-top:12px;text-align:center">
       <div id="rewardText" style="font-size:1.1rem;font-weight:800">+0 Crystals</div>
@@ -119,9 +127,9 @@ h1{margin:0;font-size:1.6rem;color:var(--neon-gold);text-shadow:0 0 12px rgba(25
 /* =========================
    State & persistence
    ========================= */
-const STORAGE_KEY = "plaque_invaders_upgraded_v1";
+const STORAGE_KEY = "plaque_invaders_deathstar_v1";
 const defaultState = {
-  name:"Oscar", crystals:0, streak:0, lastPlayDate:null, missions:0,
+  name:"Ben", crystals:0, streak:0, lastPlayDate:null, missions:0,
   owned:{ship:["basic"],laser:["neon-blue"],trail:["ion-blue"],hyperspace:["warp-default"]},
   selected:{ship:"basic",laser:"neon-blue",trail:"ion-blue",hyperspace:"warp-default"}
 };
@@ -159,6 +167,8 @@ const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const bossBar = document.getElementById("bossBar");
 const bossFill = document.getElementById("bossFill");
+const phaseName = document.getElementById("phaseName");
+const progressFill = document.getElementById("progressFill");
 
 const rewardBox = document.getElementById("rewardBox");
 const rewardText = document.getElementById("rewardText");
@@ -169,10 +179,9 @@ const rewardBack = document.getElementById("rewardBack");
    Cosmetics
    ========================= */
 const shipSkins = [
-  {id:"basic",name:"Standard",cost:0,color:"#4af"},
-  {id:"crystal-falcon",name:"Crystal Falcon",cost:80,color:"#c04aff"},
-  {id:"nebula-phantom",name:"Nebula Phantom",cost:120,color:"#0ff"},
-  {id:"ion-viper",name:"Ion Viper",cost:160,color:"#ffea4a"}
+  {id:"basic",name:"X-Wing",cost:0,color:"#4af"},
+  {id:"falcon",name:"Falcon",cost:120,color:"#c04aff"},
+  {id:"viper",name:"Viper",cost:160,color:"#ffd24a"}
 ];
 const laserDefs = [
   {id:"neon-blue",name:"Neon Blue",cost:0,color:"#4af"},
@@ -189,16 +198,32 @@ const hyperspaceDefs = [
 ];
 
 /* =========================
-   Audio (WebAudio)
+   Audio (WebAudio) - richer effects
    ========================= */
 let audioCtx = null;
 function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); }
-function playTone(freq,type="sine",dur=0.12,vol=0.12){ try{ ensureAudio(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=type; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur);}catch(e){}}
-function beep(){ playTone(880,"sine",0.08,0.12) }
-function laserSound(){ playTone(1400,"sawtooth",0.06,0.06) }
-function bossHitSound(){ playTone(320,"square",0.12,0.16) }
-function explosionSound(){ playTone(120,"triangle",0.28,0.18); setTimeout(()=>playTone(220,"sine",0.18,0.12),80) }
-function rewardChime(){ playTone(900,"sine",0.12,0.12); setTimeout(()=>playTone(1200,"sine",0.12,0.12),120) }
+function playOsc(freq,type,dur,vol, detune=0){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; o.detune.value = detune;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+function beep(){ playOsc(880,"sine",0.08,0.12) }
+function laserSound(){ playOsc(1400,"sawtooth",0.06,0.06) }
+function tieExplode(){ playOsc(180,"triangle",0.28,0.14); setTimeout(()=>playOsc(320,"sine",0.18,0.08),80) }
+function starDestroyerExplode(){ playOsc(90,"triangle",0.36,0.22); setTimeout(()=>playOsc(220,"sine",0.22,0.12),120) }
+function bossHitSound(){ playOsc(320,"square",0.12,0.16) }
+function bossExplodeSequence(){
+  // layered booms
+  playOsc(60,"triangle",0.6,0.28);
+  setTimeout(()=>playOsc(90,"triangle",0.5,0.22),120);
+  setTimeout(()=>playOsc(140,"sawtooth",0.4,0.18),260);
+}
+function rewardChime(){ playOsc(900,"sine",0.12,0.12); setTimeout(()=>playOsc(1200,"sine",0.12,0.12),120) }
 
 /* =========================
    Canvas & engine
@@ -223,13 +248,14 @@ let spawnInterval = 1.2;
 let enemies = [];
 let lasers = [];
 let sparks = [];
+let particles = [];
 let boss = null;
 let bossActive = false;
 let bossDisplayHp = 1;
 let rewardForMission = 0;
 
 /* Pools */
-const MAX_SPARKS = 160;
+const MAX_SPARKS = 220;
 for(let i=0;i<MAX_SPARKS;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,color:"#fff"});
 
 /* Ship movement state */
@@ -260,7 +286,7 @@ function refreshShop(){
     const row = document.createElement("div"); row.className="shop-item";
     const preview = document.createElement("div"); preview.className="preview";
     if(item.type==="ship"){ const s=document.createElement("div"); s.className="ship"; s.style.background=item.color; s.style.clipPath="polygon(50% 0, 90% 40%, 70% 100%, 30% 100%, 10% 40%)"; preview.appendChild(s); }
-    else if(item.type==="laser"){ const l=document.createElement("div"); l.className="ship"; l.style.width="6px"; l.style.height="26px"; l.style.background=item.color; preview.appendChild(l); }
+    else if(item.type==="laser"){ const l=document.createElement("div"); l.style.width="6px"; l.style.height="26px"; l.style.background=item.color; preview.appendChild(l); }
     const info = document.createElement("div"); info.style.flex="1"; info.style.margin="0 8px";
     const name = document.createElement("div"); name.textContent=item.name; name.style.fontWeight="800";
     const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" crystals"):" • Default"); meta.style.fontSize="0.8rem"; meta.style.opacity="0.85";
@@ -278,35 +304,34 @@ function refreshShop(){
 }
 
 /* =========================
-   Audio unlock
-   ========================= */
-document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
-
-/* =========================
    Spawn & gameplay
    ========================= */
 function spawnEnemy(phase){
-  const w = phase<3?36:60;
-  const h = phase<3?24:40;
-  const hp = phase<2?1:phase<3?2:3;
-  const speed = 40 + phase*30 + Math.random()*30;
+  // phase 1: TIE fighters (small, fast)
+  // phase 2: heavier TIE squadrons
+  // phase 3: Star Destroyers (bigger, slower)
+  const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie":"tie-heavy") : "destroyer";
+  const w = type==="tie"?28: type==="tie-heavy"?40: 90;
+  const h = type==="tie"?20: type==="tie-heavy"?28: 60;
+  const hp = type==="tie"?1: type==="tie-heavy"?2: 6;
+  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 140);
   const x = rand(40, window.innerWidth - 40);
-  enemies.push({x,y:-60,vx:0,vy:speed,w,h,hp,hitTimer:0,rot:rand(-0.6,0.6)});
+  enemies.push({x,y:-80,vx:0,vy:speed,w,h,hp,hitTimer:0,type});
 }
 
 function spawnBoss(){
   bossActive = true;
-  boss = {x:window.innerWidth/2, y:-220, vx:0, vy:0, r:140, hp:1.0, displayHp:1.0, flash:0};
+  boss = {x:window.innerWidth/2, y:-260, vx:0, vy:0, r:180, hp:1.0, displayHp:1.0, flash:0, phase:0};
   bossBar.style.display = "block";
   bossFill.style.width = "100%";
 }
 
 /* Sparks pool */
-function spawnSparks(x,y,color,count=10){
+function spawnSparks(x,y,color,count=12){
   for(let i=0;i<sparks.length && count>0;i++){
     const s = sparks[i];
     if(!s.alive){
-      s.alive=true; s.x=x; s.y=y; s.vx=rand(-160,160); s.vy=rand(-260,-40); s.life=rand(0.28,0.7); s.color=color;
+      s.alive=true; s.x=x; s.y=y; s.vx=rand(-220,220); s.vy=rand(-320,-60); s.life=rand(0.28,0.9); s.color=color;
       count--;
     }
   }
@@ -318,16 +343,30 @@ function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
   const laserColor = (laserDefs.find(l=>l.id===state.selected.laser)||laserDefs[0]).color;
-  lasers.push({x:shipX-10,y:shipY-18,vx:0,vy:-520,color:laserColor});
-  lasers.push({x:shipX+10,y:shipY-18,vx:0,vy:-520,color:laserColor});
+  lasers.push({x:shipX-12,y:shipY-18,vx:0,vy:-620,color:laserColor});
+  lasers.push({x:shipX+12,y:shipY-18,vx:0,vy:-620,color:laserColor});
   laserSound();
+}
+
+/* =========================
+   Hyperspace effect (every 30s)
+   ========================= */
+let lastHyperspaceAt = 0;
+function triggerHyperspace(){
+  // visual flash + speed boost + whoosh sound
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed"; overlay.style.inset = "0"; overlay.style.background = "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.12), rgba(255,255,255,0.02))";
+  overlay.style.zIndex = 120; overlay.style.pointerEvents = "none"; document.body.appendChild(overlay);
+  setTimeout(()=>{ overlay.style.transition = "opacity 600ms ease"; overlay.style.opacity = "0"; setTimeout(()=>overlay.remove(),700); }, 80);
+  // small audio whoosh
+  playOsc(600,"sawtooth",0.18,0.08);
 }
 
 /* =========================
    Update (delta-time)
    ========================= */
 function update(dt){
-  dt = Math.min(dt, 0.1);
+  dt = Math.min(dt, 0.12);
   if(!running) return;
 
   // mission timer
@@ -335,37 +374,48 @@ function update(dt){
     missionTime -= dt;
     missionTime = Math.max(0, missionTime);
     hudTimer.textContent = formatTime(Math.ceil(missionTime));
+    // progress bar
+    const progress = (120 - missionTime) / 120;
+    progressFill.style.width = (progress*100).toFixed(2) + "%";
   }
 
-  // ship auto movement: choose new target every 1.2-2.4s, move smoothly
+  // ship auto movement: choose new target every 1.0-2.0s, move smoothly
   ship.nextMoveAt -= dt;
   if(ship.nextMoveAt <= 0){
     ship.targetX = rand(60, window.innerWidth - 60);
-    ship.nextMoveAt = rand(1.2, 2.4);
-    ship.speed = rand(80, 220);
+    ship.nextMoveAt = rand(0.9, 2.0);
+    ship.speed = rand(120, 260);
   }
-  // smooth approach
-  const dx = ship.targetX - ship.x;
-  ship.x += dx * clamp(3*dt, 0, 1);
+  ship.x += (ship.targetX - ship.x) * clamp(4*dt, 0, 1);
 
-  // phases
+  // phases and labels
   const elapsed = 120 - missionTime;
   const phase = (elapsed < 30) ? 1 : (elapsed < 60) ? 2 : (elapsed < 90) ? 3 : 4;
-  spawnInterval = phase===1?1.2:phase===2?0.9:phase===3?0.6:0.45;
+  phaseName.textContent = phase===1? "PHASE 1 • TIE FIGHTERS" : phase===2? "PHASE 2 • TIE SQUADRONS" : phase===3? "PHASE 3 • STAR DESTROYERS" : "FINAL PHASE • DEATH STAR";
+
+  // hyperspace every 30s (trigger once per boundary)
+  const hyperspaceTick = Math.floor(elapsed/30);
+  if(hyperspaceTick > lastHyperspaceAt){
+    lastHyperspaceAt = hyperspaceTick;
+    triggerHyperspace();
+    // temporary spawn burst
+    for(let i=0;i<3;i++) spawnEnemy(phase);
+  }
 
   // spawn enemies (not during boss)
   if(!bossActive && !paused){
     spawnTimer += dt;
+    spawnInterval = phase===1?1.0:phase===2?0.8:phase===3?0.6:0.45;
     if(spawnTimer >= spawnInterval){
       spawnTimer = 0;
-      const count = phase>=3? (Math.random()>0.6?2:1) : 1;
+      const count = phase>=3? (Math.random()>0.5?2:1) : 1;
       for(let i=0;i<count;i++) spawnEnemy(phase);
     }
   }
 
   // auto-fire lasers
   laserTimer -= dt;
-  const fireRate = phase>=3?0.18:0.26;
+  const fireRate = phase>=3?0.16:0.24;
   if(laserTimer <= 0 && !paused){
     fireLasers();
     laserTimer = fireRate;
@@ -375,9 +425,9 @@ function update(dt){
   for(let i=enemies.length-1;i>=0;i--){
     const e = enemies[i];
     e.y += e.vy * dt;
-    e.x += Math.sin(performance.now()/1000 + i) * 0.2; // slight wobble
+    e.x += Math.sin((performance.now()/1000) + i) * 0.25;
     if(e.hitTimer>0) e.hitTimer -= dt;
-    if(e.y - e.h > window.innerHeight + 80) enemies.splice(i,1);
+    if(e.y - e.h > window.innerHeight + 120) enemies.splice(i,1);
   }
 
   // update lasers and collisions
@@ -389,10 +439,10 @@ function update(dt){
       const dx = L.x - boss.x, dy = L.y - boss.y;
       const dist = Math.hypot(dx,dy);
       if(dist < boss.r){
-        spawnSparks(L.x, L.y, "#ffccaa", 12);
+        spawnSparks(L.x, L.y, "#ffd2ff", 16);
         boss.flash = 0.12;
-        boss.hp = clamp(boss.hp - 0.006, 0, 1); // per-hit reduction
-        boss.displayHp += (boss.hp - boss.displayHp) * 0.2;
+        boss.hp = clamp(boss.hp - 0.008, 0, 1);
+        boss.displayHp += (boss.hp - boss.displayHp) * 0.18;
         bossFill.style.width = (boss.displayHp*100).toFixed(1) + "%";
         bossHitSound();
         lasers.splice(i,1);
@@ -404,15 +454,17 @@ function update(dt){
     for(let j=enemies.length-1;j>=0;j--){
       const E = enemies[j];
       if(Math.abs(L.x - E.x) < E.w/1.6 && Math.abs(L.y - E.y) < E.h/1.6){
-        spawnSparks(L.x, L.y, "#ffd24a", 10);
+        spawnSparks(L.x, L.y, "#ffd24a", 12);
         E.hp -= 1;
         E.hitTimer = 0.12;
         lasers.splice(i,1);
         hit = true;
         if(E.hp <= 0){
-          spawnSparks(E.x, E.y, "#ff9a4a", 18);
-          explosionSound();
-          state.crystals += 1;
+          // explosion sound depends on type
+          if(E.type==="tie") tieExplode(); else if(E.type==="destroyer") starDestroyerExplode(); else tieExplode();
+          spawnSparks(E.x, E.y, "#ff9a4a", 20);
+          // award crystals scaled by type
+          state.crystals += (E.type==="destroyer"?6:1);
           hudCrystals.textContent = state.crystals;
           enemies.splice(j,1);
         }
@@ -420,7 +472,7 @@ function update(dt){
       }
     }
     if(hit) continue;
-    if(L.y < -40) lasers.splice(i,1);
+    if(L.y < -60) lasers.splice(i,1);
   }
 
   // update sparks
@@ -441,27 +493,42 @@ function update(dt){
   if(bossActive && boss){
     if(boss.y < window.innerHeight*0.22) boss.y += 60 * dt;
     boss.x += Math.sin(performance.now()/700) * 20 * dt;
-    // automatic HP decay over final 30s to ensure mission ends if not fully hit
     if(missionTime <= 30){
       const t = missionTime / 30;
       const targetHp = t;
-      boss.hp += (targetHp - boss.hp) * 0.06;
+      boss.hp += (targetHp - boss.hp) * 0.04;
       boss.displayHp += (boss.hp - boss.displayHp) * 0.12;
       bossFill.style.width = (boss.displayHp*100).toFixed(1) + "%";
+      // dramatic explosion when boss reaches near zero
       if(boss.displayHp <= 0.02){
-        spawnSparks(boss.x, boss.y, "#fff", 40);
-        explosionSound();
-        bossActive = false; boss = null; bossBar.style.display = "none";
-        state.crystals += 40;
+        // trigger dramatic explosion sequence and then finish mission after animation
+        bossExplodeSequence();
+        // spawn large sparks and particles
+        spawnSparks(boss.x, boss.y, "#c0a0ff", 80);
+        // award big crystals
+        state.crystals += 120;
         hudCrystals.textContent = state.crystals;
+        // hide boss and mark defeated
+        bossActive = false; boss = null; bossBar.style.display = "none";
+        // delay finish to allow explosion visuals to play
+        setTimeout(()=>{ finishMission(); }, 900);
       }
     }
     if(boss.flash > 0) boss.flash -= dt;
   }
 
-  // mission end
+  // mission end if time runs out and boss still alive -> force boss destruction visuals then finish
   if(missionTime <= 0 && running){
-    finishMission();
+    if(bossActive && boss){
+      // force dramatic end
+      bossExplodeSequence();
+      spawnSparks(boss.x, boss.y, "#c0a0ff", 80);
+      bossActive = false; boss = null; bossBar.style.display = "none";
+      state.crystals += 80; hudCrystals.textContent = state.crystals;
+      setTimeout(()=>{ finishMission(); }, 900);
+    } else {
+      finishMission();
+    }
   }
 }
 
@@ -472,34 +539,36 @@ function render(){
   ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
   const W = canvas.width/DPR, H = canvas.height/DPR;
 
-  // background gradient + subtle nebula
+  // background gradient + nebula
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,"#001026"); g.addColorStop(1,"#000814");
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
   // star streaks
   ctx.globalAlpha = 0.9;
-  for(let i=0;i<120;i++){
-    const x = (i*37 + (performance.now()/8)) % W;
+  for(let i=0;i<140;i++){
+    const x = (i*47 + (performance.now()/8)) % W;
     ctx.fillStyle = "rgba(255,255,255,0.04)";
-    ctx.fillRect(x, (i*23)%H, 1, 1);
+    ctx.fillRect(x, (i*29)%H, 1, 1);
   }
   ctx.globalAlpha = 1;
 
-  // planets
-  ctx.fillStyle = "rgba(120,60,200,0.06)"; ctx.beginPath(); ctx.ellipse(W*0.18, H*0.18, 60, 60, 0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle = "rgba(255,160,80,0.03)"; ctx.beginPath(); ctx.ellipse(W*0.78, H*0.28, 40, 40, 0,0,Math.PI*2); ctx.fill();
+  // planets / nebula accents
+  ctx.fillStyle = "rgba(120,60,200,0.06)"; ctx.beginPath(); ctx.ellipse(W*0.18, H*0.18, 80, 80, 0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,160,80,0.03)"; ctx.beginPath(); ctx.ellipse(W*0.78, H*0.28, 50, 50, 0,0,Math.PI*2); ctx.fill();
 
   // enemies
   enemies.forEach(e=>{
     ctx.save();
     ctx.translate(e.x, e.y);
     if(e.hitTimer>0){ ctx.fillStyle = "#fff"; ctx.globalAlpha = 0.95; }
-    else ctx.fillStyle = "#88b";
-    if(e.w>50){
-      ctx.beginPath(); ctx.moveTo(0,-e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.lineTo(e.w/2,e.h/2); ctx.closePath(); ctx.fill();
+    else ctx.fillStyle = e.type==="destroyer"? "#bba" : "#88b";
+    if(e.type==="destroyer"){
+      // Star Destroyer silhouette
+      ctx.beginPath(); ctx.moveTo(-e.w/2, e.h/2); ctx.lineTo(e.w/2, e.h/2); ctx.lineTo(e.w/4, -e.h/2); ctx.lineTo(-e.w/4, -e.h/2); ctx.closePath(); ctx.fill();
     } else {
-      ctx.fillRect(-e.w/2, -e.h/2, e.w, e.h);
+      // TIE fighter / small triangle
+      ctx.beginPath(); ctx.moveTo(0,-e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.lineTo(e.w/2,e.h/2); ctx.closePath(); ctx.fill();
     }
     ctx.restore();
   });
@@ -508,8 +577,8 @@ function render(){
   lasers.forEach(l=>{
     ctx.save();
     ctx.fillStyle = l.color;
-    ctx.shadowColor = l.color; ctx.shadowBlur = 10;
-    ctx.fillRect(l.x-2, l.y, 4, 22);
+    ctx.shadowColor = l.color; ctx.shadowBlur = 12;
+    ctx.fillRect(l.x-2, l.y, 4, 26);
     ctx.shadowBlur = 0;
     ctx.restore();
   });
@@ -525,23 +594,22 @@ function render(){
     ctx.restore();
   }
 
-  // ship (center bottom) with improved shading
+  // ship (improved shading)
   const shipX = ship.x, shipY = ship.y;
   const shipColor = (shipSkins.find(s=>s.id===state.selected.ship)||shipSkins[0]).color;
   ctx.save();
   ctx.translate(shipX, shipY);
-  // glow
-  ctx.fillStyle = shipColor; ctx.shadowColor = shipColor; ctx.shadowBlur = 18;
-  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(18,6); ctx.lineTo(6,18); ctx.lineTo(-6,18); ctx.lineTo(-18,6); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = shipColor; ctx.shadowColor = shipColor; ctx.shadowBlur = 20;
+  ctx.beginPath(); ctx.moveTo(0,-20); ctx.lineTo(22,8); ctx.lineTo(8,20); ctx.lineTo(-8,20); ctx.lineTo(-22,8); ctx.closePath(); ctx.fill();
   ctx.shadowBlur = 0;
-  ctx.fillStyle = "#fff"; ctx.fillRect(-4,-6,8,10);
+  ctx.fillStyle = "#fff"; ctx.fillRect(-5,-8,10,12);
   ctx.restore();
 
   // engine trail
   ctx.save();
   ctx.globalAlpha = 0.6;
   ctx.fillStyle = (trailDefs.find(t=>t.id===state.selected.trail)||trailDefs[0]).color;
-  ctx.beginPath(); ctx.ellipse(shipX, shipY+22, 10, 22, 0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(shipX, shipY+26, 12, 26, 0,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1;
   ctx.restore();
 
@@ -550,8 +618,11 @@ function render(){
     ctx.save();
     ctx.translate(boss.x, boss.y);
     if(boss.flash>0){ ctx.globalAlpha = 0.9; ctx.fillStyle = "#fff"; } else ctx.fillStyle = "#222";
-    ctx.beginPath(); ctx.ellipse(0,0,boss.r,boss.r*0.6,0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = "#ff4a4a"; ctx.beginPath(); ctx.arc(0,0,28,0,Math.PI*2); ctx.fill();
+    // Death Star-like sphere with trench
+    ctx.beginPath(); ctx.arc(0,0,boss.r,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#111"; ctx.beginPath(); ctx.ellipse(-boss.r*0.2, -boss.r*0.1, boss.r*0.6, boss.r*0.6, 0,0,Math.PI*2); ctx.fill();
+    // superlaser dish
+    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(boss.r*0.28, -boss.r*0.08, boss.r*0.18, 0, Math.PI*2); ctx.fill();
     ctx.restore();
   }
 }
@@ -626,15 +697,16 @@ function openReward(){
   if(rewardOpened) return;
   rewardOpened = true;
   rewardChime();
-  for(let i=0;i<18;i++){
+  // spawn purple crystal particles DOM-based for sparkle effect
+  for(let i=0;i<26;i++){
     const s = document.createElement("div"); s.className="spark";
     const rect = rewardBox.getBoundingClientRect();
     s.style.left = (rect.left + rect.width/2) + "px";
     s.style.top = (rect.top + rect.height/2) + "px";
     document.body.appendChild(s);
-    const tx = rand(-120,120), ty = rand(-160,-40);
-    s.animate([{transform:`translate(0px,0px) scale(0.6)`,opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.1)`,opacity:0}],{duration:700+Math.random()*300,easing:"cubic-bezier(.2,.8,.2,1)"});
-    setTimeout(()=>s.remove(),1200);
+    const tx = rand(-160,160), ty = rand(-220,-40);
+    s.animate([{transform:`translate(0px,0px) scale(0.6)`,opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.2)`,opacity:0}],{duration:800+Math.random()*400,easing:"cubic-bezier(.2,.8,.2,1)"});
+    setTimeout(()=>s.remove(),1400);
   }
 }
 
@@ -662,6 +734,32 @@ bindTap(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleU
 playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim() || state.name; saveState(); });
 
 /* =========================
+   Explosion sequences & helper audio
+   ========================= */
+function playOsc(freq,type,dur,vol, detune=0){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; o.detune.value = detune;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
+}
+function bossExplodeSequence(){
+  bossExplodeSequence = function(){ /* idempotent */ };
+  // layered booms and rumble
+  playOsc(60,"triangle",0.6,0.28);
+  setTimeout(()=>playOsc(90,"triangle",0.5,0.22),120);
+  setTimeout(()=>playOsc(140,"sawtooth",0.4,0.18),260);
+  // screen shake effect (CSS)
+  const el = document.getElementById("game-canvas");
+  el.style.transition = "transform 0.6s cubic-bezier(.2,.8,.2,1)";
+  el.style.transform = "translateY(-8px) rotate(-0.6deg)";
+  setTimeout(()=>{ el.style.transform = ""; }, 600);
+}
+
+/* =========================
    Boot
    ========================= */
 function init(){
@@ -672,6 +770,7 @@ function init(){
   if(!rafId) rafId = requestAnimationFrame(loop);
   document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") saveState(); });
   window.addEventListener("resize", ()=>{ resizeCanvas(); ship.x = Math.min(ship.x, window.innerWidth-40); ship.targetX = Math.min(ship.targetX, window.innerWidth-40); });
+  document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
 }
 init();
 
