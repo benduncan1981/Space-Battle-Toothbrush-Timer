@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>Plaque Invaders — Visual Overhaul</title>
+<title>Plaque Invaders — Saucer Finale (Premium Visuals)</title>
 <style>
 :root{
   --bg-deep:#00020a; --nebula-1:#07102a; --accent-cyan:#00f2ff; --accent-mag:#c04aff; --accent-gold:#ffd24a;
@@ -47,10 +47,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-deep),
 .spark{position:absolute;width:12px;height:12px;border-radius:4px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 14px #c0a0ff}
 .small-note{font-size:0.82rem;opacity:0.9}
 @media (max-width:420px){.title{font-size:1.4rem}.center-count{font-size:2.2rem}}
-/* micro interactions */
-.btn:active{transform:translateY(2px)}
-.shop-item button{transition:transform 120ms ease}
-.shop-item button:active{transform:scale(0.98)}
 </style>
 </head>
 <body>
@@ -59,12 +55,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-deep),
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div class="title">Plaque Invaders — Visual Overhaul</div>
-        <div class="lead">Zooming space, galaxies, planets, 3D-inspired ships, escalating phases, and a cinematic Death Star finale.</div>
+        <div class="title">Plaque Invaders — Saucer Finale</div>
+        <div class="lead">Borg‑inspired, Star Wars‑tinged aesthetic. Zoom through galaxies, fight evolving enemy fleets, and finish with a massive saucer explosion.</div>
       </div>
       <div style="text-align:right">
         <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">Ben — Pilot</div>
-        <div style="font-size:0.8rem;opacity:0.9">v1.1</div>
+        <div style="font-size:0.8rem;opacity:0.9">v1.2</div>
       </div>
     </div>
 
@@ -86,7 +82,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-deep),
   </div>
 </div>
 
-<!-- Shop (kept simple) -->
+<!-- Shop -->
 <div id="screen-shop" class="screen">
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -149,16 +145,20 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-deep),
 
 <script>
 /* =========================
-   State & persistence
+   Persistent state & defaults
    ========================= */
-const STORAGE_KEY = "plaque_invaders_visual_v2";
+const STORAGE_KEY = "plaque_invaders_saucer_v1";
 const defaultState = {
-  name:"Ben", crystals:0, streak:0, lastPlayDate:null, missions:0,
-  owned:{ship:["xwing"],laser:["neon-blue"],trail:["ion-blue"],hyperspace:["warp-default"]},
-  selected:{ship:"xwing",laser:"neon-blue",trail:"ion-blue",hyperspace:"warp-default"}
+  name: "Ben",
+  crystals: 0,
+  streak: 0,
+  lastPlayDate: null,
+  missions: 0,
+  owned: { ship: ["xwing"], laser: ["neon-blue"], trail: ["ion-blue"], hyperspace: ["warp-default"] },
+  selected: { ship: "xwing", laser: "neon-blue", trail: "ion-blue", hyperspace: "warp-default" }
 };
 let state = loadState();
-function loadState(){ try{ const r=localStorage.getItem(STORAGE_KEY); return r?Object.assign(structuredClone(defaultState),JSON.parse(r)):structuredClone(defaultState);}catch(e){return structuredClone(defaultState)}}
+function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return structuredClone(defaultState); return Object.assign(structuredClone(defaultState), JSON.parse(raw)); }catch(e){ return structuredClone(defaultState); } }
 function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 
 /* =========================
@@ -201,73 +201,6 @@ const rewardDetail = document.getElementById("rewardDetail");
 const rewardBack = document.getElementById("rewardBack");
 
 /* =========================
-   Visual assets (procedural 3D-like ships)
-   ========================= */
-/* We'll draw stylized 3D-ish ships using canvas primitives and gradients.
-   Each ship type has a draw function that accepts (ctx, x, y, scale, rotation, tint).
-*/
-
-function drawXWing(ctx,x,y,s,rot,tint){
-  ctx.save();
-  ctx.translate(x,y);
-  ctx.rotate(rot);
-  ctx.scale(s,s);
-  // body shadow
-  ctx.fillStyle = "rgba(0,0,0,0.6)";
-  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(22,8); ctx.lineTo(10,20); ctx.lineTo(-10,20); ctx.lineTo(-22,8); ctx.closePath(); ctx.fill();
-  // main body gradient
-  const g = ctx.createLinearGradient(-22,-18,22,22); g.addColorStop(0,tint); g.addColorStop(1,"#ffffff");
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(22,8); ctx.lineTo(10,20); ctx.lineTo(-10,20); ctx.lineTo(-22,8); ctx.closePath(); ctx.fill();
-  // cockpit
-  ctx.fillStyle = "#111"; ctx.fillRect(-6,-8,12,10);
-  // engine glows
-  ctx.fillStyle = "rgba(0,200,255,0.9)"; ctx.beginPath(); ctx.ellipse(-14,18,4,8,0,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.ellipse(14,18,4,8,0,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
-
-function drawTie(ctx,x,y,s,rot,tint){
-  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
-  // central cockpit
-  ctx.fillStyle = "#111"; ctx.beginPath(); ctx.ellipse(0,0,10,12,0,0,Math.PI*2); ctx.fill();
-  // wings (3D-ish panels)
-  ctx.fillStyle = tint;
-  ctx.beginPath(); ctx.moveTo(-40,-28); ctx.lineTo(-12,-8); ctx.lineTo(-12,8); ctx.lineTo(-40,28); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(40,-28); ctx.lineTo(12,-8); ctx.lineTo(12,8); ctx.lineTo(40,28); ctx.closePath(); ctx.fill();
-  // wing rim
-  ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1; ctx.stroke();
-  ctx.restore();
-}
-
-function drawDestroyer(ctx,x,y,s,rot,tint){
-  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
-  // hull
-  const g = ctx.createLinearGradient(-60,-20,60,40); g.addColorStop(0,tint); g.addColorStop(1,"#222");
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.moveTo(-60,30); ctx.lineTo(60,30); ctx.lineTo(40,-30); ctx.lineTo(-40,-30); ctx.closePath(); ctx.fill();
-  // bridge
-  ctx.fillStyle = "#111"; ctx.fillRect(-18,-28,36,18);
-  // engine glow
-  ctx.fillStyle = "rgba(255,120,80,0.12)"; ctx.beginPath(); ctx.ellipse(0,34,40,8,0,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
-
-function drawDeathStar(ctx,x,y,s,rot){
-  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
-  // sphere base
-  const g = ctx.createRadialGradient(-20,-10,10,0,0,120); g.addColorStop(0,"#666"); g.addColorStop(1,"#111");
-  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0,0,120,0,Math.PI*2); ctx.fill();
-  // trench (animated band)
-  ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.beginPath(); ctx.ellipse(20,0,80,28,0,0,Math.PI*2); ctx.fill();
-  // superlaser dish
-  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(48,-12,22,0,Math.PI*2); ctx.fill();
-  // subtle highlights
-  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0,0,110,0,Math.PI*2); ctx.stroke();
-  ctx.restore();
-}
-
-/* =========================
    Audio (WebAudio)
    ========================= */
 let audioCtx = null;
@@ -295,7 +228,7 @@ function bossExplodeSequence(){
 function rewardChime(){ playOsc(900,"sine",0.12,0.12); setTimeout(()=>playOsc(1200,"sine",0.12,0.12),120); }
 
 /* =========================
-   Canvas & engine setup
+   Canvas & DPR clamp
    ========================= */
 let DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
 function resizeCanvas(){
@@ -324,15 +257,19 @@ let spawnInterval = 1.0;
 let enemies = [];
 let lasers = [];
 let sparks = [];
+let debris = [];
 let boss = null;
 let bossActive = false;
 let bossDisplayHp = 1;
 let rewardForMission = 0;
 let hyperspaceTick = -1;
+let screenShake = {x:0,y:0,duration:0,intensity:0};
 
 /* Pools */
-const MAX_SPARKS = 400;
+const MAX_SPARKS = 500;
 for(let i=0;i<MAX_SPARKS;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,color:"#fff"});
+const MAX_DEBRIS = 220;
+for(let i=0;i<MAX_DEBRIS;i++) debris.push({alive:false,x:0,y:0,vx:0,vy:0,rot:0,spin:0,life:0,color:"#fff",size:0});
 
 /* Ship movement */
 let ship = { x: window.innerWidth/2, y: window.innerHeight*0.78, targetX: window.innerWidth/2, speed: 160, nextMoveAt:0 };
@@ -346,116 +283,141 @@ function nowISO(){ return new Date().toISOString().slice(0,10) }
 function showScreen(name){ Object.values(screens).forEach(s=>s.classList.remove("active")); screens[name].classList.add("active"); }
 
 /* =========================
-   Shop UI (simple cosmetic store)
+   Procedural 3D-like ship drawing (Borg-ish / cyborg aesthetic)
+   - All shapes are drawn with gradients, bevels, and small details.
    ========================= */
-const shipSkins = [
-  {id:"xwing",name:"X‑Wing",cost:0,color:"#4af"},
-  {id:"viper",name:"Viper",cost:120,color:"#c04aff"},
-  {id:"reaper",name:"Reaper",cost:180,color:"#ffd24a"}
-];
-const laserDefs = [
-  {id:"neon-blue",name:"Neon Blue",cost:0,color:"#4af"},
-  {id:"plasma-magenta",name:"Plasma Magenta",cost:60,color:"#ff4fff"},
-  {id:"solar-gold",name:"Solar Gold",cost:80,color:"#ffd94a"}
-];
-const trailDefs = [
-  {id:"ion-blue",name:"Ion Blue",cost:0,color:"#4af"},
-  {id:"quantum-purple",name:"Quantum Purple",cost:60,color:"#c04aff"}
-];
-const hyperspaceDefs = [
-  {id:"warp-default",name:"Warp Tunnel",cost:0,star:"#8ff",streak:"#0ff"},
-  {id:"nebula-violet",name:"Nebula Violet",cost:80,star:"#f8f",streak:"#c0f"}
-];
-
-function refreshTitleUI(){
-  playerName.value = state.name;
-  statCrystals.textContent = state.crystals;
-  statStreak.textContent = state.streak;
-  statMissions.textContent = state.missions;
-  hudName.textContent = state.name || defaultState.name;
-  hudCrystals.textContent = state.crystals;
-  shopCrystals.textContent = state.crystals;
+function drawPlayerShip(ctx,x,y,scale,rot,tint){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  // hull base
+  const hull = ctx.createLinearGradient(-28,-18,28,22); hull.addColorStop(0,tint); hull.addColorStop(1,"#222");
+  ctx.fillStyle = hull;
+  ctx.beginPath(); ctx.moveTo(0,-22); ctx.bezierCurveTo(26,-12,26,12,0,22); ctx.bezierCurveTo(-26,12,-26,-12,0,-22); ctx.fill();
+  // mechanical ribs
+  ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+  for(let i=-12;i<=12;i+=6){ ctx.beginPath(); ctx.moveTo(-18,i); ctx.lineTo(18,i); ctx.stroke(); }
+  // cockpit
+  ctx.fillStyle = "#0b0b0b"; ctx.beginPath(); ctx.ellipse(0,-4,8,6,0,0,Math.PI*2); ctx.fill();
+  // engine glows (two)
+  ctx.fillStyle = "rgba(0,200,255,0.9)"; ctx.beginPath(); ctx.ellipse(-14,18,5,10,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(14,18,5,10,0,0,Math.PI*2); ctx.fill();
+  // cyber details (small squares)
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  for(let i=-10;i<=10;i+=8){ ctx.fillRect(i,6,3,3); }
+  ctx.restore();
 }
-function refreshShop(){
-  shopCrystals.textContent = state.crystals;
-  shopList.innerHTML = "";
-  const all = [...shipSkins.map(x=>({type:"ship",...x})), ...laserDefs.map(x=>({type:"laser",...x})), ...trailDefs.map(x=>({type:"trail",...x})), ...hyperspaceDefs.map(x=>({type:"hyperspace",...x}))];
-  all.forEach(item=>{
-    const row = document.createElement("div"); row.className="shop-item";
-    const preview = document.createElement("div"); preview.className="preview";
-    if(item.type==="ship"){
-      const mini = document.createElement("canvas"); mini.width=140; mini.height=80; mini.style.width="72px"; mini.style.height="40px";
-      const mctx = mini.getContext("2d");
-      mctx.clearRect(0,0,140,80);
-      drawXWing(mctx,70,40,1.0,0,item.color);
-      preview.appendChild(mini);
-    } else if(item.type==="laser"){
-      const bar = document.createElement("div"); bar.style.width="6px"; bar.style.height="28px"; bar.style.background=item.color; bar.style.borderRadius="3px";
-      preview.appendChild(bar);
-    } else {
-      preview.style.background = "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12))";
-    }
-    const info = document.createElement("div"); info.style.flex="1"; info.style.margin="0 10px";
-    const name = document.createElement("div"); name.textContent = item.name; name.style.fontWeight="900";
-    const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" crystals"):" • Default"); meta.style.fontSize="0.82rem"; meta.style.opacity="0.85";
-    info.appendChild(name); info.appendChild(meta);
-    const actions = document.createElement("div");
-    const owned = state.owned[item.type] && state.owned[item.type].includes(item.id);
-    const selected = state.selected[item.type]===item.id;
-    const btn = document.createElement("button"); btn.className="btn"; btn.style.padding="8px 10px; font-size:0.86rem";
-    if(owned){ btn.textContent = selected?"Selected":"Select"; btn.onclick = ()=>{ state.selected[item.type]=item.id; saveState(); refreshShop(); } }
-    else { btn.textContent = "Buy"; btn.onclick = ()=>{ if(state.crystals>=item.cost){ state.crystals-=item.cost; state.owned[item.type].push(item.id); state.selected[item.type]=item.id; saveState(); refreshShop(); refreshTitleUI(); } else { alert("Not enough crystals"); } } }
-    actions.appendChild(btn);
-    row.appendChild(preview); row.appendChild(info); row.appendChild(actions);
-    shopList.appendChild(row);
-  });
+
+function drawEnemyCyborg(ctx,x,y,scale,rot,variant){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  // central core
+  const coreG = ctx.createRadialGradient(0,0,0,0,0,28); coreG.addColorStop(0,"#444"); coreG.addColorStop(1,"#0b0b0b");
+  ctx.fillStyle = coreG; ctx.beginPath(); ctx.ellipse(0,0,28,28,0,0,Math.PI*2); ctx.fill();
+  // outer plates (hex-like)
+  ctx.fillStyle = variant==="heavy" ? "#6b6b6b" : "#8aa";
+  ctx.beginPath(); ctx.moveTo(-36,0); ctx.lineTo(-12,-28); ctx.lineTo(12,-28); ctx.lineTo(36,0); ctx.lineTo(12,28); ctx.lineTo(-12,28); ctx.closePath(); ctx.fill();
+  // glowing veins
+  ctx.strokeStyle = "rgba(180,120,255,0.18)"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(0,18); ctx.stroke();
+  // eye / sensor
+  ctx.fillStyle = "#ff6bff"; ctx.beginPath(); ctx.ellipse(0,-6,6,4,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawDestroyerCyborg(ctx,x,y,scale,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  // long hull
+  const g = ctx.createLinearGradient(-80,-20,80,40); g.addColorStop(0,"#333"); g.addColorStop(1,"#0b0b0b");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-80,30); ctx.lineTo(80,30); ctx.lineTo(60,-30); ctx.lineTo(-60,-30); ctx.closePath(); ctx.fill();
+  // plating
+  ctx.fillStyle = "rgba(255,255,255,0.04)"; ctx.fillRect(-40,-18,80,8);
+  // central core
+  ctx.fillStyle = "#111"; ctx.fillRect(-18,-28,36,18);
+  // cyber teeth
+  ctx.fillStyle = "rgba(255,255,255,0.06)";
+  for(let i=-60;i<=60;i+=20) ctx.fillRect(i,26,8,6);
+  ctx.restore();
+}
+
+function drawSaucerBoss(ctx,x,y,scale,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  // main dome
+  const dome = ctx.createRadialGradient(-20,-10,10,0,0,160); dome.addColorStop(0,"#9aa"); dome.addColorStop(1,"#111");
+  ctx.fillStyle = dome; ctx.beginPath(); ctx.ellipse(0,0,160,80,0,0,Math.PI*2); ctx.fill();
+  // layered rings (mechanical)
+  ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.beginPath(); ctx.ellipse(0,6,120,28,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.04)"; ctx.beginPath(); ctx.ellipse(0,-6,140,36,0,0,Math.PI*2); ctx.fill();
+  // borg-like nodes
+  for(let a=0;a<360;a+=36){
+    const r = 100;
+    const rx = Math.cos(a*Math.PI/180)*r*0.9;
+    const ry = Math.sin(a*Math.PI/180)*r*0.35;
+    ctx.fillStyle = "rgba(200,120,255,0.12)";
+    ctx.beginPath(); ctx.ellipse(rx,ry,8,6,0,0,Math.PI*2); ctx.fill();
+  }
+  // central dish (glowing)
+  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(48,-12,28,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,120,200,0.12)"; ctx.beginPath(); ctx.arc(48,-12,12,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 
 /* =========================
-   Particle & spark helpers
+   Particle & debris helpers
    ========================= */
-function spawnSparks(x,y,color,count=12){
+function spawnSparks(x,y,color,count=18){
   for(let i=0;i<sparks.length && count>0;i++){
     const s = sparks[i];
     if(!s.alive){
-      s.alive=true; s.x=x; s.y=y; s.vx=rand(-320,320); s.vy=rand(-420,-60); s.life=rand(0.28,1.2); s.color=color;
+      s.alive=true; s.x=x; s.y=y; s.vx=rand(-520,520); s.vy=rand(-720,-120); s.life=rand(0.28,1.6); s.color=color;
+      count--;
+    }
+  }
+}
+function spawnDebris(x,y,color,count=24){
+  for(let i=0;i<debris.length && count>0;i++){
+    const d = debris[i];
+    if(!d.alive){
+      d.alive=true; d.x=x; d.y=y; d.vx=rand(-420,420); d.vy=rand(-520,-80); d.rot=rand(0,Math.PI*2); d.spin=rand(-6,6); d.life=rand(0.6,2.2); d.color=color; d.size=rand(4,18);
       count--;
     }
   }
 }
 
 /* =========================
+   Audio helper wrappers
+   ========================= */
+function tieExplodeSound(){ tieExplode(); }
+function destroyerExplodeSound(){ destroyerExplode(); }
+
+/* =========================
    Gameplay: spawn, fire, boss
    ========================= */
 function spawnEnemy(phase){
   const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie-heavy":"tie") : "destroyer";
-  const w = type==="tie"?36: type==="tie-heavy"?48: 110;
-  const h = type==="tie"?26: type==="tie-heavy"?36: 60;
-  const hp = type==="tie"?1: type==="tie-heavy"?2: 6;
-  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 180);
-  const x = rand(40, window.innerWidth - 40);
-  enemies.push({x,y:-80,vx:0,vy:speed,w,h,hp,hitTimer:0,type,rot:rand(-0.2,0.2),scale: rand(0.6,1.0)});
+  const scale = type==="destroyer"? 1.0 : (type==="tie-heavy"? 0.9 : 0.7);
+  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 200 - phase*10);
+  const x = rand(80, window.innerWidth - 80);
+  enemies.push({x,y:-120,vx:0,vy:speed, type, scale, rot:rand(-0.2,0.2), hp: type==="destroyer"?6:(type==="tie-heavy"?2:1)});
 }
 
 function spawnBoss(){
   bossActive = true;
-  boss = {x:window.innerWidth/2, y:-360, vx:0, vy:0, r:220, hp:1.0, displayHp:1.0, flash:0};
+  boss = {x:window.innerWidth/2, y:-420, vx:0, vy:0, r:220, hp:1.0, displayHp:1.0, flash:0};
   bossBar.style.display = "block";
   bossFill.style.width = "100%";
 }
 
+/* Fire lasers (auto) */
 let laserTimer = 0;
 function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
   const laserColor = "#4af";
-  lasers.push({x:shipX-16,y:shipY-22,vx:0,vy:-820,color:laserColor});
-  lasers.push({x:shipX+16,y:shipY-22,vx:0,vy:-820,color:laserColor});
-  laserSound((Math.random()*2-1)*0.4);
+  lasers.push({x:shipX-18,y:shipY-26,vx:0,vy:-920,color:laserColor});
+  lasers.push({x:shipX+18,y:shipY-26,vx:0,vy:-920,color:laserColor});
+  laserSound();
 }
 
 /* =========================
-   Hyperspace & phase banner
+   Hyperspace & banner
    ========================= */
 function triggerHyperspace(){
   const overlay = document.createElement("div");
@@ -468,6 +430,26 @@ function showPhaseBanner(phase){
   phaseBanner.textContent = "PHASE " + phase;
   phaseBanner.style.display = "block"; phaseBanner.style.opacity = "1"; phaseBanner.style.transform = "translateX(-50%) translateY(-6px)";
   setTimeout(()=>{ phaseBanner.style.transition = "opacity 600ms ease, transform 600ms ease"; phaseBanner.style.opacity = "0"; phaseBanner.style.transform = "translateX(-50%) translateY(-26px)"; setTimeout(()=>phaseBanner.style.display="none",620); }, 900);
+}
+
+/* =========================
+   Screen shake helper
+   ========================= */
+function startScreenShake(intensity=12,duration=700){
+  screenShake.intensity = intensity;
+  screenShake.duration = duration;
+  screenShake.x = 0; screenShake.y = 0;
+  const start = performance.now();
+  const step = ()=>{
+    const now = performance.now();
+    const t = (now - start) / duration;
+    if(t >= 1){ screenShake.x = 0; screenShake.y = 0; return; }
+    const damper = 1 - t;
+    screenShake.x = (Math.random()*2-1) * intensity * damper;
+    screenShake.y = (Math.random()*2-1) * intensity * damper;
+    requestAnimationFrame(step);
+  };
+  step();
 }
 
 /* =========================
@@ -488,9 +470,9 @@ function update(dt){
   // ship movement
   ship.nextMoveAt -= dt;
   if(ship.nextMoveAt <= 0){
-    ship.targetX = rand(60, window.innerWidth - 60);
-    ship.nextMoveAt = rand(0.7, 1.6);
-    ship.speed = rand(160, 320);
+    ship.targetX = rand(80, window.innerWidth - 80);
+    ship.nextMoveAt = rand(0.6, 1.6);
+    ship.speed = rand(160, 360);
   }
   ship.x += (ship.targetX - ship.x) * clamp(6*dt, 0, 1);
 
@@ -499,7 +481,7 @@ function update(dt){
   const phase = (elapsed < 30) ? 1 : (elapsed < 60) ? 2 : (elapsed < 90) ? 3 : 4;
   phaseBadge.textContent = "PHASE " + phase;
 
-  // hyperspace tick
+  // hyperspace tick (every 30s)
   const tick = Math.floor(elapsed/30);
   if(tick > hyperspaceTick){
     hyperspaceTick = tick;
@@ -533,7 +515,7 @@ function update(dt){
     e.y += e.vy * dt;
     e.x += Math.sin((performance.now()/1000) + i) * 0.25;
     if(e.hitTimer>0) e.hitTimer -= dt;
-    if(e.y - e.h > window.innerHeight + 120) enemies.splice(i,1);
+    if(e.y - 200 > window.innerHeight) enemies.splice(i,1);
   }
 
   // update lasers and collisions
@@ -545,10 +527,10 @@ function update(dt){
       const dx = L.x - boss.x, dy = L.y - boss.y;
       const dist = Math.hypot(dx,dy);
       if(dist < boss.r){
-        spawnSparks(L.x, L.y, "#ffd2ff", 18);
+        spawnSparks(L.x, L.y, "#ffd2ff", 28);
         boss.flash = 0.12;
-        boss.hp = clamp(boss.hp - 0.01, 0, 1);
-        boss.displayHp += (boss.hp - boss.displayHp) * 0.2;
+        boss.hp = clamp(boss.hp - 0.012, 0, 1);
+        boss.displayHp += (boss.hp - boss.displayHp) * 0.22;
         bossFill.style.width = (boss.displayHp*100).toFixed(1) + "%";
         bossHitSound();
         lasers.splice(i,1);
@@ -559,16 +541,17 @@ function update(dt){
     let hit = false;
     for(let j=enemies.length-1;j>=0;j--){
       const E = enemies[j];
-      if(Math.abs(L.x - E.x) < E.w/1.6 && Math.abs(L.y - E.y) < E.h/1.6){
-        spawnSparks(L.x, L.y, "#ffd24a", 12);
+      if(Math.abs(L.x - E.x) < (E.scale*40) && Math.abs(L.y - E.y) < (E.scale*30)){
+        spawnSparks(L.x, L.y, "#ffd24a", 14);
         E.hp -= 1;
         E.hitTimer = 0.12;
         lasers.splice(i,1);
         hit = true;
         if(E.hp <= 0){
-          if(E.type==="tie") tieExplode((E.x/window.innerWidth)-0.5);
-          else if(E.type==="destroyer") destroyerExplode();
-          spawnSparks(E.x, E.y, "#ff9a4a", 20);
+          if(E.type==="tie") tieExplodeSound();
+          else if(E.type==="destroyer") destroyerExplodeSound();
+          spawnSparks(E.x, E.y, "#ff9a4a", 28);
+          spawnDebris(E.x, E.y, "#bba", 12);
           state.crystals += (E.type==="destroyer"?6:1);
           hudCrystals.textContent = state.crystals;
           enemies.splice(j,1);
@@ -577,7 +560,7 @@ function update(dt){
       }
     }
     if(hit) continue;
-    if(L.y < -80) lasers.splice(i,1);
+    if(L.y < -120) lasers.splice(i,1);
   }
 
   // update sparks
@@ -587,8 +570,20 @@ function update(dt){
     s.life -= dt;
     s.x += s.vx * dt;
     s.y += s.vy * dt;
-    s.vy += 420 * dt;
+    s.vy += 720 * dt;
     if(s.life <= 0) s.alive = false;
+  }
+
+  // update debris
+  for(let i=0;i<debris.length;i++){
+    const d = debris[i];
+    if(!d.alive) continue;
+    d.life -= dt;
+    d.x += d.vx * dt;
+    d.y += d.vy * dt;
+    d.vy += 420 * dt;
+    d.rot += d.spin * dt;
+    if(d.life <= 0) d.alive = false;
   }
 
   // boss logic
@@ -605,12 +600,15 @@ function update(dt){
       boss.displayHp += (boss.hp - boss.displayHp) * 0.12;
       bossFill.style.width = (boss.displayHp*100).toFixed(1) + "%";
       if(boss.displayHp <= 0.02){
+        // Massive explosion sequence
         bossExplodeSequence();
-        spawnSparks(boss.x, boss.y, "#c0a0ff", 160);
-        state.crystals += 200;
+        spawnSparks(boss.x, boss.y, "#c0a0ff", 300);
+        spawnDebris(boss.x, boss.y, "#c0a0ff", 180);
+        startScreenShake(28,1200);
+        state.crystals += 300;
         hudCrystals.textContent = state.crystals;
         bossActive = false; boss = null; bossBar.style.display = "none";
-        setTimeout(()=>{ finishMission(); }, 900);
+        setTimeout(()=>{ finishMission(); }, 1200);
       }
     }
     if(boss.flash > 0) boss.flash -= dt;
@@ -620,10 +618,12 @@ function update(dt){
   if(missionTime <= 0 && running){
     if(bossActive && boss){
       bossExplodeSequence();
-      spawnSparks(boss.x, boss.y, "#c0a0ff", 160);
+      spawnSparks(boss.x, boss.y, "#c0a0ff", 220);
+      spawnDebris(boss.x, boss.y, "#c0a0ff", 140);
+      startScreenShake(20,1000);
       bossActive = false; boss = null; bossBar.style.display = "none";
       state.crystals += 120; hudCrystals.textContent = state.crystals;
-      setTimeout(()=>{ finishMission(); }, 900);
+      setTimeout(()=>{ finishMission(); }, 1000);
     } else {
       finishMission();
     }
@@ -631,51 +631,60 @@ function update(dt){
 }
 
 /* =========================
-   Render (canvas)
+   Render (canvas) — vertical movement top->bottom for background
    ========================= */
+let bgOffset = 0;
 function render(){
+  // apply screen shake transform
+  const sx = screenShake.x || 0;
+  const sy = screenShake.y || 0;
+  canvas.style.transform = `translate(${sx}px, ${sy}px)`;
+
   ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
   const W = canvas.width/DPR, H = canvas.height/DPR;
 
-  // moving background: layered parallax nebula + galaxies + planets
+  // moving background: nebula + galaxies + planets moving top -> bottom
+  bgOffset += 0.6; if(bgOffset > H*2) bgOffset = 0;
+
   // base gradient
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,"#001026"); g.addColorStop(1,"#000814");
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // distant galaxies (animated)
+  // vertical starfield (top -> bottom)
+  for(let i=0;i<220;i++){
+    const sx = (i*73) % W;
+    const sy = ((i*97) + bgOffset) % (H + 200) - 100;
+    const size = (i%6===0)?2:1;
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(sx, sy, size, size);
+  }
+
+  // drifting galaxies (vertical)
   for(let i=0;i<6;i++){
-    const gx = (i*173 + (performance.now()/30)) % (W+400) - 200;
-    const gy = (i*97 + (performance.now()/50)) % H;
+    const gx = (i*173) % W;
+    const gy = ((i*97) + bgOffset*0.4) % (H + 400) - 200;
     const rad = 60 + (i%3)*30;
     const gg = ctx.createRadialGradient(gx,gy,0,gx,gy,rad);
-    gg.addColorStop(0, "rgba(120,80,200,0.08)");
+    gg.addColorStop(0, "rgba(120,80,200,0.06)");
     gg.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = gg; ctx.beginPath(); ctx.ellipse(gx,gy,rad,rad*0.6,0,0,Math.PI*2); ctx.fill();
   }
 
-  // planets (foreground)
-  const p1x = (performance.now()/40) % (W+300) - 150;
-  ctx.save(); ctx.globalAlpha = 0.9;
-  ctx.beginPath(); ctx.ellipse(p1x, H*0.22, 80, 80, 0,0,Math.PI*2);
-  const pg = ctx.createLinearGradient(p1x-80,H*0.22,p1x+80,H*0.22); pg.addColorStop(0,"#2a1b4a"); pg.addColorStop(1,"#0b2a3a");
-  ctx.fillStyle = pg; ctx.fill(); ctx.restore();
-
-  // star streaks (zooming forward)
-  const t = performance.now()/8;
-  for(let i=0;i<160;i++){
-    const sx = ((i*97 + t* (0.6 + (i%5)*0.02)) % (W*2)) - W*0.5;
-    const sy = (i*53 + (t*0.2)) % H;
-    ctx.fillStyle = "rgba(255,255,255,0.06)";
-    ctx.fillRect(sx, sy, 1 + (i%3), 1 + (i%2));
-  }
+  // planets moving top->bottom
+  const p1x = W*0.18;
+  const p1y = ((bgOffset*0.6) % (H + 300)) - 150;
+  ctx.save(); ctx.globalAlpha = 0.95;
+  const pg = ctx.createLinearGradient(p1x-80,p1y,p1x+80,p1y); pg.addColorStop(0,"#2a1b4a"); pg.addColorStop(1,"#0b2a3a");
+  ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(p1x, p1y, 80, 80, 0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 
   // draw enemies (3D-like)
   enemies.forEach(e=>{
     if(e.type==="tie" || e.type==="tie-heavy"){
-      drawTie(ctx, e.x, e.y, e.scale, e.rot, "#8aa");
+      drawEnemyCyborg(ctx, e.x, e.y, e.scale, e.rot, e.type==="tie-heavy"?"heavy":"light");
     } else {
-      drawDestroyer(ctx, e.x, e.y, e.scale || 0.9, e.rot, "#bba");
+      drawDestroyerCyborg(ctx, e.x, e.y, e.scale, e.rot);
     }
   });
 
@@ -683,13 +692,13 @@ function render(){
   lasers.forEach(l=>{
     ctx.save();
     ctx.fillStyle = l.color;
-    ctx.shadowColor = l.color; ctx.shadowBlur = 14;
-    ctx.fillRect(l.x-2, l.y, 4, 30);
+    ctx.shadowColor = l.color; ctx.shadowBlur = 16;
+    ctx.fillRect(l.x-2, l.y, 4, 34);
     ctx.shadowBlur = 0;
     ctx.restore();
   });
 
-  // sparks
+  // draw sparks
   for(let i=0;i<sparks.length;i++){
     const s = sparks[i];
     if(!s.alive) continue;
@@ -700,19 +709,31 @@ function render(){
     ctx.restore();
   }
 
-  // player ship (3D X-wing style)
-  drawXWing(ctx, ship.x, ship.y, 1.0, Math.sin(performance.now()/700)*0.02, "#4af");
+  // draw debris
+  for(let i=0;i<debris.length;i++){
+    const d = debris[i];
+    if(!d.alive) continue;
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    ctx.rotate(d.rot);
+    ctx.fillStyle = d.color;
+    ctx.fillRect(-d.size/2, -d.size/2, d.size, d.size*0.6);
+    ctx.restore();
+  }
+
+  // draw player ship
+  drawPlayerShip(ctx, ship.x, ship.y, 1.0, Math.sin(performance.now()/700)*0.02, "#4af");
 
   // engine trail
   ctx.save();
   ctx.globalAlpha = 0.6;
   ctx.fillStyle = "#00dfff";
-  ctx.beginPath(); ctx.ellipse(ship.x, ship.y+30, 16, 34, 0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(ship.x, ship.y+34, 18, 36, 0,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1; ctx.restore();
 
-  // boss (Death Star) if active
+  // draw boss (saucer) if active
   if(bossActive && boss){
-    drawDeathStar(ctx, boss.x, boss.y, 1.0, 0);
+    drawSaucerBoss(ctx, boss.x, boss.y, 1.0, 0);
   }
 }
 
@@ -821,18 +842,30 @@ bindTap(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleU
 playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim() || state.name; saveState(); });
 
 /* =========================
-   Boot
+   Explosion & screen shake helpers
    ========================= */
-function init(){
-  refreshTitleUI(); refreshShop();
-  hudName.textContent = state.name;
-  hudCrystals.textContent = state.crystals;
-  lastTime = performance.now();
-  if(!rafId) rafId = requestAnimationFrame(loop);
-  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") saveState(); });
-  window.addEventListener("resize", ()=>{ resizeCanvas(); ship.x = Math.min(ship.x, window.innerWidth-40); ship.targetX = Math.min(ship.targetX, window.innerWidth-40); });
-  document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
+function startScreenShake(intensity=18,duration=900){
+  screenShake.intensity = intensity;
+  screenShake.duration = duration;
+  const start = performance.now();
+  const step = ()=>{
+    const now = performance.now();
+    const t = (now - start) / duration;
+    if(t >= 1){ screenShake.x = 0; screenShake.y = 0; return; }
+    const damper = 1 - t;
+    screenShake.x = (Math.random()*2-1) * intensity * damper;
+    screenShake.y = (Math.random()*2-1) * intensity * damper;
+    requestAnimationFrame(step);
+  };
+  step();
 }
+
+/* =========================
+   Boot & initialization
+   ========================= */
+function refreshTitleUI(){ playerName.value = state.name; statCrystals.textContent = state.crystals; statStreak.textContent = state.streak; statMissions.textContent = state.missions; hudName.textContent = state.name || defaultState.name; hudCrystals.textContent = state.crystals; shopCrystals.textContent = state.crystals; }
+function refreshShop(){ shopCrystals.textContent = state.crystals; shopList.innerHTML = ""; /* minimal shop for now */ }
+function init(){ refreshTitleUI(); refreshShop(); hudName.textContent = state.name; hudCrystals.textContent = state.crystals; lastTime = performance.now(); if(!rafId) rafId = requestAnimationFrame(loop); document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState==="hidden") saveState(); }); window.addEventListener("resize", ()=>{ resizeCanvas(); ship.x = Math.min(ship.x, window.innerWidth-40); ship.targetX = Math.min(ship.targetX, window.innerWidth-40); }); document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true}); }
 init();
 
 /* =========================
