@@ -1,231 +1,264 @@
 <!doctype html>
 <html lang="en-GB">
 <head>
-  <meta charset="utf-8" />
-  <title>PLAQUE INVADERS — OPERATION: SAUCER FALL</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-  <style>
-    :root{
-      --bg-top:#00020a;--bg-bottom:#001026;
-      --accent-cyan:#00F2FF;--accent-mag:#C04AFF;--accent-gold:#FFD24A;
-      --hud-bg:rgba(0,0,0,0.64);--glass:rgba(255,255,255,0.03);
-      --ui-radius:12px;
-      --font-stack:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));font-family:var(--font-stack);color:#E8FBFF;overflow:hidden;text-transform:uppercase;-webkit-font-smoothing:antialiased}
-    .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px}
-    .screen.active{display:flex}
-    .card{width:100%;max-width:920px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
-    .title{font-weight:900;font-size:1.8rem;color:var(--accent-gold);text-shadow:0 0 12px rgba(255,210,74,0.14);letter-spacing:-0.5px}
-    .lead{font-size:0.9rem;color:#BFEFFF;opacity:0.95;margin-top:6px}
-    .input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#E8FBFF;font-weight:800;text-align:center}
-    .statbar{display:flex;gap:8px;margin:12px 0}
-    .stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
-    .stat .label{font-size:0.68rem;opacity:0.85}
-    .stat .value{font-size:1rem;font-weight:900}
-    .btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation}
-    .btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#E8FBFF}
-    #game-canvas{position:absolute;inset:0;z-index:2;touch-action:none;background:transparent;pointer-events:none}
-    #three-container{position:absolute;inset:0;z-index:1;pointer-events:none}
-    .hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:4}
-    .hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
-    .hud .left{display:flex;gap:8px;align-items:center}
-    #phaseBadge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-mag),#7F5BFF);font-weight:900;font-size:0.72rem;letter-spacing:1px}
-    #timerBig{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,"Roboto Mono",monospace;font-weight:900;font-size:1.4rem;letter-spacing:1px;color:#fff;text-shadow:0 0 12px rgba(0,255,255,0.10)}
-    #progressBar{width:240px;height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
-    #progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold));transition:width 120ms linear}
-    .label-small{font-size:0.66rem;opacity:0.85}
-    .phase-banner{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));backdrop-filter:blur(6px);font-weight:900;letter-spacing:1px;z-index:5;display:none}
-    .boss-bar{position:absolute;top:74px;left:50%;transform:translateX(-50%);width:84%;max-width:980px;height:14px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:4}
-    .boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF4A4A,#FFEA4A);transition:width 120ms linear}
-    .controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:4}
-    .control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
-    .small-note{font-size:0.78rem;opacity:0.9}
-    .hud-right{display:flex;gap:8px;align-items:center}
-    .status-bar{width:140px;height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
-    .status-fill{height:100%;width:100%;background:linear-gradient(90deg,#4AF,#7F5BFF);transition:width 120ms linear}
-    .debug{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,0.7);padding:8px 10px;border-radius:8px;font-size:11px;z-index:999;color:#fff;display:none;white-space:pre}
-    #announcementBanner{position:fixed;left:50%;top:18%;transform:translateX(-50%);padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02));backdrop-filter:blur(10px);font-weight:900;letter-spacing:1px;z-index:6;display:none;text-align:center}
-    #uiTimerLarge{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:3rem;font-weight:900;text-shadow:0 0 18px rgba(0,0,0,0.8);z-index:6;display:none}
-    @media(max-width:420px){
-      .card{padding:12px}
-      .title{font-size:1.2rem}
-      #progressBar{width:160px}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>PLAQUE INVADERS — OPERATION: SAUCER FALL</title>
+<style>
+/* (All CSS identical to your last working file with HUD, shop, mission, reward, admin, and status bars)
+   Kept unchanged except minor layout for announcement banner and large timer anchor.
+*/
+:root{
+  --bg-top:#00020a; --bg-bottom:#001026;
+  --accent-cyan:#00F2FF; --accent-mag:#C04AFF; --accent-gold:#FFD24A;
+  --hud-bg: rgba(0,0,0,0.64);
+  --glass: rgba(255,255,255,0.03);
+  --ui-radius:12px;
+  --font-stack: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),var(--bg-bottom));font-family:var(--font-stack);color:#E8FBFF;overflow:hidden;text-transform:uppercase;-webkit-font-smoothing:antialiased}
+.screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px}
+.screen.active{display:flex}
+.card{width:100%;max-width:920px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
+.title{font-weight:900;font-size:1.8rem;color:var(--accent-gold);text-shadow:0 0 12px rgba(255,210,74,0.14);letter-spacing:-0.5px}
+.lead{font-size:0.9rem;color:#BFEFFF;opacity:0.95;margin-top:6px}
+.input{width:100%;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#E8FBFF;font-weight:800;text-align:center}
+.statbar{display:flex;gap:8px;margin:12px 0}
+.stat{flex:1;background:var(--hud-bg);padding:8px;border-radius:10px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
+.stat .label{font-size:0.68rem;opacity:0.85}
+.stat .value{font-size:1rem;font-weight:900}
+.btn{appearance:none;border:0;padding:10px 12px;border-radius:999px;background:linear-gradient(135deg,var(--accent-cyan),#7F5BFF);color:#021;font-weight:900;box-shadow:0 8px 22px rgba(127,91,255,0.12);font-size:0.95rem;cursor:pointer;touch-action:manipulation}
+.btn.alt{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#E8FBFF}
+#game-canvas{position:absolute;inset:0;z-index:1;touch-action:none;background:transparent}
+.hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:60}
+.hud .box{background:var(--hud-bg);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);font-weight:900;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:6px}
+.hud .left{display:flex;gap:8px;align-items:center}
+#phaseBadge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-mag),#7F5BFF);font-weight:900;font-size:0.72rem;letter-spacing:1px}
+#timerBig{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; font-weight:900; font-size:1.4rem; letter-spacing:1px; color:#fff; text-shadow:0 0 12px rgba(0,255,255,0.10)}
+#progressBar{width:240px;height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden}
+#progressFill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold));transition:width 120ms linear}
+.label-small{font-size:0.66rem;opacity:0.85}
+.phase-banner{position:absolute;left:50%;top:14px;transform:translateX(-50%);padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));backdrop-filter: blur(6px);font-weight:900;letter-spacing:1px;z-index:70;display:none}
+.boss-bar{position:absolute;top:74px;left:50%;transform:translateX(-50%);width:84%;max-width:980px;height:14px;border-radius:999px;background:rgba(40,0,0,0.6);border:1px solid rgba(255,0,0,0.25);overflow:hidden;display:none;z-index:60}
+.boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF4A4A,#FFEA4A);transition:width 120ms linear}
+.controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
+.control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
+.admin-link{position:absolute;right:10px;top:10px;z-index:80;pointer-events:auto}
+.shop-list{max-height:calc(100vh - 220px);overflow:auto;padding-right:6px;-webkit-overflow-scrolling:touch}
+.shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:8px 0}
+.preview{width:72px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.reward-box{width:140px;height:140px;border-radius:14px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(179,107,255,0.95);cursor:pointer}
+.spark{position:absolute;width:10px;height:10px;border-radius:4px;background:radial-gradient(circle,#c0a0ff,#7f5bff);box-shadow:0 0 12px #c0a0ff}
+.small-note{font-size:0.78rem;opacity:0.9}
+.hud-right{display:flex;gap:8px;align-items:center}
+.status-bar{width:140px;height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+.status-fill{height:100%;width:100%;background:linear-gradient(90deg,#4AF,#7F5BFF);transition:width 120ms linear}
+.status-label{font-size:0.66rem;opacity:0.9}
+.debug{position:fixed;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:8px;border-radius:8px;font-size:12px;z-index:999;color:#fff}
+#announcementBanner{pointer-events:none}
+#uiTimerLarge{pointer-events:none}
+@media (max-width:420px){
+  .card{padding:12px}
+  .title{font-size:1.2rem}
+  #progressBar{width:160px}
+  .shop-list{max-height:calc(100vh - 260px)}
+}
+</style>
 </head>
 <body>
-  <!-- TITLE -->
-  <div id="screen-title" class="screen active">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:220px">
-          <div class="title">PLAQUE INVADERS — OPERATION: SAUCER FALL</div>
-          <div class="lead">BRIEFING: NAVIGATE THE COSMIC CORRIDOR, DISPATCH ESCALATING HOSTILES, AND NEUTRALISE THE CYBER SAUCER.</div>
-        </div>
-        <div style="text-align:right;min-width:140px">
-          <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">PILOT: <span id="pilotNameDisplay">BEN</span></div>
-          <div style="font-size:0.78rem;opacity:0.9">VERSION 1.2</div>
-        </div>
+<!-- TITLE -->
+<div id="screen-title" class="screen active" role="main" aria-label="Title screen">
+  <div class="card" role="region" aria-label="Mission briefing">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div class="title">PLAQUE INVADERS — OPERATION: SAUCER FALL</div>
+        <div class="lead">BRIEFING: NAVIGATE THE COSMIC CORRIDOR, DISPATCH ESCALATING HOSTILES, AND NEUTRALISE THE CYBER SAUCER.</div>
       </div>
-      <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-        <input id="playerName" class="input" placeholder="ENTER CALLSIGN" maxlength="16" />
-        <button id="startBtn" class="btn" type="button">LAUNCH MISSION</button>
+      <div style="text-align:right;min-width:140px">
+        <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">PILOT: <span id="pilotNameDisplay">BEN</span></div>
+        <div style="font-size:0.78rem;opacity:0.9">VERSION 1.2</div>
       </div>
-      <div class="statbar" style="margin-top:10px">
-        <div class="stat"><div class="label">CRYSTALS</div><div id="statCrystals" class="value">0</div></div>
-        <div class="stat"><div class="label">STREAK (DAYS)</div><div id="statStreak" class="value">0</div></div>
-        <div class="stat"><div class="label">MISSIONS</div><div id="statMissions" class="value">0</div></div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <input id="playerName" class="input" placeholder="ENTER CALLSIGN" maxlength="16" aria-label="Pilot callsign" />
+      <button id="startBtn" class="btn" type="button" aria-label="Launch mission">LAUNCH MISSION</button>
+    </div>
+
+    <div class="statbar" style="margin-top:10px">
+      <div class="stat"><div class="label-small">CRYSTALS</div><div id="statCrystals" class="value">0</div></div>
+      <div class="stat"><div class="label-small">STREAK (DAYS)</div><div id="statStreak" class="value">0</div></div>
+      <div class="stat"><div class="label-small">MISSIONS</div><div id="statMissions" class="value">0</div></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <button id="shopBtn" class="btn alt" style="flex:1;min-width:140px">SHIPYARD</button>
+      <button id="adminOpen" class="btn alt" style="flex:1;min-width:140px">ADMIN DASHBOARD</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div id="screen-shop" class="screen" role="dialog" aria-label="Shipyard">
+  <div class="card" style="width:100%;max-width:820px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="font-weight:900;font-size:1.05rem;color:var(--accent-cyan)">SHIPYARD — COSMETICS</div>
+      <div style="text-align:right">
+        <div class="small-note">CRYSTALS: <span id="shopCrystals">0</span></div>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <button id="shopBtn" class="btn alt" style="flex:1;min-width:140px">SHIPYARD</button>
-        <button id="adminOpen" class="btn alt" style="flex:1;min-width:140px">ADMIN DASHBOARD</button>
+    </div>
+
+    <div class="shop-list" id="shop-list" aria-live="polite" style="margin-top:12px"></div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="shopBack" class="btn alt" style="flex:1">BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MISSION -->
+<div id="screen-mission" class="screen" style="background:transparent;padding:0" role="application" aria-label="Mission">
+  <canvas id="game-canvas" aria-hidden="true"></canvas>
+
+  <div class="hud" aria-hidden="false">
+    <div class="left">
+      <div class="box" aria-label="Pilot"><div class="label-small">PILOT</div><div id="hudName">BEN</div></div>
+      <div class="box" aria-label="Phase"><div class="label-small">PHASE</div><div id="phaseBadge">PHASE 1</div></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="box" style="text-align:center"><div class="label-small">TIMER</div><div id="timerBig">02:00</div></div>
+      <div style="width:300px">
+        <div class="label-small" style="text-align:center">MISSION PROGRESS</div>
+        <div id="progressBar"><div id="progressFill"></div></div>
+      </div>
+      <div class="hud-right">
+        <div class="box" aria-label="Crystals"><div class="label-small">CRYSTALS</div><div id="hudCrystals">0</div></div>
+        <div class="box" aria-label="Shield"><div class="label-small">SHIELD</div><div class="status-bar" style="width:120px"><div id="shieldFill" class="status-fill" style="width:100%;background:linear-gradient(90deg,#4AF,#00DFFF)"></div></div></div>
+        <div class="box" aria-label="HP"><div class="label-small">HP</div><div class="status-bar" style="width:120px"><div id="hpFill" class="status-fill" style="width:100%;background:linear-gradient(90deg,#FF6B6B,#FFEA4A)"></div></div></div>
       </div>
     </div>
   </div>
 
-  <!-- SHOP (minimal placeholder) -->
-  <div id="screen-shop" class="screen">
-    <div class="card" style="width:100%;max-width:820px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="font-weight:900;font-size:1.05rem;color:var(--accent-cyan)">SHIPYARD — COSMETICS</div>
-        <div style="text-align:right"><div class="small-note">CRYSTALS: <span id="shopCrystals">0</span></div></div>
-      </div>
-      <div id="shop-list" style="margin-top:12px;font-size:0.8rem;opacity:0.9">
-        Cosmetic shop placeholder — wiring kept minimal for this build.
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button id="shopBack" class="btn alt" style="flex:1">BACK</button>
-      </div>
-    </div>
-  </div>
+  <div class="phase-banner" id="phaseBanner">PHASE 1</div>
+  <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
 
-  <!-- MISSION -->
-  <div id="screen-mission" class="screen" style="background:transparent;padding:0">
-    <div id="three-container"></div>
-    <canvas id="game-canvas"></canvas>
-    <div class="hud">
-      <div class="left">
-        <div class="box"><div class="label-small">PILOT</div><div id="hudName">BEN</div></div>
-        <div class="box"><div class="label-small">PHASE</div><div id="phaseBadge">PHASE 1</div></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="box" style="text-align:center"><div class="label-small">TIMER</div><div id="timerBig">02:00</div></div>
-        <div style="width:300px">
-          <div class="label-small" style="text-align:center">MISSION PROGRESS</div>
-          <div id="progressBar"><div id="progressFill"></div></div>
-        </div>
-        <div class="hud-right">
-          <div class="box"><div class="label-small">CRYSTALS</div><div id="hudCrystals">0</div></div>
-          <div class="box"><div class="label-small">SHIELD</div><div class="status-bar" style="width:120px"><div id="shieldFill" class="status-fill" style="background:linear-gradient(90deg,#4AF,#00DFFF)"></div></div></div>
-          <div class="box"><div class="label-small">HP</div><div class="status-bar" style="width:120px"><div id="hpFill" class="status-fill" style="background:linear-gradient(90deg,#FF6B6B,#FFEA4A)"></div></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="phase-banner" id="phaseBanner">PHASE 1</div>
-    <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
+  <div class="mission-overlay">
+    <div class="center-count" id="countdown" style="display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;z-index:80">5</div>
     <div class="controls">
-      <button id="pauseBtn" class="control-btn">PAUSE</button>
-      <button id="resetBtn" class="control-btn" style="background:#ff6b6b">ABORT</button>
+      <button id="pauseBtn" class="control-btn" aria-label="Pause">PAUSE</button>
+      <button id="resetBtn" class="control-btn" style="background:#ff6b6b" aria-label="Abort">ABORT</button>
     </div>
   </div>
 
-  <!-- REWARD -->
-  <div id="screen-reward" class="screen">
-    <div class="card" style="align-items:center">
-      <div style="font-weight:900;font-size:1.2rem;color:#C0A0FF">SECTOR CLEARED</div>
+  <div class="admin-link">
+    <button id="adminQuick" class="btn alt">ADMIN</button>
+  </div>
+</div>
+
+<!-- REWARD -->
+<div id="screen-reward" class="screen" role="dialog" aria-label="Reward">
+  <div class="card" style="align-items:center">
+    <div style="font-weight:900;font-size:1.2rem;color:#C0A0FF">SECTOR CLEARED</div>
+    <div style="height:12px"></div>
+    <div id="rewardBox" class="reward-box" title="Tap to open" role="button" aria-label="Open reward">📦</div>
+    <div style="margin-top:12px;text-align:center">
+      <div id="rewardText" style="font-size:1.05rem;font-weight:900">+0 CRYSTALS</div>
+      <div id="rewardDetail" class="small-note" style="margin-top:6px">TAP THE CRATE TO CLAIM</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;width:100%">
+      <button id="rewardBack" class="btn" style="flex:1">BACK TO BRIEFING</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" class="screen" role="dialog" aria-label="Admin dashboard">
+  <div class="card" style="width:100%;max-width:720px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-weight:900;font-size:1.05rem;color:var(--accent-gold)">ADMIN DASHBOARD</div>
+      <div style="text-align:right"><div class="small-note">LOCAL ONLY</div></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="label-small">SET/CHANGE PIN</div>
+      <input id="adminPin" class="input" placeholder="ENTER NEW PIN (4-8 DIGITS)" maxlength="8" />
+      <div style="height:8px"></div>
+      <button id="savePin" class="btn">SAVE PIN</button>
+    </div>
+
+    <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
+
+    <div>
+      <div class="label-small">MANUAL EDIT: CRYSTALS</div>
+      <input id="adminCrystals" class="input" placeholder="CRYSTALS" type="number" />
+      <div style="height:8px"></div>
+      <div class="label-small">MANUAL EDIT: STREAK</div>
+      <input id="adminStreak" class="input" placeholder="STREAK (DAYS)" type="number" />
+      <div style="height:8px"></div>
+      <button id="applyAdmin" class="btn">APPLY CHANGES</button>
       <div style="height:12px"></div>
-      <div id="rewardBox" style="width:140px;height:140px;border-radius:14px;background:linear-gradient(145deg,#3b1b5f,#12041f);border:2px solid #b36bff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px rgba(179,107,255,0.95);cursor:pointer;font-size:2.4rem">📦</div>
-      <div style="margin-top:12px;text-align:center">
-        <div id="rewardText" style="font-size:1.05rem;font-weight:900">+0 CRYSTALS</div>
-        <div id="rewardDetail" class="small-note" style="margin-top:6px">TAP THE CRATE TO CLAIM</div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px;width:100%">
-        <button id="rewardBack" class="btn" style="flex:1">BACK TO BRIEFING</button>
-      </div>
+      <button id="adminReset" class="btn" style="background:linear-gradient(135deg,#ff7a7a,#ffb86b);margin-top:8px">RESET DATA</button>
+      <div style="height:12px"></div>
+      <button id="adminBack" class="btn alt">CLOSE DASHBOARD</button>
     </div>
   </div>
+</div>
 
-  <!-- ADMIN (minimal) -->
-  <div id="screen-admin" class="screen">
-    <div class="card" style="width:100%;max-width:720px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-weight:900;font-size:1.05rem;color:var(--accent-gold)">ADMIN DASHBOARD</div>
-        <div style="text-align:right"><div class="small-note">LOCAL ONLY</div></div>
-      </div>
-      <div style="margin-top:12px">
-        <div class="label-small">SET/CHANGE PIN</div>
-        <input id="adminPin" class="input" placeholder="ENTER NEW PIN (4-8 DIGITS)" maxlength="8" />
-        <div style="height:8px"></div>
-        <button id="savePin" class="btn">SAVE PIN</button>
-      </div>
-      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
-      <div>
-        <div class="label-small">MANUAL EDIT: CRYSTALS</div>
-        <input id="adminCrystals" class="input" placeholder="CRYSTALS" type="number" />
-        <div style="height:8px"></div>
-        <div class="label-small">MANUAL EDIT: STREAK</div>
-        <input id="adminStreak" class="input" placeholder="STREAK (DAYS)" type="number" />
-        <div style="height:8px"></div>
-        <button id="applyAdmin" class="btn">APPLY CHANGES</button>
-        <div style="height:12px"></div>
-        <button id="adminReset" class="btn" style="background:linear-gradient(135deg,#ff7a7a,#ffb86b);margin-top:8px">RESET DATA</button>
-        <div style="height:12px"></div>
-        <button id="adminBack" class="btn alt">CLOSE DASHBOARD</button>
-      </div>
-    </div>
-  </div>
+<!-- Announcement banner and large timer placeholders (created by UIManager if missing) -->
+<div id="announcementBanner" aria-hidden="true"></div>
+<div id="uiTimerLarge" aria-hidden="true"></div>
 
-  <!-- Announcement + big timer + debug -->
-  <div id="announcementBanner"></div>
-  <div id="uiTimerLarge"></div>
-  <div id="debug" class="debug"></div>
+<div id="debug" class="debug" style="display:none" aria-hidden="true"></div>
 
-  <script>
+<script>
 /* =========================
-   CONFIG & STATE
+   Your original game code starts here
+   (player, canvas, pools, shop, admin, audio helpers, rendering, RAF loop, etc.)
+   This block is intentionally preserved from your last working file.
+   Only minimal wiring changes are made later to integrate the new systems.
    ========================= */
+
+/* CONFIG */
 const CONFIG = {
   TOTAL_TIME: 120,
   PHASE_LENGTH: 30,
   DPR_MAX: 2,
-  STORAGE_KEY: "plaque_invaders_state_v3",
-  ADMIN_KEY: "plaque_invaders_admin_pin_v3",
-  BOSS_HP: 1.0
+  PARTICLE_LIMITS: { sparks: 700, debris: 400 },
+  SPAWN_RATES: { phase1: 0.9, phase2: 0.7, phase3: 0.55, phase4: 0.45 },
+  BOSS_HP: 1.0,
+  REWARD_BASE: 10,
+  STORAGE_KEY: "plaque_invaders_state_v2",
+  ADMIN_KEY: "plaque_invaders_admin_pin_v2"
 };
 
+/* State persistence */
 const defaultState = {
   name: "BEN",
   crystals: 0,
   streak: 0,
   lastPlayDate: null,
   missions: 0,
-  completedToday: false
+  completedToday: false,
+  owned: { ship: ["xwing"], laser: ["neon-blue"], trail: ["ion-blue"], hyperspace: ["warp-default"] },
+  selected: { ship: "xwing", laser: "neon-blue", trail: "ion-blue", hyperspace: "warp-default" }
 };
-
-let state = loadState();
-let adminPin = loadAdminPin();
-
 function loadState(){
   try{
     const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
-    if(!raw) return {...defaultState};
-    return {...defaultState, ...JSON.parse(raw)};
-  }catch(e){ return {...defaultState}; }
+    if(!raw) return structuredClone(defaultState);
+    const parsed = JSON.parse(raw);
+    return Object.assign(structuredClone(defaultState), parsed || {});
+  }catch(e){
+    console.error('loadState error', e);
+    return structuredClone(defaultState);
+  }
 }
 function saveState(){
-  try{ localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  try{ localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.error('saveState error', e); }
 }
-function loadAdminPin(){
-  try{
-    const raw = localStorage.getItem(CONFIG.ADMIN_KEY);
-    return raw || "";
-  }catch(e){ return ""; }
-}
-function saveAdminPin(pin){
-  try{ localStorage.setItem(CONFIG.ADMIN_KEY, pin || ""); }catch(e){}
-}
+let state = loadState();
 
 /* DOM refs */
 const screens = {
@@ -242,556 +275,133 @@ const statStreak = document.getElementById("statStreak");
 const statMissions = document.getElementById("statMissions");
 const startBtn = document.getElementById("startBtn");
 const shopBtn = document.getElementById("shopBtn");
-const shopBack = document.getElementById("shopBack");
+const shopList = document.getElementById("shop-list");
 const shopCrystals = document.getElementById("shopCrystals");
+const shopBack = document.getElementById("shopBack");
+
 const canvas = document.getElementById("game-canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { alpha: true });
 const hudName = document.getElementById("hudName");
 const hudTimer = document.getElementById("timerBig");
 const hudCrystals = document.getElementById("hudCrystals");
+const countdownEl = document.getElementById("countdown");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+const bossBar = document.getElementById("bossBar");
+const bossFill = document.getElementById("bossFill");
 const phaseBadge = document.getElementById("phaseBadge");
 const phaseBanner = document.getElementById("phaseBanner");
 const progressFill = document.getElementById("progressFill");
+
 const shieldFillEl = document.getElementById("shieldFill");
 const hpFillEl = document.getElementById("hpFill");
-const bossBar = document.getElementById("bossBar");
-const bossFill = document.getElementById("bossFill");
-const pauseBtn = document.getElementById("pauseBtn");
-const resetBtn = document.getElementById("resetBtn");
+
 const rewardBox = document.getElementById("rewardBox");
 const rewardText = document.getElementById("rewardText");
 const rewardDetail = document.getElementById("rewardDetail");
 const rewardBack = document.getElementById("rewardBack");
+
 const adminOpen = document.getElementById("adminOpen");
-const adminBack = document.getElementById("adminBack");
+const adminQuick = document.getElementById("adminQuick");
 const adminPinInput = document.getElementById("adminPin");
 const savePinBtn = document.getElementById("savePin");
 const adminCrystals = document.getElementById("adminCrystals");
 const adminStreak = document.getElementById("adminStreak");
 const applyAdmin = document.getElementById("applyAdmin");
+const adminBack = document.getElementById("adminBack");
 const adminReset = document.getElementById("adminReset");
-const announcementBanner = document.getElementById("announcementBanner");
-const uiTimerLarge = document.getElementById("uiTimerLarge");
+
 const debugEl = document.getElementById("debug");
-const threeContainer = document.getElementById("three-container");
 
-/* Runtime */
-let DPR = 1;
-let running = false;
-let paused = false;
-let missionTime = CONFIG.TOTAL_TIME;
-let lastTime = performance.now();
-let enemies = [];
-let bullets = [];
-let enemyBullets = [];
-let player = {x:0,y:0,rad:16,shield:1,hp:1};
-let input = {left:false,right:false,fire:false};
-let boss = null;
-let currentPhase = 1;
-let debugVisible = false;
+/* Cosmetics */
+const cosmetics = [
+  {type:"ship", id:"xwing", name:"X-WING", cost:0, color:"#4AF"},
+  {type:"ship", id:"viper", name:"VIPER", cost:120, color:"#C04AFF"},
+  {type:"ship", id:"reaper", name:"REAPER", cost:180, color:"#FFD24A"},
+  {type:"laser", id:"neon-blue", name:"NEON BLUE", cost:0, color:"#4AF"},
+  {type:"laser", id:"plasma-magenta", name:"PLASMA MAGENTA", cost:60, color:"#FF4FFF"},
+  {type:"trail", id:"ion-blue", name:"ION BLUE", cost:0, color:"#4AF"},
+  {type:"trail", id:"quantum-purple", name:"QUANTUM PURPLE", cost:60, color:"#C04AFF"},
+  {type:"hyperspace", id:"warp-default", name:"WARP TUNNEL", cost:0, star:"#8FF", streak:"#0FF"},
+  {type:"hyperspace", id:"nebula-violet", name:"NEBULA VIOLET", cost:80, star:"#F8F", streak:"#C0F"}
+];
 
-/* =========================
-   UIManager
-   ========================= */
-/**
- * UIManager: transient banners and timer updates.
- */
-const UIManager = (function(){
-  let bannerTimeout = null;
-  /**
-   * Show a banner message.
-   * @param {string} text
-   * @param {{duration?:number,style?:'warning'|'phase'|'boss',subtitle?:string,sfx?:string}} opts
-   */
-  function Show(text, opts={}){
-    const {duration=1000,style,subtitle} = opts;
-    announcementBanner.textContent = text + (subtitle ? (" — " + subtitle) : "");
-    announcementBanner.style.display = "block";
-    announcementBanner.style.border = "1px solid rgba(255,255,255,0.18)";
-    if(style==="warning"){
-      announcementBanner.style.background = "linear-gradient(90deg,rgba(255,160,0,0.4),rgba(255,80,0,0.2))";
-    }else if(style==="boss"){
-      announcementBanner.style.background = "linear-gradient(90deg,rgba(255,0,80,0.5),rgba(255,200,0,0.2))";
-    }else{
-      announcementBanner.style.background = "linear-gradient(90deg,rgba(120,200,255,0.4),rgba(192,74,255,0.2))";
-    }
-    if(bannerTimeout) clearTimeout(bannerTimeout);
-    bannerTimeout = setTimeout(()=>{announcementBanner.style.display="none";}, duration);
-  }
-  /**
-   * Update the HUD timer and big timer color.
-   * @param {number} seconds
-   */
-  function UpdateTimerDisplay(seconds){
-    const s = Math.max(0,Math.floor(seconds));
-    const m = Math.floor(s/60);
-    const r = s%60;
-    const txt = `${m.toString().padStart(2,"0")}:${r.toString().padStart(2,"0")}`;
-    hudTimer.textContent = txt;
-    if(seconds<10) hudTimer.style.color = "#FF4A4A";
-    else if(seconds<30) hudTimer.style.color = "#FFB84A";
-    else hudTimer.style.color = "#FFFFFF";
-  }
-  return {Show,UpdateTimerDisplay};
-})();
-
-/* =========================
-   ZoneManager
-   ========================= */
-/**
- * ZoneManager: controls palettes and spawn parameters.
- */
-const ZoneManager = (function(){
-  const zones = [
-    {id:1,palette:{bg:"#02020a",fog:"#0a1a3a"},spawnRate:1.0,difficultyMultiplier:1.0},
-    {id:2,palette:{bg:"#050014",fog:"#2a0a3a"},spawnRate:0.8,difficultyMultiplier:1.2},
-    {id:3,palette:{bg:"#000814",fog:"#0a283a"},spawnRate:0.7,difficultyMultiplier:1.4},
-    {id:4,palette:{bg:"#140008",fog:"#3a0a1a"},spawnRate:0.6,difficultyMultiplier:1.6}
-  ];
-  let currentIndex = 0;
-  /**
-   * Load a zone by index.
-   * @param {number} index
-   */
-  function LoadZone(index){
-    currentIndex = Math.max(0,Math.min(zones.length-1,index));
-    const z = zones[currentIndex];
-    document.body.style.background = `linear-gradient(180deg,${z.palette.bg},${z.palette.fog})`;
-    RenderBridge.applyPalette(z.palette);
-  }
-  /**
-   * Get the next zone object.
-   * @returns {object}
-   */
-  function GetNextZone(){
-    const idx = Math.min(zones.length-1,currentIndex+1);
-    return zones[idx];
-  }
-  /**
-   * Get the current zone object.
-   * @returns {object}
-   */
-  function GetCurrentZone(){ return zones[currentIndex]; }
-  return {LoadZone,GetNextZone,GetCurrentZone};
-})();
-
-/* =========================
-   BossStateMachine
-   ========================= */
-/**
- * BossStateMachine: simple state machine for the saucer.
- */
-const BossStateMachine = (function(){
-  let hp = 0;
-  let maxHp = 1;
-  let state = "Idle"; // Idle, HitReact, PhaseTransition, Enraged, Death
-  let active = false;
-  let hitTimer = 0;
-  /**
-   * Spawn the boss.
-   * @param {number} hpNorm 0–1 normalized HP
-   */
-  function spawnBoss(hpNorm){
-    maxHp = Math.max(0.2,hpNorm);
-    hp = maxHp;
-    state = "Idle";
-    active = true;
-    hitTimer = 0;
-    boss = {x:canvas.width/(2*DPR),y:80,rad:40};
-    RenderBridge.spawnBossModel();
-    UIManager.Show("CYBER SAUCER INBOUND", {style:"boss",duration:900});
-  }
-  /**
-   * Apply damage to the boss.
-   * @param {number} amount
-   */
-  function ApplyDamage(amount){
-    if(!active || state==="Death") return;
-    hp = Math.max(0,hp-amount);
-    state = "HitReact";
-    hitTimer = 0.25;
-    RenderBridge.bossHitFlash();
-    if(hp<=0){
-      state = "Death";
-      active = false;
-      onBossDeath();
-    }
-  }
-  /**
-   * @returns {boolean} boss active
-   */
-  function isActive(){ return active; }
-  /**
-   * @returns {number} normalized HP 0–1
-   */
-  function getHp(){ return maxHp>0 ? hp/maxHp : 0; }
-  function update(dt){
-    if(hitTimer>0){
-      hitTimer -= dt;
-      if(hitTimer<=0 && state==="HitReact") state="Idle";
-    }
-    if(boss){
-      boss.x += Math.sin(performance.now()/800)*20*dt;
-    }
-  }
-  function onBossDeath(){
-    UIManager.Show("BOSS NEUTRALISED", {style:"boss",duration:1000});
-    bossBar.style.display = "none";
-    missionComplete(true);
-  }
-  return {spawnBoss,ApplyDamage,isActive,getHp,update};
-})();
-
-/* =========================
-   GameFlowController
-   ========================= */
-/**
- * GameFlowController: handles precount, timer, phases, and boss spawn.
- */
-const GameFlowController = (function(){
-  let started = false;
-  let precount = 5;
-  let precountActive = false;
-  let nextPhaseThresholds = [90,60,30];
-  let nextPhaseIndex = 0;
-  let bossSpawned = false;
-
-  /**
-   * Start the mission flow.
-   */
-  function Start(){
-    missionTime = CONFIG.TOTAL_TIME;
-    started = false;
-    precount = 5;
-    precountActive = true;
-    nextPhaseIndex = 0;
-    nextPhaseThresholds = [90,60,30];
-    bossSpawned = false;
-    currentPhase = 1;
-    phaseBadge.textContent = "PHASE 1";
-    UIManager.Show("PREPARE FOR HYPERSPACE", {style:"warning",duration:1200});
-    showBigTimer("5");
-  }
-  /**
-   * Force a hyperspace transition immediately.
-   */
-  function ForceHyperspace(){
-    doPhaseTransition();
-  }
-  /**
-   * Set the mission timer.
-   * @param {number} seconds
-   */
-  function SetTimer(seconds){
-    missionTime = Math.max(0,seconds);
-    UIManager.UpdateTimerDisplay(missionTime);
-  }
-  function update(dt){
-    if(precountActive){
-      precount -= dt;
-      const left = Math.ceil(precount);
-      showBigTimer(left>0?String(left):"GO");
-      if(precount<=0){
-        precountActive = false;
-        hideBigTimer();
-        started = true;
-      }
-      return;
-    }
-    if(!started || paused) return;
-    missionTime -= dt;
-    if(missionTime<0) missionTime = 0;
-    UIManager.UpdateTimerDisplay(missionTime);
-    const progress = 1 - missionTime/CONFIG.TOTAL_TIME;
-    progressFill.style.width = (progress*100).toFixed(1)+"%";
-
-    if(nextPhaseIndex<nextPhaseThresholds.length && missionTime<=nextPhaseThresholds[nextPhaseIndex]){
-      doPhaseTransition();
-      nextPhaseIndex++;
-    }
-    if(!bossSpawned && missionTime<=30){
-      bossSpawned = true;
-      bossBar.style.display = "block";
-      BossStateMachine.spawnBoss(CONFIG.BOSS_HP);
-    }
-    if(missionTime<=0 && !BossStateMachine.isActive()){
-      missionComplete(false);
-    }
-  }
-  function doPhaseTransition(){
-    currentPhase++;
-    const zone = ZoneManager.GetNextZone();
-    ZoneManager.LoadZone(zone.id-1);
-    phaseBadge.textContent = "PHASE "+currentPhase;
-    UIManager.Show("PHASE SHIFT INBOUND", {style:"warning",duration:900});
-    RenderBridge.playHyperspace(1000);
-    setTimeout(()=>{
-      UIManager.Show("BEGIN PHASE "+currentPhase, {style:"phase",duration:900});
-    },900);
-  }
-  function showBigTimer(text){
-    uiTimerLarge.textContent = text;
-    uiTimerLarge.style.display = "block";
-  }
-  function hideBigTimer(){ uiTimerLarge.style.display = "none"; }
-  return {Start,ForceHyperspace,SetTimer,update};
-})();
-
-/* =========================
-   RenderBridge (Three.js-ish stub)
-   ========================= */
-/**
- * RenderBridge: handles 3D background and boss model.
- * Uses graceful fallback if WebGL/Three.js unavailable.
- */
-const RenderBridge = (function(){
-  let enabled = false;
-  let bloomEnabled = false;
-  let palette = {bg:"#00020a",fog:"#001026"};
-  let lastT = performance.now();
-  let starCanvas, starCtx;
-  let stars = [];
-  let bossFlashTimer = 0;
-
-  /**
-   * Init background container.
-   * @param {HTMLElement} container
-   */
-  function init(container){
-    // Fallback: 2D starfield in its own canvas.
-    starCanvas = document.createElement("canvas");
-    starCanvas.style.position = "absolute";
-    starCanvas.style.inset = "0";
-    starCanvas.style.width = "100%";
-    starCanvas.style.height = "100%";
-    starCanvas.style.pointerEvents = "none";
-    container.appendChild(starCanvas);
-    starCtx = starCanvas.getContext("2d");
-    enabled = true;
-    resizeStarfield();
-    window.addEventListener("resize", resizeStarfield);
-    for(let i=0;i<220;i++){
-      stars.push({x:Math.random(),y:Math.random(),z:Math.random(),s:Math.random()*1.2+0.2});
-    }
-  }
-  function resizeStarfield(){
-    if(!starCanvas) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    starCanvas.width = w;
-    starCanvas.height = h;
-  }
-  /**
-   * Apply palette to background.
-   * @param {{bg:string,fog:string}} pal
-   */
-  function applyPalette(pal){
-    palette = pal || palette;
-  }
-  /**
-   * Spawn boss model (no-op for 2D fallback).
-   */
-  function spawnBossModel(){ /* visual handled in 2D canvas */ }
-  /**
-   * Play hyperspace animation.
-   * @param {number} duration
-   */
-  function playHyperspace(duration){
-    // Simple zoom + streaks via starfield speed-up.
-    hyperspaceTimer = duration || 1000;
-  }
-  /**
-   * Enable/disable bloom.
-   * @param {boolean} b
-   */
-  function enableBloom(b){ bloomEnabled = !!b; }
-  function bossHitFlash(){ bossFlashTimer = 0.18; }
-
-  let hyperspaceTimer = 0;
-  function update(dt){
-    if(!enabled || !starCtx) return;
-    const w = starCanvas.width;
-    const h = starCanvas.height;
-    starCtx.fillStyle = palette.bg;
-    starCtx.fillRect(0,0,w,h);
-    const speedBase = 0.06;
-    const hyperBoost = hyperspaceTimer>0 ? 4 : 1;
-    if(hyperspaceTimer>0) hyperspaceTimer -= dt*1000;
-    starCtx.save();
-    starCtx.translate(w/2,h/2);
-    for(const s of stars){
-      s.z -= speedBase*hyperBoost*dt;
-      if(s.z<=0){ s.x=Math.random()-0.5; s.y=Math.random()-0.5; s.z=1; }
-      const k = 260/s.z;
-      const x = s.x*k;
-      const y = s.y*k;
-      const alpha = 0.2+0.8*(1-s.z);
-      starCtx.fillStyle = `rgba(200,240,255,${alpha})`;
-      starCtx.fillRect(x,y,s.s,s.s*2);
-    }
-    starCtx.restore();
-    if(bossFlashTimer>0){
-      bossFlashTimer -= dt;
-      starCtx.fillStyle = "rgba(255,120,200,0.18)";
-      starCtx.fillRect(0,0,w,h);
-    }
-  }
-  return {init,applyPalette,spawnBossModel,playHyperspace,update,enableBloom,bossHitFlash};
-})();
-
-/* =========================
-   Simple 2D gameplay
-   ========================= */
+/* Canvas & DPR */
+let DPR = Math.min(CONFIG.DPR_MAX, Math.max(1, window.devicePixelRatio || 1));
 function resizeCanvas(){
   DPR = Math.min(CONFIG.DPR_MAX, Math.max(1, window.devicePixelRatio || 1));
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  canvas.width = w*DPR;
-  canvas.height = h*DPR;
-  canvas.style.width = w+"px";
-  canvas.style.height = h+"px";
+  const vw = (window.visualViewport && window.visualViewport.width) || window.innerWidth;
+  const vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  canvas.width = Math.floor(vw * DPR);
+  canvas.height = Math.floor(vh * DPR);
+  canvas.style.width = vw + "px";
+  canvas.style.height = vh + "px";
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  player.x = w/2;
-  player.y = h*0.8;
 }
 window.addEventListener("resize", resizeCanvas);
+if(window.visualViewport) window.visualViewport.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-function spawnEnemy(){
-  const w = canvas.width/DPR;
-  enemies.push({
-    x:Math.random()*w,
-    y:-20,
-    vy:40+Math.random()*40,
-    rad:14
-  });
-}
-function firePlayer(){
-  bullets.push({x:player.x,y:player.y-20,vy:-260,rad:4});
-}
-function updateGame(dt){
-  const w = canvas.width/DPR;
-  const h = canvas.height/DPR;
-  // Input movement
-  const speed = 260;
-  if(input.left) player.x -= speed*dt;
-  if(input.right) player.x += speed*dt;
-  player.x = Math.max(20,Math.min(w-20,player.x));
-  // Fire
-  if(input.fire && bullets.length<12){
-    firePlayer();
-  }
-  // Enemies
-  if(Math.random()<0.9*dt) spawnEnemy();
-  enemies.forEach(e=>{e.y+=e.vy*dt;});
-  enemies = enemies.filter(e=>e.y<h+40);
-  // Bullets
-  bullets.forEach(b=>{b.y+=b.vy*dt;});
-  bullets = bullets.filter(b=>b.y>-40);
-  // Collisions
-  for(const b of bullets){
-    for(const e of enemies){
-      const dx = b.x-e.x;
-      const dy = b.y-e.y;
-      if(dx*dx+dy*dy<(b.rad+e.rad)**2){
-        e.dead = true;
-        b.dead = true;
-        state.crystals += 1;
-      }
-    }
-    if(boss && BossStateMachine.isActive()){
-      const dx = b.x-boss.x;
-      const dy = b.y-boss.y;
-      if(dx*dx+dy*dy<(b.rad+boss.rad)**2){
-        b.dead = true;
-        BossStateMachine.ApplyDamage(0.05);
-      }
-    }
-  }
-  enemies = enemies.filter(e=>!e.dead);
-  bullets = bullets.filter(b=>!b.dead);
-  // Boss HP bar
-  if(BossStateMachine.isActive()){
-    bossFill.style.width = (BossStateMachine.getHp()*100).toFixed(1)+"%";
-  }
-  // Simple enemy bullets vs player (lightweight)
-  // (kept minimal to avoid threatening tone)
-  hudCrystals.textContent = state.crystals;
-  shieldFillEl.style.width = (player.shield*100).toFixed(1)+"%";
-  hpFillEl.style.width = (player.hp*100).toFixed(1)+"%";
-}
+/* Runtime & pools */
+let lastTime = performance.now();
+let rafId = null;
+let running = false;
+let paused = false;
+let countdown = 5;
+let countdownInterval = null;
+let missionTime = CONFIG.TOTAL_TIME;
+let spawnTimer = 0;
+let spawnInterval = CONFIG.SPAWN_RATES.phase1;
+let enemies = [];
+let lasers = [];
+let enemyBullets = [];
+let sparks = [];
+let debris = [];
+let boss = null;
+let bossActive = false;
+let rewardForMission = 0;
+let hyperspaceTick = -1;
+let screenShake = {x:0,y:0};
+let cinematicSlow = 1.0;
 
-function renderGame(){
-  const w = canvas.width/DPR;
-  const h = canvas.height/DPR;
-  ctx.clearRect(0,0,w,h);
-  // Player
-  ctx.save();
-  ctx.translate(player.x,player.y);
-  ctx.fillStyle = "#4AF";
-  ctx.beginPath();
-  ctx.moveTo(0,-18);ctx.lineTo(14,14);ctx.lineTo(-14,14);ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-  // Bullets
-  ctx.fillStyle = "#8FF";
-  bullets.forEach(b=>{
-    ctx.beginPath();
-    ctx.arc(b.x,b.y,3,0,Math.PI*2);
-    ctx.fill();
-  });
-  // Enemies
-  ctx.fillStyle = "#FF6BFF";
-  enemies.forEach(e=>{
-    ctx.beginPath();
-    ctx.arc(e.x,e.y,e.rad,0,Math.PI*2);
-    ctx.fill();
-  });
-  // Boss
-  if(boss && (BossStateMachine.isActive() || BossStateMachine.getHp()<=0)){
-    ctx.save();
-    ctx.translate(boss.x,boss.y);
-    ctx.fillStyle = "#555";
-    ctx.beginPath();
-    ctx.ellipse(0,0,80,32,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = "rgba(255,120,200,0.4)";
-    ctx.beginPath();
-    ctx.ellipse(0,-6,60,18,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
-}
+for(let i=0;i<CONFIG.PARTICLE_LIMITS.sparks;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,color:"#fff"});
+for(let i=0;i<CONFIG.PARTICLE_LIMITS.debris;i++) debris.push({alive:false,x:0,y:0,vx:0,vy:0,rot:0,spin:0,life:0,color:"#fff",size:0});
 
-/* =========================
-   Game loop
-   ========================= */
-function loop(){
-  const now = performance.now();
-  const dt = Math.min(0.05,(now-lastTime)/1000);
-  lastTime = now;
-  if(running && !paused){
-    GameFlowController.update(dt);
-    BossStateMachine.update(dt);
-    updateGame(dt);
-  }
-  RenderBridge.update(dt);
-  renderGame();
-  updateDebug();
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
+/* Ship */
+let ship = { x: window.innerWidth/2, y: window.innerHeight*0.78, targetX: window.innerWidth/2, speed: 160, nextMoveAt:0 };
 
-/* =========================
-   Screen & input bindings
-   ========================= */
-function showScreen(name){
-  Object.values(screens).forEach(s=>s.classList.remove("active"));
-  screens[name].classList.add("active");
-  const interactive = name==="mission";
-  canvas.style.pointerEvents = interactive ? "auto" : "none";
-  threeContainer.style.pointerEvents = "none";
+/* Player defensive stats (new) */
+/* Values are normalized 0.0 - 1.0. They will never be allowed to reach zero to keep it playful. */
+let playerShield = 1.0; // visual force field strength
+let playerHP = 1.0;     // health bar
+const MIN_VISIBLE_STAT = 0.12; // never drop below this to keep it non-threatening
+
+/* Audio helpers */
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); }
+function playOsc(freq,type,dur,vol){
+  try{
+    ensureAudio();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq; g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  }catch(e){}
 }
+function beep(){ playOsc(880,"sine",0.08,0.12) }
+function laserSound(){ playOsc(1400,"sawtooth",0.06,0.06) }
+function enemyFireSound(){ playOsc(600,"sawtooth",0.06,0.05) }
+function smallExplode(){ playOsc(180,"triangle",0.28,0.12); setTimeout(()=>playOsc(320,"sine",0.18,0.08),80) }
+function bigExplode(){ playOsc(60,"triangle",0.6,0.28); setTimeout(()=>playOsc(90,"triangle",0.5,0.22),120); setTimeout(()=>playOsc(140,"sawtooth",0.4,0.18),260) }
+function rewardChime(){ playOsc(900,"sine",0.12,0.12); setTimeout(()=>playOsc(1200,"sine",0.12,0.12),120); }
+
+/* Utilities */
+function rand(min,max){ return min + Math.random()*(max-min) }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)) }
+function nowISO(){ return new Date().toISOString().slice(0,10) }
+function showScreen(name){ Object.values(screens).forEach(s=>s.classList.remove("active")); screens[name].classList.add("active"); }
+
+/* Shop UI */
 function refreshTitleUI(){
   playerName.value = state.name;
   pilotNameDisplay.textContent = state.name;
@@ -802,134 +412,1107 @@ function refreshTitleUI(){
   hudCrystals.textContent = state.crystals;
   shopCrystals.textContent = state.crystals;
 }
-refreshTitleUI();
-RenderBridge.init(threeContainer);
-ZoneManager.LoadZone(0);
+function renderShop(){
+  shopList.innerHTML = "";
+  cosmetics.forEach(item=>{
+    const row = document.createElement("div"); row.className="shop-item";
+    row.style.display="flex"; row.style.alignItems="center"; row.style.justifyContent="space-between";
+    const left = document.createElement("div"); left.style.display="flex"; left.style.alignItems="center"; left.style.gap="10px";
+    const preview = document.createElement("div"); preview.className="preview";
+    preview.style.width="72px"; preview.style.height="44px";
+    if(item.type==="ship"){
+      const c = document.createElement("canvas"); c.width=144; c.height=88; c.style.width="72px"; c.style.height="44px";
+      const cc = c.getContext("2d");
+      cc.clearRect(0,0,144,88);
+      drawPlayerShip(cc,72,44,0.6,0,item.color);
+      preview.appendChild(c);
+    } else {
+      const sw = document.createElement("div"); sw.style.width="36px"; sw.style.height="28px"; sw.style.background=item.color || "#666"; sw.style.borderRadius="6px";
+      preview.appendChild(sw);
+    }
+    left.appendChild(preview);
+    const info = document.createElement("div"); info.style.display="flex"; info.style.flexDirection="column";
+    const name = document.createElement("div"); name.textContent = item.name; name.style.fontWeight="900";
+    const meta = document.createElement("div"); meta.textContent = item.type.toUpperCase() + (item.cost?(" • "+item.cost+" CRYSTALS"):" • DEFAULT"); meta.style.fontSize="0.78rem"; meta.style.opacity="0.85";
+    info.appendChild(name); info.appendChild(meta);
+    left.appendChild(info);
+    const actions = document.createElement("div");
+    const owned = state.owned[item.type] && state.owned[item.type].includes(item.id);
+    const selected = state.selected[item.type]===item.id;
+    const btn = document.createElement("button"); btn.className="btn"; btn.style.padding="8px 10px; font-size:0.86rem";
+    if(owned){ btn.textContent = selected?"EQUIPPED":"EQUIP"; btn.onclick = ()=>{ state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } }
+    else { btn.textContent = "BUY"; btn.onclick = ()=>{ if(state.crystals >= item.cost){ state.crystals -= item.cost; state.owned[item.type].push(item.id); state.selected[item.type]=item.id; saveState(); renderShop(); refreshTitleUI(); } else { alert("NOT ENOUGH CRYSTALS"); } } }
+    actions.appendChild(btn);
+    row.appendChild(left); row.appendChild(actions);
+    shopList.appendChild(row);
+  });
+}
 
-startBtn.addEventListener("click",()=>{
-  state.name = (playerName.value || "BEN").toUpperCase();
+/* Drawing helpers */
+function drawPlayerShip(ctx,x,y,scale,rot,tint){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  const hull = ctx.createLinearGradient(-28,-18,28,22); hull.addColorStop(0,tint); hull.addColorStop(1,"#222");
+  ctx.fillStyle = hull;
+  ctx.beginPath(); ctx.moveTo(0,-22); ctx.bezierCurveTo(26,-12,26,12,0,22); ctx.bezierCurveTo(-26,12,-26,-12,0,-22); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1;
+  for(let i=-12;i<=12;i+=6){ ctx.beginPath(); ctx.moveTo(-18,i); ctx.lineTo(18,i); ctx.stroke(); }
+  ctx.fillStyle = "#0b0b0b"; ctx.beginPath(); ctx.ellipse(0,-4,8,6,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(0,200,255,0.9)"; ctx.beginPath(); ctx.ellipse(-14,18,5,10,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(14,18,5,10,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawEnemyCyborg(ctx,x,y,scale,rot,variant){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  const coreG = ctx.createRadialGradient(0,0,0,0,0,28); coreG.addColorStop(0,"#444"); coreG.addColorStop(1,"#0b0b0b");
+  ctx.fillStyle = coreG; ctx.beginPath(); ctx.ellipse(0,0,28,28,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = variant==="heavy" ? "#6b6b6b" : "#8aa";
+  ctx.beginPath(); ctx.moveTo(-36,0); ctx.lineTo(-12,-28); ctx.lineTo(12,-28); ctx.lineTo(36,0); ctx.lineTo(12,28); ctx.lineTo(-12,28); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "rgba(180,120,255,0.18)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(0,18); ctx.stroke();
+  ctx.fillStyle = "#FF6BFF"; ctx.beginPath(); ctx.ellipse(0,-6,6,4,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawDestroyerCyborg(ctx,x,y,scale,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  const g = ctx.createLinearGradient(-80,-20,80,40); g.addColorStop(0,"#333"); g.addColorStop(1,"#0b0b0b");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-80,30); ctx.lineTo(80,30); ctx.lineTo(60,-30); ctx.lineTo(-60,-30); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.04)"; ctx.fillRect(-40,-18,80,8);
+  ctx.fillStyle = "#111"; ctx.fillRect(-18,-28,36,18);
+  ctx.fillStyle = "rgba(255,255,255,0.06)"; for(let i=-60;i<=60;i+=20) ctx.fillRect(i,26,8,6);
+  ctx.restore();
+}
+function drawSaucerBoss(ctx,x,y,scale,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(scale,scale);
+  const dome = ctx.createRadialGradient(-20,-10,10,0,0,160); dome.addColorStop(0,"#9aa"); dome.addColorStop(1,"#111");
+  ctx.fillStyle = dome; ctx.beginPath(); ctx.ellipse(0,0,160,80,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.beginPath(); ctx.ellipse(0,6,120,28,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,255,255,0.04)"; ctx.beginPath(); ctx.ellipse(0,-6,140,36,0,0,Math.PI*2); ctx.fill();
+  for(let a=0;a<360;a+=36){
+    const r = 100;
+    const rx = Math.cos(a*Math.PI/180)*r*0.9;
+    const ry = Math.sin(a*Math.PI/180)*r*0.35;
+    ctx.fillStyle = "rgba(200,120,255,0.12)";
+    ctx.beginPath(); ctx.ellipse(rx,ry,8,6,0,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(48,-12,28,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = "rgba(255,120,200,0.12)"; ctx.beginPath(); ctx.arc(48,-12,12,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+/* Particles & debris */
+function spawnSparks(x,y,color,count=18){
+  for(let i=0;i<sparks.length && count>0;i++){
+    const s = sparks[i];
+    if(!s.alive){
+      s.alive=true; s.x=x; s.y=y; s.vx=rand(-520,520); s.vy=rand(-720,-120); s.life=rand(0.28,1.6); s.color=color;
+      count--;
+    }
+  }
+}
+function spawnDebris(x,y,color,count=24){
+  for(let i=0;i<debris.length && count>0;i++){
+    const d = debris[i];
+    if(!d.alive){
+      d.alive=true; d.x=x; d.y=y; d.vx=rand(-420,420); d.vy=rand(-520,-80); d.rot=rand(0,Math.PI*2); d.spin=rand(-6,6); d.life=rand(0.6,2.2); d.color=color; d.size=rand(4,18);
+      count--;
+    }
+  }
+}
+
+/* Enemy firing */
+function enemyFire(enemy){
+  const dx = ship.x - enemy.x;
+  const dy = ship.y - enemy.y;
+  const dist = Math.hypot(dx,dy) || 1;
+  const speed = 160 + Math.random()*120;
+  const vx = (dx/dist) * speed;
+  const vy = (dy/dist) * speed;
+  enemyBullets.push({x:enemy.x, y:enemy.y, vx, vy, life:4, color:"#FF8A8A"});
+  enemyFireSound();
+}
+
+/* Hyperspace visuals (simple fallback) */
+function playHyperspaceAnimation(opts = {duration:1000, chroma:true}){
+  // Simple built-in hyperspace animation: overlay streaks + whoosh SFX + subtle zoom
+  const dur = opts.duration || 1000;
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = 9997; overlay.style.pointerEvents = 'none';
+  overlay.style.background = 'radial-gradient(circle at 50% 40%, rgba(255,255,255,0.08), rgba(255,255,255,0.02))';
+  document.body.appendChild(overlay);
+  const s = document.createElement('canvas'); s.width = window.innerWidth; s.height = window.innerHeight; s.style.width="100%"; s.style.height="100%";
+  s.style.position="absolute"; s.style.left="0"; s.style.top="0"; overlay.appendChild(s);
+  const sc = s.getContext("2d");
+  const start = performance.now();
+  function frame(){
+    const t = (performance.now() - start)/dur;
+    sc.clearRect(0,0,s.width,s.height);
+    sc.globalCompositeOperation = "lighter";
+    for(let i=0;i<160;i++){
+      const x = (i*37 + t*1200) % s.width;
+      const y = (i*23 + t*1600) % s.height;
+      sc.fillStyle = "rgba(255,255,255,0.08)";
+      sc.fillRect(x, y, 2, 18 + (i%6));
+    }
+    sc.globalCompositeOperation = "source-over";
+    if(t < 1) requestAnimationFrame(frame); else { overlay.style.transition="opacity 420ms"; overlay.style.opacity=0; setTimeout(()=>overlay.remove(),460); }
+  }
+  frame();
+  playSfx && playSfx('whoosh-phase');
+}
+
+/* Screen shake */
+function startScreenShake(intensity=18,duration=900){
+  const start = performance.now();
+  function step(){
+    const now = performance.now();
+    const t = (now - start) / duration;
+    if(t >= 1){ screenShake.x = 0; screenShake.y = 0; return; }
+    const damper = 1 - t;
+    screenShake.x = (Math.random()*2-1) * intensity * damper;
+    screenShake.y = (Math.random()*2-1) * intensity * damper;
+    requestAnimationFrame(step);
+  }
+  step();
+}
+
+/* Spawn helpers */
+function spawnEnemy(phase){
+  const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie-heavy":"tie") : "destroyer";
+  const scale = type==="destroyer"? 1.0 : (type==="tie-heavy"? 0.9 : 0.7);
+  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 200 - phase*10);
+  const x = rand(80, window.innerWidth - 80);
+  enemies.push({x,y:-120,vx:0,vy:speed, type, scale, rot:rand(-0.2,0.2), hp: type==="destroyer"?6:(type==="tie-heavy"?2:1), fireCooldown: rand(0.6,2.4)});
+}
+function spawnBoss(){
+  bossActive = true;
+  boss = {x:window.innerWidth/2, y:-420, vx:0, vy:0, r:220, hp:CONFIG.BOSS_HP, displayHp:CONFIG.BOSS_HP, flash:0};
+  bossBar.style.display = "block";
+  bossFill.style.width = "100%";
+}
+
+/* Update loop */
+let bgScroll = 0;
+let laserTimer = 0;
+function update(dt){
+  dt = Math.min(dt, 0.12) * cinematicSlow;
+  if(!running) return;
+
+  if(!paused){
+    missionTime -= dt;
+    missionTime = Math.max(0, missionTime);
+    hudTimer.textContent = formatTime(Math.ceil(missionTime));
+    // Also update UIManager large timer if present
+    if(window.UIManager && UIManager.UpdateTimerDisplay) UIManager.UpdateTimerDisplay(Math.ceil(missionTime));
+    const progress = (CONFIG.TOTAL_TIME - missionTime) / CONFIG.TOTAL_TIME;
+    progressFill.style.width = (progress*100).toFixed(2) + "%";
+  }
+
+  ship.nextMoveAt -= dt;
+  if(ship.nextMoveAt <= 0){
+    ship.targetX = rand(80, window.innerWidth - 80);
+    ship.nextMoveAt = rand(0.6, 1.6);
+    ship.speed = rand(160, 360);
+  }
+  ship.x += (ship.targetX - ship.x) * clamp(6*dt, 0, 1);
+
+  const elapsed = CONFIG.TOTAL_TIME - missionTime;
+  const phase = (elapsed < CONFIG.PHASE_LENGTH) ? 1 : (elapsed < CONFIG.PHASE_LENGTH*2) ? 2 : (elapsed < CONFIG.PHASE_LENGTH*3) ? 3 : 4;
+  phaseBadge.textContent = "PHASE " + phase;
+
+  const tick = Math.floor(elapsed/CONFIG.PHASE_LENGTH);
+  if(tick > hyperspaceTick){
+    hyperspaceTick = tick;
+    // Hyperspace is now controlled by GameFlowController; keep this as a fallback
+  }
+
+  if(!bossActive && !paused){
+    spawnTimer += dt;
+    spawnInterval = phase===1?CONFIG.SPAWN_RATES.phase1:phase===2?CONFIG.SPAWN_RATES.phase2:phase===3?CONFIG.SPAWN_RATES.phase3:CONFIG.SPAWN_RATES.phase4;
+    if(spawnTimer >= spawnInterval){
+      spawnTimer = 0;
+      const count = phase>=3? (Math.random()>0.5?2:1) : 1;
+      for(let i=0;i<count;i++) spawnEnemy(phase);
+    }
+  }
+
+  laserTimer -= dt;
+  const fireRate = phase>=3?0.14:0.22;
+  if(laserTimer <= 0 && !paused){
+    fireLasers();
+    laserTimer = fireRate;
+  }
+
+  enemies.forEach(e=>{
+    e.fireCooldown -= dt;
+    if(e.fireCooldown <= 0){
+      enemyFire(e);
+      e.fireCooldown = rand(0.8, 2.6);
+    }
+  });
+
+  for(let i=enemies.length-1;i>=0;i--){
+    const e = enemies[i];
+    e.y += e.vy * dt;
+    e.x += Math.sin((performance.now()/1000) + i) * 0.25;
+    if(e.hitTimer>0) e.hitTimer -= dt;
+    if(e.y - 200 > window.innerHeight) enemies.splice(i,1);
+  }
+
+  for(let i=lasers.length-1;i>=0;i--){
+    const L = lasers[i];
+    L.y += L.vy * dt;
+    if(bossActive && boss){
+      const dx = L.x - boss.x, dy = L.y - boss.y;
+      const dist = Math.hypot(dx,dy);
+      if(dist < boss.r){
+        spawnSparks(L.x, L.y, "#FFD2FF", 28);
+        boss.flash = 0.12;
+        boss.hp = clamp(boss.hp - 0.012, 0, CONFIG.BOSS_HP);
+        boss.displayHp += (boss.hp - boss.displayHp) * 0.22;
+        bossFill.style.width = ((boss.displayHp/CONFIG.BOSS_HP)*100).toFixed(1) + "%";
+        playOsc(320,"square",0.08,0.12);
+        lasers.splice(i,1);
+        continue;
+      }
+    }
+    let hit = false;
+    for(let j=enemies.length-1;j>=0;j--){
+      const E = enemies[j];
+      if(Math.abs(L.x - E.x) < (E.scale*40) && Math.abs(L.y - E.y) < (E.scale*30)){
+        spawnSparks(L.x, L.y, "#FFD24A", 14);
+        E.hp -= 1;
+        E.hitTimer = 0.12;
+        lasers.splice(i,1);
+        hit = true;
+        if(E.hp <= 0){
+          smallExplode();
+          spawnSparks(E.x, E.y, "#FF9A4A", 28);
+          spawnDebris(E.x, E.y, "#BBA", 12);
+          state.crystals += (E.type==="destroyer"?6:1);
+          hudCrystals.textContent = state.crystals;
+          enemies.splice(j,1);
+        }
+        break;
+      }
+    }
+    if(hit) continue;
+    if(L.y < -120) lasers.splice(i,1);
+  }
+
+  for(let i=enemyBullets.length-1;i>=0;i--){
+    const b = enemyBullets[i];
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    b.life -= dt;
+    if(Math.hypot(b.x - ship.x, b.y - ship.y) < 18){
+      // Player takes damage: reduce shield first, then HP; never drop below MIN_VISIBLE_STAT
+      const damage = rand(0.06, 0.14); // small playful damage
+      if(playerShield > MIN_VISIBLE_STAT + 0.001){
+        playerShield = clamp(playerShield - damage, MIN_VISIBLE_STAT, 1.0);
+      } else {
+        // shield low, reduce HP a bit
+        playerHP = clamp(playerHP - (damage * 0.6), MIN_VISIBLE_STAT, 1.0);
+      }
+      // update HUD bars
+      shieldFillEl.style.width = (playerShield * 100).toFixed(1) + "%";
+      hpFillEl.style.width = (playerHP * 100).toFixed(1) + "%";
+
+      // visual feedback
+      spawnSparks(ship.x, ship.y, "#FF6B6B", 12);
+      startScreenShake(8,300);
+      enemyBullets.splice(i,1);
+    } else if(b.life <= 0 || b.y > window.innerHeight + 80) enemyBullets.splice(i,1);
+  }
+
+  for(let i=0;i<sparks.length;i++){
+    const s = sparks[i];
+    if(!s.alive) continue;
+    s.life -= dt;
+    s.x += s.vx * dt;
+    s.y += s.vy * dt;
+    s.vy += 720 * dt;
+    if(s.life <= 0) s.alive = false;
+  }
+
+  for(let i=0;i<debris.length;i++){
+    const d = debris[i];
+    if(!d.alive) continue;
+    d.life -= dt;
+    d.x += d.vx * dt;
+    d.y += d.vy * dt;
+    d.vy += 420 * dt;
+    d.rot += d.spin * dt;
+    if(d.life <= 0) d.alive = false;
+  }
+
+  if(!bossActive && missionTime <= CONFIG.PHASE_LENGTH && !paused){
+    spawnBoss();
+  }
+  if(bossActive && boss){
+    if(boss.y < window.innerHeight*0.22) boss.y += 60 * dt;
+    boss.x += Math.sin(performance.now()/700) * 20 * dt;
+    if(missionTime <= CONFIG.PHASE_LENGTH){
+      const t = missionTime / CONFIG.PHASE_LENGTH;
+      const targetHp = t * CONFIG.BOSS_HP;
+      boss.hp += (targetHp - boss.hp) * 0.04;
+      boss.displayHp += (boss.hp - boss.displayHp) * 0.12;
+      bossFill.style.width = ((boss.displayHp/CONFIG.BOSS_HP)*100).toFixed(1) + "%";
+      if(boss.displayHp <= 0.02){
+        bigExplode();
+        spawnSparks(boss.x, boss.y, "#C0A0FF", 500);
+        spawnDebris(boss.x, boss.y, "#C0A0FF", 360);
+        startScreenShake(48,1600);
+        cinematicSlow = 0.18;
+        setTimeout(()=>{ cinematicSlow = 1.0; bossActive = false; boss = null; bossBar.style.display = "none"; state.crystals += 500; hudCrystals.textContent = state.crystals; finishMission(); }, 1600);
+      }
+    }
+    if(boss.flash > 0) boss.flash -= dt;
+  }
+
+  if(missionTime <= 0 && running){
+    if(bossActive && boss){
+      bigExplode();
+      spawnSparks(boss.x, boss.y, "#C0A0FF", 300);
+      spawnDebris(boss.x, boss.y, "#C0A0FF", 220);
+      startScreenShake(28,1200);
+      bossActive = false; boss = null; bossBar.style.display = "none";
+      state.crystals += 160; hudCrystals.textContent = state.crystals;
+      setTimeout(()=>{ finishMission(); }, 1200);
+    } else {
+      finishMission();
+    }
+  }
+}
+
+/* Render */
+function render(){
+  canvas.style.transform = `translate(${screenShake.x||0}px, ${screenShake.y||0}px)`;
+  ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
+  const W = canvas.width/DPR, H = canvas.height/DPR;
+
+  bgScroll = (bgScroll || 0) + 0.9;
+  if(bgScroll > H*2) bgScroll = 0;
+
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#001026"); g.addColorStop(1,"#000814");
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  for(let i=0;i<260;i++){
+    const sx = (i*73) % W;
+    const sy = ((i*97) + bgScroll) % (H + 200) - 100;
+    const size = (i%7===0)?2:1;
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(sx, sy, size, size);
+  }
+
+  for(let i=0;i<6;i++){
+    const gx = (i*173) % W;
+    const gy = ((i*97) + bgScroll*0.4) % (H + 400) - 200;
+    const rad = 60 + (i%3)*30;
+    const gg = ctx.createRadialGradient(gx,gy,0,gx,gy,rad);
+    gg.addColorStop(0, "rgba(120,80,200,0.06)");
+    gg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = gg; ctx.beginPath(); ctx.ellipse(gx,gy,rad,rad*0.6,0,0,Math.PI*2); ctx.fill();
+  }
+
+  const p1x = W*0.18;
+  const p1y = ((bgScroll*0.6) % (H + 300)) - 150;
+  ctx.save(); ctx.globalAlpha = 0.95;
+  const pg = ctx.createLinearGradient(p1x-80,p1y,p1x+80,p1y); pg.addColorStop(0,"#2a1b4a"); pg.addColorStop(1,"#0b2a3a");
+  ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(p1x, p1y, 80, 80, 0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  enemies.forEach(e=>{
+    if(e.type==="tie" || e.type==="tie-heavy"){
+      drawEnemyCyborg(ctx, e.x, e.y, e.scale, e.rot, e.type==="tie-heavy"?"heavy":"light");
+    } else {
+      drawDestroyerCyborg(ctx, e.x, e.y, e.scale, e.rot);
+    }
+  });
+
+  enemyBullets.forEach(b=>{
+    ctx.save();
+    ctx.fillStyle = b.color;
+    ctx.shadowColor = b.color; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.ellipse(b.x, b.y, 4, 8, 0, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+
+  lasers.forEach(l=>{
+    ctx.save();
+    ctx.fillStyle = l.color;
+    ctx.shadowColor = l.color; ctx.shadowBlur = 16;
+    ctx.fillRect(l.x-2, l.y, 4, 34);
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  });
+
+  for(let i=0;i<sparks.length;i++){
+    const s = sparks[i];
+    if(!s.alive) continue;
+    ctx.save();
+    ctx.globalAlpha = clamp(s.life,0,1);
+    ctx.fillStyle = s.color;
+    ctx.beginPath(); ctx.ellipse(s.x, s.y, 3, 3, 0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  for(let i=0;i<debris.length;i++){
+    const d = debris[i];
+    if(!d.alive) continue;
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    ctx.rotate(d.rot);
+    ctx.fillStyle = d.color;
+    ctx.fillRect(-d.size/2, -d.size/2, d.size, d.size*0.6);
+    ctx.restore();
+  }
+
+  // Force field visual around player (new)
+  const shieldAlpha = clamp(playerShield, 0.12, 1.0);
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.beginPath();
+  const fieldRadius = 46 + (shieldAlpha * 18);
+  const grd = ctx.createRadialGradient(ship.x, ship.y, fieldRadius*0.2, ship.x, ship.y, fieldRadius);
+  grd.addColorStop(0, `rgba(0,220,255,${0.28 * shieldAlpha})`);
+  grd.addColorStop(0.6, `rgba(0,150,255,${0.12 * shieldAlpha})`);
+  grd.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grd;
+  ctx.ellipse(ship.x, ship.y, fieldRadius, fieldRadius*0.6, 0, 0, Math.PI*2);
+  ctx.fill();
+  // ring
+  ctx.lineWidth = 2 + (shieldAlpha * 3);
+  ctx.strokeStyle = `rgba(0,200,255,${0.6 * shieldAlpha})`;
+  ctx.beginPath(); ctx.ellipse(ship.x, ship.y, fieldRadius, fieldRadius*0.6, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+
+  drawPlayerShip(ctx, ship.x, ship.y, 1.0, Math.sin(performance.now()/700)*0.02, "#4AF");
+
+  ctx.save();
+  ctx.globalAlpha = 0.6;
+  ctx.fillStyle = "#00DFFF";
+  ctx.beginPath(); ctx.ellipse(ship.x, ship.y+34, 18, 36, 0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.restore();
+
+  if(bossActive && boss){
+    drawSaucerBoss(ctx, boss.x, boss.y, 1.0, 0);
+  }
+}
+
+/* RAF loop */
+function loop(ts){
+  const dt = (ts - lastTime)/1000;
+  lastTime = ts;
+  try{
+    render();
+    if(running && !paused) update(dt);
+    // NEW: update GameFlowController (schedules hyperspace, boss spawn, timer UI)
+    if(window.GameFlowController && typeof GameFlowController.updateFlow === 'function') GameFlowController.updateFlow();
+  }catch(e){
+    console.error('Runtime error in loop', e);
+  }
+  rafId = requestAnimationFrame(loop);
+}
+
+/* Mission flow & one-play-per-day */
+function canPlayToday(){
+  const today = nowISO();
+  if(state.completedToday && state.lastPlayDate === today) return false;
+  return true;
+}
+function markCompletedToday(){
+  state.completedToday = true;
+  state.lastPlayDate = nowISO();
   saveState();
-  refreshTitleUI();
-  resetMission();
+}
+
+/* START COUNTDOWN and BEGIN MISSION (kept for compatibility but LAUNCH now uses GameFlowController.Start) */
+function startCountdown(){
+  if(!canPlayToday()){ alert("MISSION ALREADY COMPLETED TODAY. TRY AGAIN TOMORROW."); return; }
+
+  // switch UI immediately so menu disappears
   showScreen("mission");
-  running = true;
-  paused = false;
-  GameFlowController.Start();
-});
-shopBtn.addEventListener("click",()=>{showScreen("shop");});
-shopBack.addEventListener("click",()=>{showScreen("title");});
-adminOpen.addEventListener("click",()=>{
-  adminPinInput.value = adminPin;
-  adminCrystals.value = state.crystals;
-  adminStreak.value = state.streak;
-  showScreen("admin");
-});
-adminBack.addEventListener("click",()=>{showScreen("title");});
-savePinBtn.addEventListener("click",()=>{
-  adminPin = adminPinInput.value.trim();
-  saveAdminPin(adminPin);
-});
-applyAdmin.addEventListener("click",()=>{
-  state.crystals = parseInt(adminCrystals.value||"0",10);
-  state.streak = parseInt(adminStreak.value||"0",10);
-  saveState();
-  refreshTitleUI();
-});
-adminReset.addEventListener("click",()=>{
-  state = {...defaultState};
-  saveState();
-  refreshTitleUI();
-});
-pauseBtn.addEventListener("click",()=>{paused=!paused;pauseBtn.textContent=paused?"RESUME":"PAUSE";});
-resetBtn.addEventListener("click",()=>{missionAbort();});
-rewardBox.addEventListener("click",()=>{showScreen("title");});
-rewardBack.addEventListener("click",()=>{showScreen("title");});
 
-/* Keyboard input */
-window.addEventListener("keydown",e=>{
-  if(e.key==="ArrowLeft"||e.key==="a") input.left=true;
-  if(e.key==="ArrowRight"||e.key==="d") input.right=true;
-  if(e.key===" "||e.key==="ArrowUp") input.fire=true;
-  if(e.key==="d" && !e.metaKey && !e.ctrlKey) {debugVisible=!debugVisible;debugEl.style.display=debugVisible?"block":"none";}
-});
-window.addEventListener("keyup",e=>{
-  if(e.key==="ArrowLeft"||e.key==="a") input.left=false;
-  if(e.key==="ArrowRight"||e.key==="d") input.right=false;
-  if(e.key===" "||e.key==="ArrowUp") input.fire=false;
-});
+  // disable start to prevent double-start
+  startBtn.disabled = true;
 
-/* Mission lifecycle */
-function resetMission(){
-  enemies = [];
-  bullets = [];
-  enemyBullets = [];
-  boss = null;
-  player.shield = 1;
-  player.hp = 1;
-  missionTime = CONFIG.TOTAL_TIME;
-  GameFlowController.SetTimer(missionTime);
-  progressFill.style.width = "0%";
+  // ensure audio unlocked
+  try{ ensureAudio(); }catch(e){}
+
+  // show countdown on mission screen
+  countdown = 5;
+  countdownEl.textContent = countdown;
+  countdownEl.style.display = "block";
+
+  playBeepSequence(5);
+
+  // clear any existing interval just in case
+  if(countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+
+  countdownInterval = setInterval(()=>{
+    countdown--;
+    if(countdown <= 0){
+      clearInterval(countdownInterval); countdownInterval = null;
+      countdownEl.style.display = "none";
+      beginMission();
+    } else {
+      countdownEl.textContent = countdown;
+      beep();
+    }
+  }, 1000);
+}
+function playBeepSequence(n){ for(let i=0;i<n;i++) setTimeout(()=>beep(), i*900); }
+
+function beginMission(){
+  // ensure mission screen visible
+  showScreen("mission");
+
+  running = true; paused = false; cinematicSlow = 1.0;
+
+  missionTime = CONFIG.TOTAL_TIME; spawnTimer = 0; enemies.length = 0; lasers.length = 0; enemyBullets.length = 0; boss = null; bossActive = false; rewardForMission = 0; hyperspaceTick = -1;
+  hudName.textContent = state.name || defaultState.name;
+  hudCrystals.textContent = state.crystals;
   bossBar.style.display = "none";
+  ship.x = window.innerWidth/2; ship.y = window.innerHeight*0.78; ship.targetX = ship.x; ship.nextMoveAt = 0;
+  lastTime = performance.now();
+  // reset player defensive stats for each mission to full (but keep playful minimum)
+  playerShield = 1.0;
+  playerHP = 1.0;
+  shieldFillEl.style.width = "100%";
+  hpFillEl.style.width = "100%";
+  if(!rafId) rafId = requestAnimationFrame(loop);
 }
-function missionAbort(){
-  running = false;
-  paused = false;
-  showScreen("title");
-}
-function missionComplete(bossKilled){
-  running = false;
-  paused = false;
-  const reward = bossKilled ? 20 : 8;
-  state.crystals += reward;
-  state.missions += 1;
+
+/* Finish mission */
+function finishMission(){
+  running = false; paused = false;
+  markCompletedToday();
+  state.missions = (state.missions||0) + 1;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if(state.lastPlayDate === yesterday) state.streak = (state.streak||0) + 1;
+  else state.streak = 1;
+  const base = CONFIG.REWARD_BASE * Math.max(1, state.streak);
+  const weekly = (state.streak % 7 === 0) ? 100 : 0;
+  rewardForMission = base + weekly;
+  state.crystals += rewardForMission;
   saveState();
-  rewardText.textContent = `+${reward} CRYSTALS`;
-  rewardDetail.textContent = bossKilled ? "BOSS NEUTRALISED — REWARD CLAIMED" : "SECTOR CLEARED — REWARD CLAIMED";
-  refreshTitleUI();
+  rewardText.textContent = `+${rewardForMission} CRYSTALS`;
+  rewardDetail.textContent = `BASE ${base}${weekly?(" • WEEKLY +"+weekly):""}`;
+  // re-enable start button for next day
+  startBtn.disabled = false;
   showScreen("reward");
 }
 
-/* Debug overlay & hooks */
-function updateDebug(){
-  if(!debugVisible) return;
-  debugEl.textContent =
-    `Zone: ${ZoneManager.GetCurrentZone().id}\n`+
-    `Phase: ${currentPhase}\n`+
-    `Timer: ${missionTime.toFixed(1)}\n`+
-    `BossHP: ${BossStateMachine.getHp().toFixed(2)}\n`+
-    `Enemies: ${enemies.length}\n`+
-    `Bloom: ${"off"}`;
+/* Reward visuals */
+let rewardOpened = false;
+function openReward(){
+  if(rewardOpened) return;
+  rewardOpened = true;
+  rewardChime();
+  for(let i=0;i<48;i++){
+    const s = document.createElement("div"); s.className="spark";
+    const rect = rewardBox.getBoundingClientRect();
+    s.style.left = (rect.left + rect.width/2) + "px";
+    s.style.top = (rect.top + rect.height/2) + "px";
+    document.body.appendChild(s);
+    const tx = rand(-320,320), ty = rand(-420,-40);
+    s.animate([{transform:`translate(0px,0px) scale(0.6)`,opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.2)`,opacity:0}],{duration:900+Math.random()*800,easing:"cubic-bezier(.2,.8,.2,1)"});
+    setTimeout(()=>s.remove(),2000);
+  }
 }
 
-/* Global debug hooks */
-/**
- * Force hyperspace transition (debug).
- */
-window.ForceHyperspace = ()=>GameFlowController.ForceHyperspace();
-/**
- * Spawn boss immediately (debug).
- */
-window.SpawnBoss = ()=>BossStateMachine.spawnBoss(CONFIG.BOSS_HP);
-/**
- * Set mission timer (debug).
- * @param {number} seconds
- */
-window.SetTimer = (seconds)=>GameFlowController.SetTimer(seconds);
+/* Format time */
+function formatTime(sec){ const m=Math.floor(sec/60).toString().padStart(2,"0"); const s=Math.floor(sec%60).toString().padStart(2,"0"); return `${m}:${s}`; }
+
+/* Binding helper */
+function bindClick(el, fn){
+  if(!el) return;
+  el.setAttribute('type','button');
+  el.addEventListener('click', (e)=>{ e.preventDefault(); fn(e); }, {passive:false});
+  el.addEventListener('pointerup', (e)=>{}, {passive:true});
+  el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); fn(e); } });
+}
+
+/* Fire lasers */
+function fireLasers(){
+  const shipX = ship.x;
+  const shipY = ship.y;
+  const laserColor = "#4AF";
+  lasers.push({x:shipX-18,y:shipY-26,vx:0,vy:-920,color:laserColor});
+  lasers.push({x:shipX+18,y:shipY-26,vx:0,vy:-920,color:laserColor});
+  laserSound();
+}
+
+/* Bind UI actions after DOM ready */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // LAUNCH now starts GameFlowController (new system) which handles precount and main timer
+  bindClick(startBtn, ()=>{
+    state.name = (playerName.value.trim().toUpperCase() || state.name);
+    saveState();
+    refreshTitleUI();
+    // show mission screen immediately and disable start
+    showScreen("mission");
+    startBtn.disabled = true;
+    // Start the new flow controller (precount + main timer + scheduled hyperspace)
+    if(window.GameFlowController && typeof GameFlowController.Start === 'function') GameFlowController.Start();
+    else startCountdown(); // fallback
+  });
+  bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
+  bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+  bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
+  bindClick(resetBtn, ()=>{ // abort handler clears countdown and stops mission
+    if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){
+      // clear countdown if running
+      if(countdownInterval){ clearInterval(countdownInterval); countdownInterval = null; countdownEl.style.display = "none"; }
+      running=false; paused=false;
+      // re-enable start button
+      startBtn.disabled = false;
+      showScreen("title"); refreshTitleUI();
+    }
+  });
+  bindClick(rewardBox, ()=>{ openReward(); });
+  bindClick(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleUI(); });
+
+  bindClick(adminOpen, ()=>{ const pin = localStorage.getItem(CONFIG.ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
+  bindClick(adminQuick, ()=>{ const pin = localStorage.getItem(CONFIG.ADMIN_KEY); if(!pin){ showScreen("admin"); return; } const attempt = prompt("ENTER ADMIN PIN"); if(attempt === pin) { showScreen("admin"); } else { if(attempt!==null) alert("INVALID PIN"); } });
+
+  bindClick(savePinBtn, ()=>{ const p = adminPinInput.value.trim(); if(!/^\d{4,8}$/.test(p)){ alert("PIN MUST BE 4-8 DIGITS"); return; } localStorage.setItem(CONFIG.ADMIN_KEY, p); alert("PIN SAVED"); adminPinInput.value=""; });
+  bindClick(applyAdmin, ()=>{ const c = parseInt(adminCrystals.value||"0"); const s = parseInt(adminStreak.value||"0"); if(!isNaN(c)){ state.crystals = c; } if(!isNaN(s)){ state.streak = s; } saveState(); refreshTitleUI(); alert("ADMIN CHANGES APPLIED"); });
+  bindClick(adminBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+
+  // RESET DATA moved to adminReset
+  bindClick(adminReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(CONFIG.STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); alert("DATA RESET"); showScreen("title"); } });
+
+  playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim().toUpperCase() || state.name; saveState(); refreshTitleUI(); });
+
+  refreshTitleUI();
+  renderShop();
+  hudName.textContent = state.name;
+  hudCrystals.textContent = state.crystals;
+  lastTime = performance.now();
+  if(!rafId) rafId = requestAnimationFrame(loop);
+
+  document.addEventListener("pointerdown", ()=>{ try{ ensureAudio(); }catch(e){} }, {once:true});
+});
+
+/* Debug & logging */
+window.addEventListener('error', e => console.error('Runtime error:', e.message, e.filename, e.lineno));
+window.addEventListener('unhandledrejection', e => console.error('Promise rejection:', e.reason));
+setInterval(()=>{ debugEl.textContent = `ENEMIES:${enemies.length} LASERS:${lasers.length} BULLETS:${enemyBullets.length} PARTICLES:${sparks.filter(s=>s.alive).length} SHIELD:${(playerShield*100).toFixed(0)}% HP:${(playerHP*100).toFixed(0)}%`; }, 600);
+document.addEventListener('keydown', (e)=>{ if(e.key.toLowerCase()==='d'){ debugEl.style.display = debugEl.style.display === 'none' ? 'block' : 'none'; } });
+
+/* Save on unload */
+window.addEventListener("beforeunload", ()=>{ saveState(); });
 
 /* =========================
-   Wiring checklist (copy/paste)
-   =========================
-   1. Start mission: GameFlowController.Start()
-   2. Force hyperspace: GameFlowController.ForceHyperspace()
-   3. Set timer: GameFlowController.SetTimer(90)
-   4. Spawn boss: BossStateMachine.spawnBoss(1.0)
-   5. Apply boss damage: BossStateMachine.ApplyDamage(0.1)
-   6. Check boss active: BossStateMachine.isActive()
-   7. Get boss HP: BossStateMachine.getHp()
-   8. Show banner: UIManager.Show("TEXT",{style:"phase"})
-   9. Update timer: UIManager.UpdateTimerDisplay(75)
-   10. Toggle bloom: RenderBridge.enableBloom(true)
+   New modular systems (ZoneManager, UIManager, GameFlowController, BossStateMachine, DebugHooks)
+   - These are integrated with the existing code above via small APIs.
+   - They are intentionally modular and documented inline.
    ========================= */
-  </script>
+
+/* -------------------------
+   UIManager + AnnouncementBanner
+   - API: UIManager.ShowAnnouncement(text, opts)
+   - API: UIManager.UpdateTimerDisplay(seconds)
+   ------------------------- */
+const UIManager = (function(){
+  const bannerEl = document.getElementById('announcementBanner') || (function createBanner(){
+    const el = document.getElementById('announcementBanner') || document.createElement('div');
+    el.id = 'announcementBanner';
+    el.style.position = 'fixed';
+    el.style.left = '50%';
+    el.style.top = '12%';
+    el.style.transform = 'translateX(-50%)';
+    el.style.zIndex = 9999;
+    el.style.padding = '12px 20px';
+    el.style.borderRadius = '12px';
+    el.style.fontWeight = '900';
+    el.style.fontSize = '20px';
+    el.style.textAlign = 'center';
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0';
+    el.style.whiteSpace = 'pre-line';
+    el.style.transition = 'opacity 220ms ease, transform 260ms cubic-bezier(.2,.9,.2,1)';
+    document.body.appendChild(el);
+    return el;
+  })();
+
+  const timerEl = document.getElementById('uiTimerLarge') || (function createTimer(){
+    const t = document.getElementById('uiTimerLarge') || document.createElement('div');
+    t.id = 'uiTimerLarge';
+    t.style.position = 'fixed';
+    t.style.left = '50%';
+    t.style.top = '6%';
+    t.style.transform = 'translateX(-50%)';
+    t.style.zIndex = 9998;
+    t.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace';
+    t.style.fontWeight = '900';
+    t.style.fontSize = '56px';
+    t.style.letterSpacing = '1px';
+    t.style.padding = '8px 14px';
+    t.style.borderRadius = '10px';
+    t.style.textAlign = 'center';
+    t.style.pointerEvents = 'none';
+    t.style.color = '#fff';
+    document.body.appendChild(t);
+    return t;
+  })();
+
+  function styleFor(type){
+    if(type==='Warning') return {bg:'linear-gradient(90deg,#FFB86B,#FF6B6B)', color:'#1b0b0b', sfx:'whoosh-warning'};
+    if(type==='Phase') return {bg:'linear-gradient(90deg,#7F5BFF,#C04AFF)', color:'#fff', sfx:'whoosh-phase'};
+    if(type==='Boss') return {bg:'linear-gradient(90deg,#FF4A4A,#FFD24A)', color:'#111', sfx:'whoosh-boss'};
+    return {bg:'rgba(0,0,0,0.6)', color:'#fff', sfx:null};
+  }
+  function ShowAnnouncement(text, opts = {}){
+    const duration = (opts.duration || 1000);
+    const style = styleFor(opts.style || 'Phase');
+    bannerEl.textContent = text + (opts.subtitle ? ('\n' + opts.subtitle) : '');
+    bannerEl.style.background = style.bg;
+    bannerEl.style.color = style.color;
+    bannerEl.style.padding = opts.subtitle ? '14px 22px' : '10px 18px';
+    bannerEl.style.transform = 'translateX(-50%) translateY(-8px)';
+    bannerEl.style.opacity = '1';
+    if(opts.sfx && typeof playSfx === 'function') playSfx(opts.sfx);
+    setTimeout(()=>{ bannerEl.style.opacity = '0'; bannerEl.style.transform = 'translateX(-50%) translateY(-26px)'; }, duration);
+  }
+  function UpdateTimerDisplay(seconds){
+    const mm = String(Math.floor(seconds/60)).padStart(2,'0');
+    const ss = String(Math.floor(seconds%60)).padStart(2,'0');
+    timerEl.textContent = `${mm}:${ss}`;
+    // color changes
+    if(seconds <= 10) timerEl.style.color = '#FF4A4A';
+    else if(seconds <= 30) timerEl.style.color = '#FF9A4A';
+    else timerEl.style.color = '#FFFFFF';
+    // also update small HUD timer for compatibility
+    const small = document.getElementById('timerBig');
+    if(small) small.textContent = `${mm}:${ss}`;
+  }
+  return { ShowAnnouncement, UpdateTimerDisplay };
+})();
+
+/* -------------------------
+   ZoneManager
+   - Data-driven zones
+   - API: ZoneManager.LoadZone(index), ZoneManager.GetNextZone(), ZoneManager.GetCurrentZone()
+   ------------------------- */
+const ZoneManager = (function(){
+  const zones = [
+    { id: 'alpha', background: {stars:1, tint:'#0ff'}, music: 'synthA', enemyPool: ['tie','drone'], spawnRate: 0.9, difficultyMultiplier: 1.0, palette: {primary:'#00dfff',accent:'#7f5bff'} },
+    { id: 'beta',  background: {stars:1.2, tint:'#c0f'}, music: 'synthB', enemyPool: ['tie-heavy','drone-fast'], spawnRate: 0.7, difficultyMultiplier: 1.2, palette: {primary:'#c04aff',accent:'#ffd24a'} },
+    { id: 'gamma', background: {stars:1.4, tint:'#fa8'}, music: 'synthC', enemyPool: ['destroyer','drone-heavy'], spawnRate: 0.55, difficultyMultiplier: 1.45, palette: {primary:'#ff9a4a',accent:'#ff4a4a'} },
+  ];
+  let currentIndex = 0;
+
+  function LoadZone(index){
+    currentIndex = Math.max(0, Math.min(index, zones.length-1));
+    const z = zones[currentIndex];
+    // Integration points: apply visuals, audio, and spawn settings
+    if(typeof applyZoneVisuals === 'function') applyZoneVisuals(z.background, z.palette);
+    if(typeof AudioManager !== 'undefined' && AudioManager.playTrack) AudioManager.playTrack(z.music);
+    // expose spawn settings to game
+    window.GameSettings = window.GameSettings || {};
+    GameSettings.currentEnemyPool = z.enemyPool.slice();
+    GameSettings.spawnRateBase = z.spawnRate;
+    GameSettings.difficultyMultiplier = z.difficultyMultiplier;
+    console.info('ZoneManager: Loaded zone', z.id);
+    return z;
+  }
+  function GetNextZone(){
+    return zones[(currentIndex + 1) % zones.length];
+  }
+  function GetCurrentZone(){ return zones[currentIndex]; }
+  return { LoadZone, GetNextZone, GetCurrentZone, zones };
+})();
+
+/* -------------------------
+   GameFlowController
+   - Orchestrates precount, main timer, scheduled phase events, hyperspace sequence, boss spawn
+   - API: GameFlowController.Start(), ForceHyperspace(), SetTimer(seconds), updateFlow()
+   - Calls your existing beginMission() when main timer starts
+   ------------------------- */
+const GameFlowController = (function(){
+  let mainTimer = CONFIG.TOTAL_TIME;
+  let runningFlow = false;
+  let scheduled = [];
+  let lastTick = performance.now();
+  let phaseIndex = 0;
+
+  function scheduleEvents(){
+    scheduled = [];
+    const total = CONFIG.TOTAL_TIME;
+    // schedule hyperspace at 90,60,30 remaining -> compute elapsed times
+    [90,60,30].forEach(rem => {
+      const elapsedAt = total - rem;
+      if(elapsedAt >= 0 && elapsedAt <= total) scheduled.push({type:'hyperspace', at: elapsedAt});
+    });
+    // sort by at
+    scheduled.sort((a,b)=>a.at-b.at);
+  }
+
+  function Start(){
+    // Precount: show "Prepare for hyperspace" for 5s, then start main timer and call beginMission()
+    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:5000, style:'Warning'});
+    // ensure zone 0 loaded initially
+    ZoneManager.LoadZone(0);
+    scheduleEvents();
+    phaseIndex = 0;
+    runningFlow = true;
+    mainTimer = CONFIG.TOTAL_TIME;
+    lastTick = performance.now();
+    // show mission HUD timer immediately
+    UIManager.UpdateTimerDisplay(mainTimer);
+    // call beginMission after 5s (precount)
+    setTimeout(()=>{ if(typeof beginMission === 'function') beginMission(); }, 5000);
+  }
+
+  function updateFlow(){
+    if(!runningFlow) return;
+    const now = performance.now();
+    const dt = (now - lastTick)/1000;
+    lastTick = now;
+    mainTimer = Math.max(0, mainTimer - dt);
+    UIManager.UpdateTimerDisplay(Math.ceil(mainTimer));
+    // check scheduled events by elapsed time
+    const elapsed = CONFIG.TOTAL_TIME - mainTimer;
+    while(scheduled.length && elapsed >= scheduled[0].at){
+      const ev = scheduled.shift();
+      if(ev.type === 'hyperspace') runHyperspaceSequence();
+    }
+    // boss spawn when timer <= 30s
+    if(mainTimer <= CONFIG.PHASE_LENGTH && typeof BossStateMachine !== 'undefined' && !BossStateMachine.isActive()){
+      // spawn boss with intro
+      runBossIntro();
+    }
+    if(mainTimer <= 0){
+      runningFlow = false;
+      // mission end hook
+      if(typeof onMissionEnd === 'function') onMissionEnd();
+    }
+  }
+
+  function runHyperspaceSequence(){
+    // Warning banner (short), then hyperspace animation, then load next zone and show phase banner
+    UIManager.ShowAnnouncement('Prepare for hyperspace', {duration:900, style:'Warning'});
+    setTimeout(()=>{
+      // play hyperspace animation (camera zoom + streak overlay)
+      playHyperspaceAnimation({duration: 1000, chroma:true});
+      // after animation, load next zone
+      setTimeout(()=>{
+        const next = ZoneManager.GetNextZone();
+        const idx = ZoneManager.zones.findIndex(z=>z.id===next.id);
+        ZoneManager.LoadZone(idx);
+        phaseIndex++;
+        UIManager.ShowAnnouncement('Begin Phase ' + Math.min(phaseIndex+1,4), {duration:1000, style:'Phase'});
+      }, 1000);
+    }, 200);
+  }
+
+  function runBossIntro(){
+    UIManager.ShowAnnouncement('Boss Approaching', {duration:900, style:'Boss'});
+    setTimeout(()=>{
+      // spawn boss via BossStateMachine
+      if(BossStateMachine && typeof BossStateMachine.spawnBoss === 'function'){
+        BossStateMachine.spawnBoss(CONFIG.BOSS_HP);
+      } else {
+        // fallback to existing spawnBoss
+        spawnBoss && spawnBoss();
+      }
+    }, 600);
+  }
+
+  function ForceHyperspace(){ runHyperspaceSequence(); }
+  function SetTimer(seconds){ mainTimer = Math.max(0, seconds); UIManager.UpdateTimerDisplay(Math.ceil(mainTimer)); }
+  function getTimer(){ return mainTimer; }
+
+  return { Start, updateFlow, ForceHyperspace, SetTimer, getTimer };
+})();
+
+/* -------------------------
+   BossStateMachine
+   - States: Idle, HitReact, PhaseTransition, Enraged, Death
+   - API: spawnBoss(hp), ApplyDamage(d), isActive(), getHp()
+   - Uses existing spawnSparks, spawnDebris, startScreenShake, playSfx, setCinematicSlow hooks if available
+   ------------------------- */
+const BossStateMachine = (function(){
+  let bossObj = null;
+  let state = 'Idle';
+  let hp = 1.0;
+  let maxHp = 1.0;
+
+  function spawnBoss(hpValue = 1.0){
+    // Use existing spawnBoss() to create boss object if present, otherwise create minimal bossObj
+    if(typeof spawnBoss === 'function'){
+      spawnBoss(); // existing function sets bossActive and boss global
+      // wait a tick for boss to be created
+      setTimeout(()=>{ if(window.boss){ bossObj = boss; hp = bossObj.hp; maxHp = bossObj.hp; bossObj.active = true; } }, 60);
+    } else {
+      bossObj = { x: window.innerWidth/2, y: -300, active:false, hp: hpValue, maxHp: hpValue };
+      hp = hpValue; maxHp = hpValue;
+      // intro drop
+      const introDur = 700;
+      const start = performance.now();
+      const introTick = () => {
+        const t = (performance.now() - start)/introDur;
+        bossObj.y = -300 + Math.min(1, t) * (window.innerHeight*0.22 + 300);
+        if(t < 1) requestAnimationFrame(introTick);
+        else { bossObj.active = true; if(typeof onBossSpawned === 'function') onBossSpawned(bossObj); }
+      };
+      introTick();
+    }
+    state = 'Idle';
+    return bossObj;
+  }
+
+  function isActive(){ return !!(window.boss && window.boss.active) || (!!bossObj && bossObj.active && state !== 'Death'); }
+
+  function ApplyDamage(damage){
+    // Accept damage in normalized 0..1 scale
+    const target = window.boss || bossObj;
+    if(!target || state === 'Death') return;
+    // apply damage
+    hp = clamp((target.hp || hp) - damage, 0, (target.maxHp || maxHp));
+    if(target) target.hp = hp;
+    // hit react visuals
+    state = 'HitReact';
+    // 0.08s white flash, red tint, small particle burst, brief camera shake
+    if(typeof spawnSparks === 'function') spawnSparks(target.x || (window.innerWidth/2), target.y || (window.innerHeight*0.22), '#FFD2FF', 18);
+    if(typeof startScreenShake === 'function') startScreenShake(10, 220);
+    if(typeof playSfx === 'function') playSfx('boss-hit');
+    // schedule post-hit
+    setTimeout(()=>{
+      if(hp <= 0.001){
+        state = 'Death';
+        runDeath(target);
+      } else {
+        // visual stages by HP
+        const pct = (hp / (target.maxHp || maxHp)) * 100;
+        if(pct <= 33) applyBossVisualStage(3);
+        else if(pct <= 66) applyBossVisualStage(2);
+        else applyBossVisualStage(1);
+        state = 'Idle';
+      }
+    }, 80);
+  }
+
+  function applyBossVisualStage(stage){
+    // stage 1: normal, stage 2: cracks/smoke, stage 3: heavy sparks
+    if(typeof setBossVisualStage === 'function') setBossVisualStage(stage);
+    // fallback: small particle burst to hint damage
+    if(stage === 2) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF9A4A', 24);
+    if(stage === 3) spawnSparks(window.boss ? window.boss.x : ship.x, window.boss ? window.boss.y : ship.y, '#FF4A4A', 48);
+  }
+
+  function runDeath(target){
+    if(typeof playSfx === 'function') playSfx('boss-death');
+    if(typeof spawnSparks === 'function') spawnSparks(target.x || ship.x, target.y || ship.y, '#C0A0FF', 400);
+    if(typeof spawnDebris === 'function') spawnDebris(target.x || ship.x, target.y || ship.y, '#C0A0FF', 240);
+    if(typeof startScreenShake === 'function') startScreenShake(48, 1600);
+    // slow motion if supported
+    if(typeof setCinematicSlow === 'function') setCinematicSlow(0.18);
+    setTimeout(()=>{
+      if(typeof setCinematicSlow === 'function') setCinematicSlow(1.0);
+      // finalize death: call existing onBossDeath if present
+      if(typeof onBossDeath === 'function') onBossDeath(target);
+      // clear global boss if used
+      if(window.boss){ bossActive = false; boss = null; bossBar.style.display = "none"; }
+      bossObj = null;
+    }, 1600);
+  }
+
+  function getHp(){ return (window.boss && window.boss.hp) ? window.boss.hp : (bossObj ? bossObj.hp : hp); }
+  return { spawnBoss, ApplyDamage, isActive, getHp };
+})();
+
+/* -------------------------
+   Minimal SFX mapping and helpers (map to existing playOsc/bigExplode)
+   - playSfx(name) used by new modules; maps to existing audio helpers
+   ------------------------- */
+window.playSfx = window.playSfx || function(name){
+  if(name === 'whoosh-warning') playOsc(600,'sine',0.18,0.12);
+  if(name === 'whoosh-phase')   playOsc(900,'sine',0.18,0.12);
+  if(name === 'whoosh-boss')    playOsc(420,'sawtooth',0.28,0.18);
+  if(name === 'boss-hit')       playOsc(320,'square',0.08,0.12);
+  if(name === 'boss-death')     bigExplode && bigExplode();
+};
+
+/* -------------------------
+   Integration helper stubs (optional to override in your code)
+   - applyZoneVisuals(background, palette)
+   - setBossVisualStage(stage)
+   - setCinematicSlow(value)
+   - onBossSpawned(bossObj), onBossDeath(bossObj), onMissionEnd()
+   These are intentionally no-ops here; override in your main code if you want custom visuals.
+   ------------------------- */
+window.applyZoneVisuals = window.applyZoneVisuals || function(background, palette){
+  // Default: set a global palette used by render code (your render loop can read RenderPalette)
+  window.RenderPalette = palette || window.RenderPalette;
+  window.BackgroundParams = background || window.BackgroundParams;
+  console.info('applyZoneVisuals applied', background, palette);
+};
+window.setBossVisualStage = window.setBossVisualStage || function(stage){
+  // Default: small console hint; you can implement sprite cracks/smoke here
+  console.info('Boss visual stage', stage);
+};
+window.setCinematicSlow = window.setCinematicSlow || function(v){
+  cinematicSlow = v;
+};
+
+/* -------------------------
+   Debug hooks and console commands
+   - Toggle overlay with D, console commands: ForceHyperspace(), SpawnBoss(), SetTimer(seconds)
+   ------------------------- */
+(function DebugHooks(){
+  let dbg = document.getElementById('zoneDebugOverlay');
+  if(!dbg){
+    dbg = document.createElement('div'); dbg.id = 'zoneDebugOverlay';
+    dbg.style.position = 'fixed'; dbg.style.left = '8px'; dbg.style.top = '8px'; dbg.style.zIndex = 99999;
+    dbg.style.background = 'rgba(0,0,0,0.6)'; dbg.style.color = '#fff'; dbg.style.padding = '8px 10px'; dbg.style.borderRadius = '8px';
+    dbg.style.fontSize = '12px'; dbg.style.display = 'none';
+    document.body.appendChild(dbg);
+  }
+  let visible = false;
+  function update(){
+    const zone = ZoneManager.GetCurrentZone();
+    const phase = Math.ceil((CONFIG.TOTAL_TIME - (GameFlowController.getTimer ? GameFlowController.getTimer() : missionTime)) / CONFIG.PHASE_LENGTH) + 1;
+    const bossHp = (BossStateMachine.getHp) ? BossStateMachine.getHp() : 0;
+    dbg.innerText = `Zone:${zone ? zone.id : 'n/a'}\nPhase:${phase}\nTimer:${Math.ceil(GameFlowController.getTimer ? GameFlowController.getTimer() : missionTime)}\nBossHP:${(bossHp*100).toFixed(0)}%\nEnemies:${(typeof enemies !== 'undefined' ? enemies.length : 'n/a')}`;
+  }
+  setInterval(()=>{ if(visible) update(); }, 400);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key.toLowerCase() === 'd'){ visible = !visible; dbg.style.display = visible ? 'block' : 'none'; update(); }
+  });
+  // console commands
+  window.ForceHyperspace = GameFlowController.ForceHyperspace;
+  window.SpawnBoss = function(){ if(BossStateMachine.spawnBoss) BossStateMachine.spawnBoss(1.0); };
+  window.SetTimer = GameFlowController.SetTimer;
+})();
+
+/* =========================
+   Wiring checklist (short)
+   - Ensure these functions/objects exist or map them to your systems:
+     • GameFlowController.Start() — called by LAUNCH button (already wired)
+     • GameFlowController.updateFlow() — called each RAF loop (wired)
+     • ZoneManager.LoadZone(index) — loads palette/enemy pool (provided)
+     • UIManager.ShowAnnouncement(text, opts) — used for banners (provided)
+     • UIManager.UpdateTimerDisplay(seconds) — updates large timer (provided)
+     • BossStateMachine.spawnBoss(hp) and .ApplyDamage(d) — used for boss lifecycle (provided)
+     • playSfx(name) — mapped to existing audio helpers (provided)
+     • applyZoneVisuals(background,palette) — override to change background rendering (stub provided)
+     • setBossVisualStage(stage) — override to show cracks/smoke (stub provided)
+     • setCinematicSlow(value) — sets cinematicSlow (provided)
+   - Enemy spawn code should read window.GameSettings.currentEnemyPool and GameSettings.spawnRateBase if you want zone-specific pools (GameSettings is set by ZoneManager.LoadZone).
+   ========================= */
+
+/* =========================
+   Test plan (brief)
+   1. Press LAUNCH → mission screen appears, "Prepare for hyperspace" banner shows for 5s, then main timer starts at 02:00.
+   2. Watch timer color: normal → orange when <30s → red when <10s.
+   3. At 90s, 60s, 30s remaining you should see a short warning, hyperspace animation, zone load, and "Begin Phase X" banner.
+   4. At ≤30s the boss intro runs and boss becomes active; hitting boss triggers hit react and visual stages.
+   5. Toggle debug overlay with D; run ForceHyperspace(), SpawnBoss(), SetTimer(45) in console to verify hooks.
+   ========================= */
+
+</script>
 </body>
 </html>
