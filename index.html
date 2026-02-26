@@ -1,23 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-GB">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
-<title>Plaque Invaders — Premium Visual Upgrade</title>
+<title>Plaque Invaders — Visual Overhaul</title>
 <style>
 :root{
-  --bg-0:#00040a; --bg-1:#001026; --accent-cyan:#00f2ff; --accent-mag:#c04aff; --accent-gold:#ffd24a;
-  --glass: rgba(255,255,255,0.04);
-  --hud-bg: rgba(0,0,0,0.55);
-  --ui-radius:14px;
-  --font-display: "SF Pro Display", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  --bg-deep:#00020a; --nebula-1:#07102a; --accent-cyan:#00f2ff; --accent-mag:#c04aff; --accent-gold:#ffd24a;
+  --glass: rgba(255,255,255,0.04); --hud-bg: rgba(0,0,0,0.55);
+  --ui-radius:14px; --font-display: "SF Pro Display", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var(--bg-1));font-family:var(--font-display);color:#e8fbff;overflow:hidden}
+html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-deep),#000814);font-family:var(--font-display);color:#e8fbff;overflow:hidden}
 .screen{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:14px}
 .screen.active{display:flex}
-.card{width:100%;max-width:720px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
-.title{font-weight:900;font-size:1.8rem;line-height:1;color:var(--accent-gold);text-shadow:0 0 18px rgba(255,210,74,0.18);letter-spacing:-1px}
+.card{width:100%;max-width:760px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 60px rgba(0,0,0,0.6)}
+.title{font-weight:900;font-size:1.8rem;color:var(--accent-gold);text-shadow:0 0 18px rgba(255,210,74,0.18);letter-spacing:-1px}
 .lead{font-size:0.95rem;color:#bfefff;opacity:0.95;margin-top:6px}
 .row{display:flex;gap:10px}
 .input{width:100%;padding:12px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.45);color:#e8fbff;font-weight:800;text-align:center}
@@ -54,35 +52,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
 .shop-item button{transition:transform 120ms ease}
 .shop-item button:active{transform:scale(0.98)}
 </style>
-<!-- Inline SVG assets (X-wing, TIE, Destroyer, Death Star simplified silhouettes) -->
-<svg id="svgs" style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="svg-xwing" viewBox="0 0 64 64">
-    <g fill="none" stroke="none">
-      <path d="M32 6 L40 18 L58 22 L40 26 L32 40 L24 26 L6 22 L24 18 Z" fill="#ffffff"/>
-      <rect x="28" y="40" width="8" height="12" rx="2" fill="#ffffff"/>
-    </g>
-  </symbol>
-  <symbol id="svg-tie" viewBox="0 0 64 64">
-    <g fill="none" stroke="none">
-      <rect x="28" y="18" width="8" height="12" rx="1" fill="#ffffff"/>
-      <rect x="6" y="12" width="12" height="40" rx="2" fill="#ffffff"/>
-      <rect x="46" y="12" width="12" height="40" rx="2" fill="#ffffff"/>
-    </g>
-  </symbol>
-  <symbol id="svg-destroyer" viewBox="0 0 128 64">
-    <g fill="#ffffff">
-      <path d="M8 48 L120 48 L96 12 L32 12 Z"/>
-      <rect x="52" y="6" width="24" height="8" rx="2" fill="#ffffff"/>
-    </g>
-  </symbol>
-  <symbol id="svg-deathstar" viewBox="0 0 128 128">
-    <g fill="#ffffff">
-      <circle cx="64" cy="64" r="56" />
-      <circle cx="92" cy="52" r="18" fill="#000000"/>
-      <path d="M8 64 A56 56 0 0 0 120 64" fill="#111111"/>
-    </g>
-  </symbol>
-</svg>
 </head>
 <body>
 <!-- Title -->
@@ -90,12 +59,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div>
-        <div class="title">Plaque Invaders — Premium</div>
-        <div class="lead">X‑wing vs Imperial fleet aesthetic. Hyperspace every 30s. Cinematic HUD, explosions, and a dramatic Death Star finale.</div>
+        <div class="title">Plaque Invaders — Visual Overhaul</div>
+        <div class="lead">Zooming space, galaxies, planets, 3D-inspired ships, escalating phases, and a cinematic Death Star finale.</div>
       </div>
       <div style="text-align:right">
         <div style="font-weight:900;color:var(--accent-cyan);font-size:0.9rem">Ben — Pilot</div>
-        <div style="font-size:0.8rem;opacity:0.9">v1.0</div>
+        <div style="font-size:0.8rem;opacity:0.9">v1.1</div>
       </div>
     </div>
 
@@ -106,22 +75,22 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
 
     <div class="statbar">
       <div class="stat"><div class="label">Crystals</div><div id="statCrystals" class="value">0</div></div>
-      <div class="stat"><div class="label">Streak</div><div id="statStreak" class="value">0</div></div>
+      <div class="stat"><div class="label">Streak (days)</div><div id="statStreak" class="value">0</div></div>
       <div class="stat"><div class="label">Missions</div><div id="statMissions" class="value">0</div></div>
     </div>
 
     <div style="display:flex;gap:8px;margin-top:8px">
       <button id="shopBtn" class="btn alt" style="flex:1">Shipyard</button>
-      <button id="howBtn" class="btn alt" style="flex:1">How it works</button>
+      <button id="howBtn" class="btn alt" style="flex:1">Controls & Info</button>
     </div>
   </div>
 </div>
 
-<!-- Shop -->
+<!-- Shop (kept simple) -->
 <div id="screen-shop" class="screen">
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-weight:900;font-size:1.2rem;color:var(--accent-cyan)">Crystal Shipyard</div>
+      <div style="font-weight:900;font-size:1.2rem;color:var(--accent-cyan)">Shipyard</div>
       <div style="text-align:right">
         <div class="small-note">Crystals: <span id="shopCrystals">0</span></div>
       </div>
@@ -141,7 +110,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
   <div class="hud">
     <div class="left">
       <div class="box" id="hudPilot">Pilot: <span id="hudName">Ben</span></div>
-      <div class="box" id="phaseBadge">PHASE 1 • TIE FIGHTERS</div>
+      <div class="box" id="phaseBadge">PHASE 1</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <div class="box" id="timerBig">02:00</div>
@@ -150,7 +119,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
     </div>
   </div>
 
-  <div class="phase-banner" id="phaseBanner">PHASE 1 • TIE FIGHTERS</div>
+  <div class="phase-banner" id="phaseBanner">PHASE 1</div>
   <div class="boss-bar" id="bossBar"><div class="boss-fill" id="bossFill"></div></div>
 
   <div class="mission-overlay">
@@ -179,26 +148,22 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-0),var
 </div>
 
 <script>
-/* ============================================================
-   Persistent state & defaults
-   ============================================================ */
-const STORAGE_KEY = "plaque_invaders_premium_visual_v1";
+/* =========================
+   State & persistence
+   ========================= */
+const STORAGE_KEY = "plaque_invaders_visual_v2";
 const defaultState = {
-  name: "Ben",
-  crystals: 0,
-  streak: 0,
-  lastPlayDate: null,
-  missions: 0,
-  owned: { ship: ["xwing"], laser: ["neon-blue"], trail: ["ion-blue"], hyperspace: ["warp-default"] },
-  selected: { ship: "xwing", laser: "neon-blue", trail: "ion-blue", hyperspace: "warp-default" }
+  name:"Ben", crystals:0, streak:0, lastPlayDate:null, missions:0,
+  owned:{ship:["xwing"],laser:["neon-blue"],trail:["ion-blue"],hyperspace:["warp-default"]},
+  selected:{ship:"xwing",laser:"neon-blue",trail:"ion-blue",hyperspace:"warp-default"}
 };
 let state = loadState();
-function loadState(){ try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return structuredClone(defaultState); return Object.assign(structuredClone(defaultState), JSON.parse(raw)); }catch(e){ return structuredClone(defaultState); } }
+function loadState(){ try{ const r=localStorage.getItem(STORAGE_KEY); return r?Object.assign(structuredClone(defaultState),JSON.parse(r)):structuredClone(defaultState);}catch(e){return structuredClone(defaultState)}}
 function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 
-/* ============================================================
+/* =========================
    DOM refs
-   ============================================================ */
+   ========================= */
 const screens = {
   title: document.getElementById("screen-title"),
   shop: document.getElementById("screen-shop"),
@@ -235,75 +200,93 @@ const rewardText = document.getElementById("rewardText");
 const rewardDetail = document.getElementById("rewardDetail");
 const rewardBack = document.getElementById("rewardBack");
 
-/* ============================================================
-   Inline SVG assets -> ImageBitmaps for canvas drawing
-   ============================================================ */
-const svgMap = {
-  xwing: document.getElementById("svg-xwing"),
-  tie: document.getElementById("svg-tie"),
-  destroyer: document.getElementById("svg-destroyer"),
-  deathstar: document.getElementById("svg-deathstar")
-};
-const spriteBitmaps = {};
-async function createSpriteBitmaps(){
-  // convert each symbol to an SVG string and create ImageBitmap
-  for(const key in svgMap){
-    const sym = svgMap[key];
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${sym.getAttribute('viewBox')}">${sym.innerHTML}</svg>`;
-    const blob = new Blob([svg], {type:'image/svg+xml'});
-    try{
-      const img = await createImageBitmap(blob);
-      spriteBitmaps[key] = img;
-    }catch(e){
-      // fallback: draw later using path primitives
-      spriteBitmaps[key] = null;
-    }
-  }
+/* =========================
+   Visual assets (procedural 3D-like ships)
+   ========================= */
+/* We'll draw stylized 3D-ish ships using canvas primitives and gradients.
+   Each ship type has a draw function that accepts (ctx, x, y, scale, rotation, tint).
+*/
+
+function drawXWing(ctx,x,y,s,rot,tint){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(rot);
+  ctx.scale(s,s);
+  // body shadow
+  ctx.fillStyle = "rgba(0,0,0,0.6)";
+  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(22,8); ctx.lineTo(10,20); ctx.lineTo(-10,20); ctx.lineTo(-22,8); ctx.closePath(); ctx.fill();
+  // main body gradient
+  const g = ctx.createLinearGradient(-22,-18,22,22); g.addColorStop(0,tint); g.addColorStop(1,"#ffffff");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(22,8); ctx.lineTo(10,20); ctx.lineTo(-10,20); ctx.lineTo(-22,8); ctx.closePath(); ctx.fill();
+  // cockpit
+  ctx.fillStyle = "#111"; ctx.fillRect(-6,-8,12,10);
+  // engine glows
+  ctx.fillStyle = "rgba(0,200,255,0.9)"; ctx.beginPath(); ctx.ellipse(-14,18,4,8,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(14,18,4,8,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
 }
 
-/* ============================================================
-   Cosmetic definitions
-   ============================================================ */
-const shipSkins = [
-  {id:"xwing", name:"X‑Wing", cost:0, color:"#4af"},
-  {id:"falcon", name:"Falcon", cost:120, color:"#c04aff"},
-  {id:"viper", name:"Viper", cost:160, color:"#ffd24a"}
-];
-const laserDefs = [
-  {id:"neon-blue", name:"Neon Blue", cost:0, color:"#4af"},
-  {id:"plasma-magenta", name:"Plasma Magenta", cost:60, color:"#ff4fff"},
-  {id:"solar-gold", name:"Solar Gold", cost:80, color:"#ffd94a"}
-];
-const trailDefs = [
-  {id:"ion-blue", name:"Ion Blue", cost:0, color:"#4af"},
-  {id:"quantum-purple", name:"Quantum Purple", cost:60, color:"#c04aff"}
-];
-const hyperspaceDefs = [
-  {id:"warp-default", name:"Warp Tunnel", cost:0, star:"#8ff", streak:"#0ff"},
-  {id:"nebula-violet", name:"Nebula Violet", cost:80, star:"#f8f", streak:"#c0f"}
-];
+function drawTie(ctx,x,y,s,rot,tint){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
+  // central cockpit
+  ctx.fillStyle = "#111"; ctx.beginPath(); ctx.ellipse(0,0,10,12,0,0,Math.PI*2); ctx.fill();
+  // wings (3D-ish panels)
+  ctx.fillStyle = tint;
+  ctx.beginPath(); ctx.moveTo(-40,-28); ctx.lineTo(-12,-8); ctx.lineTo(-12,8); ctx.lineTo(-40,28); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(40,-28); ctx.lineTo(12,-8); ctx.lineTo(12,8); ctx.lineTo(40,28); ctx.closePath(); ctx.fill();
+  // wing rim
+  ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1; ctx.stroke();
+  ctx.restore();
+}
 
-/* ============================================================
-   Audio: layered WebAudio synths
-   ============================================================ */
+function drawDestroyer(ctx,x,y,s,rot,tint){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
+  // hull
+  const g = ctx.createLinearGradient(-60,-20,60,40); g.addColorStop(0,tint); g.addColorStop(1,"#222");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.moveTo(-60,30); ctx.lineTo(60,30); ctx.lineTo(40,-30); ctx.lineTo(-40,-30); ctx.closePath(); ctx.fill();
+  // bridge
+  ctx.fillStyle = "#111"; ctx.fillRect(-18,-28,36,18);
+  // engine glow
+  ctx.fillStyle = "rgba(255,120,80,0.12)"; ctx.beginPath(); ctx.ellipse(0,34,40,8,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawDeathStar(ctx,x,y,s,rot){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.scale(s,s);
+  // sphere base
+  const g = ctx.createRadialGradient(-20,-10,10,0,0,120); g.addColorStop(0,"#666"); g.addColorStop(1,"#111");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0,0,120,0,Math.PI*2); ctx.fill();
+  // trench (animated band)
+  ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.beginPath(); ctx.ellipse(20,0,80,28,0,0,Math.PI*2); ctx.fill();
+  // superlaser dish
+  ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(48,-12,22,0,Math.PI*2); ctx.fill();
+  // subtle highlights
+  ctx.strokeStyle = "rgba(255,255,255,0.03)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(0,0,110,0,Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+
+/* =========================
+   Audio (WebAudio)
+   ========================= */
 let audioCtx = null;
 function ensureAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); }
 function playOsc(freq,type,dur,vol, pan=0){
   try{
     ensureAudio();
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    const p = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type = type; o.frequency.value = freq;
     g.gain.value = vol;
-    o.connect(g); if(p){ g.connect(p); p.connect(audioCtx.destination); p.pan.value = pan; } else g.connect(audioCtx.destination);
+    o.connect(g); g.connect(audioCtx.destination);
     o.start(); o.stop(audioCtx.currentTime + dur);
   }catch(e){}
 }
-function laserSound(pan=0){ playOsc(1400,"sawtooth",0.06,0.06, pan); }
+function beep(){ playOsc(880,"sine",0.08,0.12) }
+function laserSound(pan=0){ playOsc(1400,"sawtooth",0.06,0.06, pan) }
 function tieExplode(pan=0){ playOsc(180,"triangle",0.28,0.14, pan); setTimeout(()=>playOsc(320,"sine",0.18,0.08, pan),80); }
 function destroyerExplode(){ playOsc(90,"triangle",0.36,0.22); setTimeout(()=>playOsc(220,"sine",0.22,0.12),120); }
-function bossHitSound(){ playOsc(320,"square",0.12,0.16); }
+function bossHitSound(){ playOsc(320,"square",0.12,0.16) }
 function bossExplodeSequence(){
   playOsc(60,"triangle",0.6,0.28);
   setTimeout(()=>playOsc(90,"triangle",0.5,0.22),120);
@@ -311,10 +294,10 @@ function bossExplodeSequence(){
 }
 function rewardChime(){ playOsc(900,"sine",0.12,0.12); setTimeout(()=>playOsc(1200,"sine",0.12,0.12),120); }
 
-/* ============================================================
+/* =========================
    Canvas & engine setup
-   ============================================================ */
-let DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1)); // clamp DPR for performance
+   ========================= */
+let DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
 function resizeCanvas(){
   DPR = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
   canvas.width = Math.floor(window.innerWidth * DPR);
@@ -326,22 +309,21 @@ function resizeCanvas(){
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-/* ============================================================
-   Game runtime variables (delta-time driven)
-   ============================================================ */
+/* =========================
+   Runtime variables
+   ========================= */
 let lastTime = performance.now();
 let rafId = null;
 let running = false;
 let paused = false;
 let countdown = 5;
 let countdownActive = false;
-let missionTime = 120; // seconds
+let missionTime = 120;
 let spawnTimer = 0;
 let spawnInterval = 1.0;
 let enemies = [];
 let lasers = [];
 let sparks = [];
-let particles = [];
 let boss = null;
 let bossActive = false;
 let bossDisplayHp = 1;
@@ -349,23 +331,42 @@ let rewardForMission = 0;
 let hyperspaceTick = -1;
 
 /* Pools */
-const MAX_SPARKS = 300;
+const MAX_SPARKS = 400;
 for(let i=0;i<MAX_SPARKS;i++) sparks.push({alive:false,x:0,y:0,vx:0,vy:0,life:0,color:"#fff"});
 
-/* Ship movement state */
+/* Ship movement */
 let ship = { x: window.innerWidth/2, y: window.innerHeight*0.78, targetX: window.innerWidth/2, speed: 160, nextMoveAt:0 };
 
-/* ============================================================
-   Utility helpers
-   ============================================================ */
+/* =========================
+   Helpers
+   ========================= */
 function rand(min,max){ return min + Math.random()*(max-min) }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)) }
 function nowISO(){ return new Date().toISOString().slice(0,10) }
 function showScreen(name){ Object.values(screens).forEach(s=>s.classList.remove("active")); screens[name].classList.add("active"); }
 
-/* ============================================================
-   Shop UI
-   ============================================================ */
+/* =========================
+   Shop UI (simple cosmetic store)
+   ========================= */
+const shipSkins = [
+  {id:"xwing",name:"X‑Wing",cost:0,color:"#4af"},
+  {id:"viper",name:"Viper",cost:120,color:"#c04aff"},
+  {id:"reaper",name:"Reaper",cost:180,color:"#ffd24a"}
+];
+const laserDefs = [
+  {id:"neon-blue",name:"Neon Blue",cost:0,color:"#4af"},
+  {id:"plasma-magenta",name:"Plasma Magenta",cost:60,color:"#ff4fff"},
+  {id:"solar-gold",name:"Solar Gold",cost:80,color:"#ffd94a"}
+];
+const trailDefs = [
+  {id:"ion-blue",name:"Ion Blue",cost:0,color:"#4af"},
+  {id:"quantum-purple",name:"Quantum Purple",cost:60,color:"#c04aff"}
+];
+const hyperspaceDefs = [
+  {id:"warp-default",name:"Warp Tunnel",cost:0,star:"#8ff",streak:"#0ff"},
+  {id:"nebula-violet",name:"Nebula Violet",cost:80,star:"#f8f",streak:"#c0f"}
+];
+
 function refreshTitleUI(){
   playerName.value = state.name;
   statCrystals.textContent = state.crystals;
@@ -378,21 +379,16 @@ function refreshTitleUI(){
 function refreshShop(){
   shopCrystals.textContent = state.crystals;
   shopList.innerHTML = "";
-  const all = [
-    ...shipSkins.map(x=>({type:"ship",...x})),
-    ...laserDefs.map(x=>({type:"laser",...x})),
-    ...trailDefs.map(x=>({type:"trail",...x})),
-    ...hyperspaceDefs.map(x=>({type:"hyperspace",...x}))
-  ];
+  const all = [...shipSkins.map(x=>({type:"ship",...x})), ...laserDefs.map(x=>({type:"laser",...x})), ...trailDefs.map(x=>({type:"trail",...x})), ...hyperspaceDefs.map(x=>({type:"hyperspace",...x}))];
   all.forEach(item=>{
     const row = document.createElement("div"); row.className="shop-item";
     const preview = document.createElement("div"); preview.className="preview";
     if(item.type==="ship"){
-      const img = document.createElementNS("http://www.w3.org/2000/svg","svg");
-      img.setAttribute("viewBox", document.getElementById("svg-xwing").getAttribute("viewBox"));
-      img.innerHTML = document.getElementById("svg-xwing").innerHTML;
-      img.style.width = "56px"; img.style.height = "36px"; img.style.filter = "drop-shadow(0 6px 8px rgba(0,0,0,0.6))";
-      preview.appendChild(img);
+      const mini = document.createElement("canvas"); mini.width=140; mini.height=80; mini.style.width="72px"; mini.style.height="40px";
+      const mctx = mini.getContext("2d");
+      mctx.clearRect(0,0,140,80);
+      drawXWing(mctx,70,40,1.0,0,item.color);
+      preview.appendChild(mini);
     } else if(item.type==="laser"){
       const bar = document.createElement("div"); bar.style.width="6px"; bar.style.height="28px"; bar.style.background=item.color; bar.style.borderRadius="3px";
       preview.appendChild(bar);
@@ -415,50 +411,52 @@ function refreshShop(){
   });
 }
 
-/* ============================================================
-   Spawn & gameplay
-   ============================================================ */
-function spawnEnemy(phase){
-  // types: tie (small), tie-heavy (medium), destroyer (large)
-  const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie-heavy":"tie") : "destroyer";
-  const w = type==="tie"?36: type==="tie-heavy"?48: 110;
-  const h = type==="tie"?26: type==="tie-heavy"?36: 60;
-  const hp = type==="tie"?1: type==="tie-heavy"?2: 6;
-  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 160);
-  const x = rand(40, window.innerWidth - 40);
-  enemies.push({x,y:-80,vx:0,vy:speed,w,h,hp,hitTimer:0,type});
-}
-
-function spawnBoss(){
-  bossActive = true;
-  boss = {x:window.innerWidth/2, y:-320, vx:0, vy:0, r:200, hp:1.0, displayHp:1.0, flash:0};
-  bossBar.style.display = "block";
-  bossFill.style.width = "100%";
-}
-
-/* Sparks pool */
+/* =========================
+   Particle & spark helpers
+   ========================= */
 function spawnSparks(x,y,color,count=12){
   for(let i=0;i<sparks.length && count>0;i++){
     const s = sparks[i];
     if(!s.alive){
-      s.alive=true; s.x=x; s.y=y; s.vx=rand(-260,260); s.vy=rand(-360,-60); s.life=rand(0.28,1.0); s.color=color;
+      s.alive=true; s.x=x; s.y=y; s.vx=rand(-320,320); s.vy=rand(-420,-60); s.life=rand(0.28,1.2); s.color=color;
       count--;
     }
   }
 }
 
-/* Fire lasers (auto) */
+/* =========================
+   Gameplay: spawn, fire, boss
+   ========================= */
+function spawnEnemy(phase){
+  const type = phase===1? "tie" : phase===2? (Math.random()>0.6?"tie-heavy":"tie") : "destroyer";
+  const w = type==="tie"?36: type==="tie-heavy"?48: 110;
+  const h = type==="tie"?26: type==="tie-heavy"?36: 60;
+  const hp = type==="tie"?1: type==="tie-heavy"?2: 6;
+  const speed = type==="destroyer"? 40 : (type==="tie-heavy"? 90 : 180);
+  const x = rand(40, window.innerWidth - 40);
+  enemies.push({x,y:-80,vx:0,vy:speed,w,h,hp,hitTimer:0,type,rot:rand(-0.2,0.2),scale: rand(0.6,1.0)});
+}
+
+function spawnBoss(){
+  bossActive = true;
+  boss = {x:window.innerWidth/2, y:-360, vx:0, vy:0, r:220, hp:1.0, displayHp:1.0, flash:0};
+  bossBar.style.display = "block";
+  bossFill.style.width = "100%";
+}
+
 let laserTimer = 0;
 function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
-  const laserColor = (laserDefs.find(l=>l.id===state.selected.laser)||laserDefs[0]).color;
-  lasers.push({x:shipX-14,y:shipY-20,vx:0,vy:-720,color:laserColor});
-  lasers.push({x:shipX+14,y:shipY-20,vx:0,vy:-720,color:laserColor});
+  const laserColor = "#4af";
+  lasers.push({x:shipX-16,y:shipY-22,vx:0,vy:-820,color:laserColor});
+  lasers.push({x:shipX+16,y:shipY-22,vx:0,vy:-820,color:laserColor});
   laserSound((Math.random()*2-1)*0.4);
 }
 
-/* Hyperspace effect */
+/* =========================
+   Hyperspace & phase banner
+   ========================= */
 function triggerHyperspace(){
   const overlay = document.createElement("div");
   overlay.style.position = "fixed"; overlay.style.inset = "0"; overlay.style.background = "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.12), rgba(255,255,255,0.02))";
@@ -466,15 +464,19 @@ function triggerHyperspace(){
   setTimeout(()=>{ overlay.style.transition = "opacity 600ms ease"; overlay.style.opacity = "0"; setTimeout(()=>overlay.remove(),700); }, 80);
   playOsc(600,"sawtooth",0.18,0.08);
 }
+function showPhaseBanner(phase){
+  phaseBanner.textContent = "PHASE " + phase;
+  phaseBanner.style.display = "block"; phaseBanner.style.opacity = "1"; phaseBanner.style.transform = "translateX(-50%) translateY(-6px)";
+  setTimeout(()=>{ phaseBanner.style.transition = "opacity 600ms ease, transform 600ms ease"; phaseBanner.style.opacity = "0"; phaseBanner.style.transform = "translateX(-50%) translateY(-26px)"; setTimeout(()=>phaseBanner.style.display="none",620); }, 900);
+}
 
-/* ============================================================
+/* =========================
    Update (delta-time)
-   ============================================================ */
+   ========================= */
 function update(dt){
   dt = Math.min(dt, 0.12);
   if(!running) return;
 
-  // mission timer
   if(!paused){
     missionTime -= dt;
     missionTime = Math.max(0, missionTime);
@@ -483,32 +485,30 @@ function update(dt){
     progressFill.style.width = (progress*100).toFixed(2) + "%";
   }
 
-  // ship auto movement
+  // ship movement
   ship.nextMoveAt -= dt;
   if(ship.nextMoveAt <= 0){
     ship.targetX = rand(60, window.innerWidth - 60);
-    ship.nextMoveAt = rand(0.8, 1.8);
-    ship.speed = rand(140, 300);
+    ship.nextMoveAt = rand(0.7, 1.6);
+    ship.speed = rand(160, 320);
   }
-  ship.x += (ship.targetX - ship.x) * clamp(5*dt, 0, 1);
+  ship.x += (ship.targetX - ship.x) * clamp(6*dt, 0, 1);
 
   // phases
   const elapsed = 120 - missionTime;
   const phase = (elapsed < 30) ? 1 : (elapsed < 60) ? 2 : (elapsed < 90) ? 3 : 4;
-  phaseBadge.textContent = phase===1? "PHASE 1 • TIE FIGHTERS" : phase===2? "PHASE 2 • TIE SQUADRONS" : phase===3? "PHASE 3 • STAR DESTROYERS" : "FINAL PHASE • DEATH STAR";
+  phaseBadge.textContent = "PHASE " + phase;
 
   // hyperspace tick
   const tick = Math.floor(elapsed/30);
   if(tick > hyperspaceTick){
     hyperspaceTick = tick;
     triggerHyperspace();
-    // spawn burst
     for(let i=0;i<3;i++) spawnEnemy(phase);
-    // show banner
     showPhaseBanner(phase);
   }
 
-  // spawn enemies
+  // spawn enemies (not during boss)
   if(!bossActive && !paused){
     spawnTimer += dt;
     spawnInterval = phase===1?0.9:phase===2?0.7:phase===3?0.55:0.45;
@@ -606,8 +606,8 @@ function update(dt){
       bossFill.style.width = (boss.displayHp*100).toFixed(1) + "%";
       if(boss.displayHp <= 0.02){
         bossExplodeSequence();
-        spawnSparks(boss.x, boss.y, "#c0a0ff", 120);
-        state.crystals += 160;
+        spawnSparks(boss.x, boss.y, "#c0a0ff", 160);
+        state.crystals += 200;
         hudCrystals.textContent = state.crystals;
         bossActive = false; boss = null; bossBar.style.display = "none";
         setTimeout(()=>{ finishMission(); }, 900);
@@ -620,9 +620,9 @@ function update(dt){
   if(missionTime <= 0 && running){
     if(bossActive && boss){
       bossExplodeSequence();
-      spawnSparks(boss.x, boss.y, "#c0a0ff", 120);
+      spawnSparks(boss.x, boss.y, "#c0a0ff", 160);
       bossActive = false; boss = null; bossBar.style.display = "none";
-      state.crystals += 80; hudCrystals.textContent = state.crystals;
+      state.crystals += 120; hudCrystals.textContent = state.crystals;
       setTimeout(()=>{ finishMission(); }, 900);
     } else {
       finishMission();
@@ -630,45 +630,61 @@ function update(dt){
   }
 }
 
-/* ============================================================
-   Render (draw everything to canvas)
-   ============================================================ */
+/* =========================
+   Render (canvas)
+   ========================= */
 function render(){
   ctx.clearRect(0,0,canvas.width/DPR,canvas.height/DPR);
   const W = canvas.width/DPR, H = canvas.height/DPR;
 
-  // background nebula gradient
+  // moving background: layered parallax nebula + galaxies + planets
+  // base gradient
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0,"#001026"); g.addColorStop(1,"#000814");
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
 
-  // starfield (parallax)
-  for(let i=0;i<140;i++){
-    const x = (i*47 + (performance.now()/8)) % W;
-    ctx.fillStyle = "rgba(255,255,255,0.04)";
-    ctx.fillRect(x, (i*29)%H, 1, 1);
+  // distant galaxies (animated)
+  for(let i=0;i<6;i++){
+    const gx = (i*173 + (performance.now()/30)) % (W+400) - 200;
+    const gy = (i*97 + (performance.now()/50)) % H;
+    const rad = 60 + (i%3)*30;
+    const gg = ctx.createRadialGradient(gx,gy,0,gx,gy,rad);
+    gg.addColorStop(0, "rgba(120,80,200,0.08)");
+    gg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = gg; ctx.beginPath(); ctx.ellipse(gx,gy,rad,rad*0.6,0,0,Math.PI*2); ctx.fill();
   }
 
-  // draw enemies
+  // planets (foreground)
+  const p1x = (performance.now()/40) % (W+300) - 150;
+  ctx.save(); ctx.globalAlpha = 0.9;
+  ctx.beginPath(); ctx.ellipse(p1x, H*0.22, 80, 80, 0,0,Math.PI*2);
+  const pg = ctx.createLinearGradient(p1x-80,H*0.22,p1x+80,H*0.22); pg.addColorStop(0,"#2a1b4a"); pg.addColorStop(1,"#0b2a3a");
+  ctx.fillStyle = pg; ctx.fill(); ctx.restore();
+
+  // star streaks (zooming forward)
+  const t = performance.now()/8;
+  for(let i=0;i<160;i++){
+    const sx = ((i*97 + t* (0.6 + (i%5)*0.02)) % (W*2)) - W*0.5;
+    const sy = (i*53 + (t*0.2)) % H;
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
+    ctx.fillRect(sx, sy, 1 + (i%3), 1 + (i%2));
+  }
+
+  // draw enemies (3D-like)
   enemies.forEach(e=>{
-    ctx.save();
-    ctx.translate(e.x, e.y);
-    if(e.hitTimer>0){ ctx.globalAlpha = 0.95; ctx.fillStyle = "#fff"; }
-    else ctx.fillStyle = e.type==="destroyer"? "#bba" : "#88b";
-    if(e.type==="destroyer"){
-      ctx.beginPath(); ctx.moveTo(-e.w/2, e.h/2); ctx.lineTo(e.w/2, e.h/2); ctx.lineTo(e.w/4, -e.h/2); ctx.lineTo(-e.w/4, -e.h/2); ctx.closePath(); ctx.fill();
+    if(e.type==="tie" || e.type==="tie-heavy"){
+      drawTie(ctx, e.x, e.y, e.scale, e.rot, "#8aa");
     } else {
-      ctx.beginPath(); ctx.moveTo(0,-e.h/2); ctx.lineTo(-e.w/2,e.h/2); ctx.lineTo(e.w/2,e.h/2); ctx.closePath(); ctx.fill();
+      drawDestroyer(ctx, e.x, e.y, e.scale || 0.9, e.rot, "#bba");
     }
-    ctx.restore();
   });
 
-  // lasers
+  // draw lasers
   lasers.forEach(l=>{
     ctx.save();
     ctx.fillStyle = l.color;
-    ctx.shadowColor = l.color; ctx.shadowBlur = 12;
-    ctx.fillRect(l.x-2, l.y, 4, 28);
+    ctx.shadowColor = l.color; ctx.shadowBlur = 14;
+    ctx.fillRect(l.x-2, l.y, 4, 30);
     ctx.shadowBlur = 0;
     ctx.restore();
   });
@@ -684,40 +700,25 @@ function render(){
     ctx.restore();
   }
 
-  // ship (X-wing silhouette with glow)
-  const shipX = ship.x, shipY = ship.y;
-  const shipColor = (shipSkins.find(s=>s.id===state.selected.ship)||shipSkins[0]).color;
-  ctx.save();
-  ctx.translate(shipX, shipY);
-  ctx.fillStyle = shipColor; ctx.shadowColor = shipColor; ctx.shadowBlur = 22;
-  ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(26,10); ctx.lineTo(10,22); ctx.lineTo(-10,22); ctx.lineTo(-26,10); ctx.closePath(); ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = "#fff"; ctx.fillRect(-6,-8,12,14);
-  ctx.restore();
+  // player ship (3D X-wing style)
+  drawXWing(ctx, ship.x, ship.y, 1.0, Math.sin(performance.now()/700)*0.02, "#4af");
 
   // engine trail
   ctx.save();
   ctx.globalAlpha = 0.6;
-  ctx.fillStyle = (trailDefs.find(t=>t.id===state.selected.trail)||trailDefs[0]).color;
-  ctx.beginPath(); ctx.ellipse(shipX, shipY+28, 14, 30, 0,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.restore();
+  ctx.fillStyle = "#00dfff";
+  ctx.beginPath(); ctx.ellipse(ship.x, ship.y+30, 16, 34, 0,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.restore();
 
-  // boss (Death Star)
+  // boss (Death Star) if active
   if(bossActive && boss){
-    ctx.save();
-    ctx.translate(boss.x, boss.y);
-    if(boss.flash>0){ ctx.globalAlpha = 0.9; ctx.fillStyle = "#fff"; } else ctx.fillStyle = "#222";
-    ctx.beginPath(); ctx.arc(0,0,boss.r,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = "#111"; ctx.beginPath(); ctx.ellipse(-boss.r*0.2, -boss.r*0.1, boss.r*0.6, boss.r*0.6, 0,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(boss.r*0.28, -boss.r*0.08, boss.r*0.18, 0, Math.PI*2); ctx.fill();
-    ctx.restore();
+    drawDeathStar(ctx, boss.x, boss.y, 1.0, 0);
   }
 }
 
-/* ============================================================
+/* =========================
    RAF loop
-   ============================================================ */
+   ========================= */
 function loop(ts){
   const dt = (ts - lastTime)/1000;
   lastTime = ts;
@@ -726,9 +727,9 @@ function loop(ts){
   rafId = requestAnimationFrame(loop);
 }
 
-/* ============================================================
+/* =========================
    Mission flow & rewards
-   ============================================================ */
+   ========================= */
 function startCountdown(){
   ensureAudio();
   countdown = 5; countdownActive = true;
@@ -776,43 +777,34 @@ function finishMission(){
   showScreen("reward");
 }
 
-/* ============================================================
+/* =========================
    Reward open visuals
-   ============================================================ */
+   ========================= */
 let rewardOpened = false;
 function openReward(){
   if(rewardOpened) return;
   rewardOpened = true;
   rewardChime();
-  for(let i=0;i<28;i++){
+  for(let i=0;i<36;i++){
     const s = document.createElement("div"); s.className="spark";
     const rect = rewardBox.getBoundingClientRect();
     s.style.left = (rect.left + rect.width/2) + "px";
     s.style.top = (rect.top + rect.height/2) + "px";
     document.body.appendChild(s);
-    const tx = rand(-220,220), ty = rand(-260,-40);
-    s.animate([{transform:`translate(0px,0px) scale(0.6)`,opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.2)`,opacity:0}],{duration:900+Math.random()*400,easing:"cubic-bezier(.2,.8,.2,1)"});
-    setTimeout(()=>s.remove(),1600);
+    const tx = rand(-260,260), ty = rand(-320,-40);
+    s.animate([{transform:`translate(0px,0px) scale(0.6)`,opacity:1},{transform:`translate(${tx}px,${ty}px) scale(1.2)`,opacity:0}],{duration:900+Math.random()*600,easing:"cubic-bezier(.2,.8,.2,1)"});
+    setTimeout(()=>s.remove(),1800);
   }
 }
 
-/* ============================================================
-   Phase banner helper
-   ============================================================ */
-function showPhaseBanner(phase){
-  phaseBanner.textContent = phase===1? "PHASE 1 • TIE FIGHTERS" : phase===2? "PHASE 2 • TIE SQUADRONS" : phase===3? "PHASE 3 • STAR DESTROYERS" : "FINAL PHASE • DEATH STAR";
-  phaseBanner.style.display = "block"; phaseBanner.style.opacity = "1"; phaseBanner.style.transform = "translateX(-50%) translateY(-6px)";
-  setTimeout(()=>{ phaseBanner.style.transition = "opacity 600ms ease, transform 600ms ease"; phaseBanner.style.opacity = "0"; phaseBanner.style.transform = "translateX(-50%) translateY(-26px)"; setTimeout(()=>phaseBanner.style.display="none",620); }, 900);
-}
-
-/* ============================================================
+/* =========================
    Format time
-   ============================================================ */
+   ========================= */
 function formatTime(sec){ const m=Math.floor(sec/60).toString().padStart(2,"0"); const s=Math.floor(sec%60).toString().padStart(2,"0"); return `${m}:${s}`; }
 
-/* ============================================================
+/* =========================
    Input bindings (pointer-safe)
-   ============================================================ */
+   ========================= */
 function bindTap(el, fn){
   let last=0;
   el.addEventListener("pointerdown", e=>{ const t=performance.now(); if(t-last<250) return; last=t; e.preventDefault(); fn(e); }, {passive:false});
@@ -828,14 +820,11 @@ bindTap(rewardBack, ()=>{ rewardOpened=false; showScreen("title"); refreshTitleU
 
 playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim() || state.name; saveState(); });
 
-/* ============================================================
-   Boot & initialization
-   ============================================================ */
-async function init(){
-  // create sprite bitmaps
-  await createSpriteBitmaps().catch(()=>{});
-  refreshTitleUI();
-  refreshShop();
+/* =========================
+   Boot
+   ========================= */
+function init(){
+  refreshTitleUI(); refreshShop();
   hudName.textContent = state.name;
   hudCrystals.textContent = state.crystals;
   lastTime = performance.now();
@@ -846,46 +835,10 @@ async function init(){
 }
 init();
 
-/* ============================================================
+/* =========================
    Safe unload
-   ============================================================ */
+   ========================= */
 window.addEventListener("beforeunload", ()=>{ saveState(); });
-
-/* ============================================================
-   Helper: create ImageBitmaps from inline SVGs
-   ============================================================ */
-async function createSpriteBitmaps(){
-  const symbols = document.querySelectorAll("#svgs symbol");
-  for(const sym of symbols){
-    const view = sym.getAttribute("viewBox") || "0 0 64 64";
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${view}">${sym.innerHTML}</svg>`;
-    const blob = new Blob([svg], {type:'image/svg+xml'});
-    try{
-      const bmp = await createImageBitmap(blob);
-      spriteBitmaps[sym.id.replace("svg-","")] = bmp;
-    }catch(e){
-      spriteBitmaps[sym.id.replace("svg-","")] = null;
-    }
-  }
-}
-
-/* ============================================================
-   Small audio helper used in hyperspace
-   ============================================================ */
-function playOsc(freq,type,dur,vol, pan=0){
-  try{
-    ensureAudio();
-    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.value = vol;
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start(); o.stop(audioCtx.currentTime + dur);
-  }catch(e){}
-}
-
-/* ============================================================
-   End of script
-   ============================================================ */
 </script>
 </body>
 </html>
