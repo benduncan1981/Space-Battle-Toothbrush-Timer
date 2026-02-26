@@ -41,7 +41,8 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 .boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#FF4A4A,#FFEA4A);transition:width 120ms linear}
 .controls{position:absolute;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:60}
 .control-btn{pointer-events:auto;background:linear-gradient(135deg,#fff,#cfc);border-radius:999px;padding:8px 10px;font-weight:900;border:0;box-shadow:0 8px 18px rgba(0,0,0,0.5)}
-.admin-link{position:absolute;left:10px;bottom:10px;z-index:80;pointer-events:auto}
+/* adminQuick moved to top-right to avoid overlap with pause/reset controls */
+.admin-link{position:absolute;right:10px;top:10px;z-index:80;pointer-events:auto}
 .shop-list{max-height:calc(100vh - 220px);overflow:auto;padding-right:6px;-webkit-overflow-scrolling:touch}
 .shop-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02);margin:8px 0}
 .preview{width:72px;height:44px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.12));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
@@ -104,7 +105,6 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
 
     <div style="display:flex;gap:8px;margin-top:12px">
       <button id="shopBack" class="btn alt" style="flex:1">BACK</button>
-      <button id="shopReset" class="btn" style="flex:1;background:linear-gradient(135deg,#ff7a7a,#ffb86b)">RESET DATA</button>
     </div>
   </div>
 </div>
@@ -187,6 +187,9 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
       <div style="height:8px"></div>
       <button id="applyAdmin" class="btn">APPLY CHANGES</button>
       <div style="height:12px"></div>
+      <!-- RESET DATA moved here per request -->
+      <button id="adminReset" class="btn" style="background:linear-gradient(135deg,#ff7a7a,#ffb86b);margin-top:8px">RESET DATA</button>
+      <div style="height:12px"></div>
       <button id="adminBack" class="btn alt">CLOSE DASHBOARD</button>
     </div>
   </div>
@@ -253,7 +256,6 @@ const shopBtn = document.getElementById("shopBtn");
 const shopList = document.getElementById("shop-list");
 const shopCrystals = document.getElementById("shopCrystals");
 const shopBack = document.getElementById("shopBack");
-const shopReset = document.getElementById("shopReset");
 
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d", { alpha: true });
@@ -282,6 +284,7 @@ const adminCrystals = document.getElementById("adminCrystals");
 const adminStreak = document.getElementById("adminStreak");
 const applyAdmin = document.getElementById("applyAdmin");
 const adminBack = document.getElementById("adminBack");
+const adminReset = document.getElementById("adminReset");
 
 const debugEl = document.getElementById("debug");
 
@@ -320,7 +323,7 @@ let rafId = null;
 let running = false;
 let paused = false;
 let countdown = 5;
-let countdownInterval = null; // global so abort can clear
+let countdownInterval = null;
 let missionTime = CONFIG.TOTAL_TIME;
 let spawnTimer = 0;
 let spawnInterval = CONFIG.SPAWN_RATES.phase1;
@@ -983,7 +986,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   });
   bindClick(shopBtn, ()=>{ renderShop(); showScreen("shop"); });
   bindClick(shopBack, ()=>{ showScreen("title"); refreshTitleUI(); });
-  bindClick(shopReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(CONFIG.STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); }});
   bindClick(pauseBtn, ()=>{ paused = !paused; pauseBtn.textContent = paused ? "RESUME" : "PAUSE"; });
   bindClick(resetBtn, ()=>{ // abort handler clears countdown and stops mission
     if(confirm("ABORT MISSION AND RETURN TO BRIEFING?")){
@@ -1004,6 +1006,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   bindClick(savePinBtn, ()=>{ const p = adminPinInput.value.trim(); if(!/^\d{4,8}$/.test(p)){ alert("PIN MUST BE 4-8 DIGITS"); return; } localStorage.setItem(CONFIG.ADMIN_KEY, p); alert("PIN SAVED"); adminPinInput.value=""; });
   bindClick(applyAdmin, ()=>{ const c = parseInt(adminCrystals.value||"0"); const s = parseInt(adminStreak.value||"0"); if(!isNaN(c)){ state.crystals = c; } if(!isNaN(s)){ state.streak = s; } saveState(); refreshTitleUI(); alert("ADMIN CHANGES APPLIED"); });
   bindClick(adminBack, ()=>{ showScreen("title"); refreshTitleUI(); });
+
+  // RESET DATA moved to adminReset
+  bindClick(adminReset, ()=>{ if(confirm("RESET ALL SAVED DATA?")){ localStorage.removeItem(CONFIG.STORAGE_KEY); state = structuredClone(defaultState); saveState(); refreshTitleUI(); renderShop(); alert("DATA RESET"); showScreen("title"); } });
 
   playerName.addEventListener("change", ()=>{ state.name = playerName.value.trim().toUpperCase() || state.name; saveState(); refreshTitleUI(); });
 
