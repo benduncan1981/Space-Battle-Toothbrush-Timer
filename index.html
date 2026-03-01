@@ -240,7 +240,7 @@ const defaultState = {
   streak: 0,
   lastPlayDate: null,
   missions: 0,
-  completedToday: false,
+  playsToday: 0,
   owned: { ship: ["xwing"], laser: ["neon-blue"], trail: ["ion-blue"], hyperspace: ["warp-default"] },
   selected: { ship: "xwing", laser: "neon-blue", trail: "ion-blue", hyperspace: "warp-default" }
 };
@@ -783,6 +783,11 @@ function update(dt){
   }
 }
 
+function getSelectedCosmetic(type){
+  const id = state.selected[type];
+  return cosmetics.find(c => c.type === type && c.id === id);
+}
+
 /* Render */
 function render(){
   canvas.style.transform = `translate(${screenShake.x||0}px, ${screenShake.y||0}px)`;
@@ -886,11 +891,19 @@ function render(){
   ctx.beginPath(); ctx.ellipse(ship.x, ship.y, fieldRadius, fieldRadius*0.6, 0, 0, Math.PI*2); ctx.stroke();
   ctx.restore();
 
-  drawPlayerShip(ctx, ship.x, ship.y, 1.0, Math.sin(performance.now()/700)*0.02, "#4AF");
-
+const shipCos = getSelectedCosmetic("ship");
+drawPlayerShip(
+  ctx,
+  ship.x,
+  ship.y,
+  1.0,
+  Math.sin(performance.now()/700)*0.02,
+  shipCos?.color || "#4AF"
+);
   ctx.save();
   ctx.globalAlpha = 0.6;
-  ctx.fillStyle = "#00DFFF";
+  const trailCos = getSelectedCosmetic("trail");
+ctx.fillStyle = trailCos?.color || "#00DFFF";
   ctx.beginPath(); ctx.ellipse(ship.x, ship.y+34, 18, 36, 0,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha = 1; ctx.restore();
 
@@ -917,12 +930,20 @@ function loop(ts){
 /* Mission flow & one-play-per-day */
 function canPlayToday(){
   const today = nowISO();
-  if(state.completedToday && state.lastPlayDate === today) return false;
-  return true;
+  if(state.lastPlayDate !== today){
+    state.lastPlayDate = today;
+    state.playsToday = 0;
+    saveState();
+  }
+  return state.playsToday < 2;
 }
 function markCompletedToday(){
-  state.completedToday = true;
-  state.lastPlayDate = nowISO();
+  const today = nowISO();
+  if(state.lastPlayDate !== today){
+    state.lastPlayDate = today;
+    state.playsToday = 0;
+  }
+  state.playsToday++;
   saveState();
 }
 
@@ -1037,7 +1058,8 @@ function bindClick(el, fn){
 function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
-  const laserColor = "#4AF";
+  const laserCos = getSelectedCosmetic("laser");
+const laserColor = laserCos?.color || "#4AF";
   lasers.push({x:shipX-18,y:shipY-26,vx:0,vy:-920,color:laserColor});
   lasers.push({x:shipX+18,y:shipY-26,vx:0,vy:-920,color:laserColor});
   laserSound();
