@@ -72,7 +72,7 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
   <div class="card" role="region" aria-label="Mission briefing">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div style="flex:1;min-width:220px">
-        <div class="title">PLAQUE INVADERS — OPERATION: SAUCER FALL</div>
+        <div class="title">PLAQUE INVADERS</div>
         <div class="lead">BRIEFING: NAVIGATE THE COSMIC CORRIDOR, DISPATCH ESCALATING HOSTILES, AND NEUTRALISE THE CYBER SAUCER.</div>
       </div>
       <div style="text-align:right;min-width:140px">
@@ -81,9 +81,12 @@ html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-top),v
       </div>
     </div>
 
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+    <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;width:100%">
       <input id="playerName" class="input" placeholder="ENTER CALLSIGN" maxlength="16" aria-label="Pilot callsign" />
-      <button id="startBtn" class="btn" type="button" aria-label="Launch mission">LAUNCH MISSION</button>
+      <button id="startBtn" class="btn" type="button" aria-label="Launch mission"
+        style="width:100%;text-align:center;font-size:1.4rem;padding:18px 0;margin-top:10px">
+  LAUNCH MISSION
+</button>
     </div>
 
     <div class="statbar" style="margin-top:10px">
