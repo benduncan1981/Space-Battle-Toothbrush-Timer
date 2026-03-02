@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en-GB">
 <head>
@@ -323,6 +324,8 @@ const cosmetics = [
   {type:"ship", id:"reaper", name:"REAPER", cost:180, color:"#FFD24A"},
   {type:"laser", id:"neon-blue", name:"NEON BLUE", cost:0, color:"#4AF"},
   {type:"laser", id:"plasma-magenta", name:"PLASMA MAGENTA", cost:60, color:"#FF4FFF"},
+  {type:"laser", id:"gold-laser", name:"GOLD LASER", cost:100, color:"#FFEA4A"},
+  {type:"laser", id:"photon-torpedo", name:"PHOTON TORPEDO", cost:150, color:"#00FF66"},
   {type:"trail", id:"ion-blue", name:"ION BLUE", cost:0, color:"#4AF"},
   {type:"trail", id:"quantum-purple", name:"QUANTUM PURPLE", cost:60, color:"#C04AFF"},
   {type:"hyperspace", id:"warp-default", name:"WARP TUNNEL", cost:0, star:"#8FF", streak:"#0FF"},
@@ -927,15 +930,42 @@ applyHDGraphics(ctx, W, H);
     ctx.restore();
   });
 
-  lasers.forEach(l=>{
-    ctx.save();
-    ctx.fillStyle = l.color;
-    ctx.shadowColor = l.color; ctx.shadowBlur = 16;
-    ctx.fillRect(l.x-2, l.y, 4, 34); drawLaserHD(ctx, l.x, l.y, l.color);
+  lasers.forEach(l => {
+  ctx.save();
 
-    ctx.shadowBlur = 0;
+  // If it's a torpedo (big size), draw a chunky glowing oval
+  if (l.size && l.size > 6) {
+    ctx.fillStyle = l.color;
+    ctx.shadowColor = l.color;
+    ctx.shadowBlur = 20;
+
+    ctx.beginPath();
+    ctx.ellipse(
+      l.x,
+      l.y,
+      l.size,        // width
+      l.size * 2,    // height (longer shape)
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
+
     ctx.restore();
-  });
+    return;
+  }
+
+  // Otherwise it's a normal laser → draw your original beam
+  ctx.fillStyle = l.color;
+  ctx.shadowColor = l.color;
+  ctx.shadowBlur = 16;
+
+  ctx.fillRect(l.x - 2, l.y, 4, 34);
+  drawLaserHD(ctx, l.x, l.y, l.color);
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
+});
 
   for(let i=0;i<sparks.length;i++){
     const s = sparks[i];
@@ -1013,29 +1043,17 @@ function loop(ts){
   rafId = requestAnimationFrame(loop);
 }
 
-/* Mission flow & one-play-per-day */
+/* Mission flow — daily limit disabled */
 function canPlayToday(){
-  const today = nowISO();
-  if(state.lastPlayDate !== today){
-    state.lastPlayDate = today;
-    state.playsToday = 0;
-    saveState();
-  }
-  return state.playsToday < 2;
-}
-function markCompletedToday(){
-  const today = nowISO();
-  if(state.lastPlayDate !== today){
-    state.lastPlayDate = today;
-    state.playsToday = 0;
-  }
-  state.playsToday++;
-  saveState();
+  return true; // always allow play
 }
 
+function markCompletedToday(){
+  // no-op: daily limit removed
+}
 /* START COUNTDOWN and BEGIN MISSION (kept for compatibility but LAUNCH now uses GameFlowController.Start) */
 function startCountdown(){
-  if(!canPlayToday()){ alert("MISSION ALREADY COMPLETED TODAY. TRY AGAIN TOMORROW."); return; }
+  
 
   // switch UI immediately so menu disappears
   showScreen("mission");
@@ -1140,14 +1158,53 @@ function bindClick(el, fn){
   el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); fn(e); } });
 }
 
-/* Fire lasers */
+/* Fire lasers / photon torpedoes */
 function fireLasers(){
   const shipX = ship.x;
   const shipY = ship.y;
+  const equipped = state.selected.laser;
+
+  // --- PHOTON TORPEDO MODE ---
+  if (equipped === "photon-torpedo") {
+    lasers.push({
+      x: shipX,
+      y: shipY - 32,
+      vx: 0,
+      vy: -420,        // slower than lasers
+      color: "#00FF66",
+      power: 10,       // 10× damage
+      size: 12         // visually bigger
+    });
+
+    // Heavy torpedo sound
+    playOsc(300, "square", 0.18, 0.18);
+    return;
+  }
+
+  // --- NORMAL LASERS (including gold) ---
   const laserCos = getSelectedCosmetic("laser");
-const laserColor = laserCos?.color || "#4AF";
-  lasers.push({x:shipX-18,y:shipY-26,vx:0,vy:-920,color:laserColor});
-  lasers.push({x:shipX+18,y:shipY-26,vx:0,vy:-920,color:laserColor});
+  const laserColor = laserCos?.color || "#4AF";
+
+  lasers.push({
+    x: shipX - 18,
+    y: shipY - 26,
+    vx: 0,
+    vy: -920,
+    color: laserColor,
+    power: 1,
+    size: 4
+  });
+
+  lasers.push({
+    x: shipX + 18,
+    y: shipY - 26,
+    vx: 0,
+    vy: -920,
+    color: laserColor,
+    power: 1,
+    size: 4
+  });
+
   laserSound();
 }
 
@@ -1620,6 +1677,7 @@ window.setCinematicSlow = window.setCinematicSlow || function(v){
    4. At ≤30s the boss intro runs and boss becomes active; hitting boss triggers hit react and visual stages.
    5. Toggle debug overlay with D; run ForceHyperspace(), SpawnBoss(), SetTimer(45) in console to verify hooks.
    ========================= */
+
 
 </script>
 </body>
